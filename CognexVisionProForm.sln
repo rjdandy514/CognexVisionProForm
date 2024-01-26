@@ -5,6 +5,8 @@ VisualStudioVersion = 17.7.34031.279
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CognexVisionProForm", "CognexVisionProForm\CognexVisionProForm.csproj", "{BE308112-82EA-44A7-A3D4-C2BD957ADF81}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibplctagWrapper", "LibplctagWrapper\LibplctagWrapper.csproj", "{394ABFC2-E570-462E-9994-37B33C348702}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,14 @@ Global
 		{BE308112-82EA-44A7-A3D4-C2BD957ADF81}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BE308112-82EA-44A7-A3D4-C2BD957ADF81}.Release|x64.ActiveCfg = Release|x64
 		{BE308112-82EA-44A7-A3D4-C2BD957ADF81}.Release|x64.Build.0 = Release|x64
+		{394ABFC2-E570-462E-9994-37B33C348702}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{394ABFC2-E570-462E-9994-37B33C348702}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{394ABFC2-E570-462E-9994-37B33C348702}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{394ABFC2-E570-462E-9994-37B33C348702}.Debug|x64.Build.0 = Debug|Any CPU
+		{394ABFC2-E570-462E-9994-37B33C348702}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{394ABFC2-E570-462E-9994-37B33C348702}.Release|Any CPU.Build.0 = Release|Any CPU
+		{394ABFC2-E570-462E-9994-37B33C348702}.Release|x64.ActiveCfg = Release|Any CPU
+		{394ABFC2-E570-462E-9994-37B33C348702}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

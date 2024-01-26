@@ -30,27 +30,23 @@ namespace CognexVisionProForm
         public string ArchiveLog;
         public string LogDir;
 
-        Cognex.VisionPro.ICogRecord ImageRecord;
-
         //public variable
-        public int CogOutputCount;
         public bool ResultUpdated;
-        public string UserResultTag;
+        public CogToolBlockTerminal[] ToolOutput;
 
         public bool ToolReady = false;
-        public double TotalTime;
 
         public Cognex.VisionPro.ICogRecord ImageDisplayRecord;
         public Cognex.VisionPro.ICogRecord ImageStatusRecord;
-        public Cognex.VisionPro.ICogRecord[] JobData;
         public TextWriterTraceListener CameraListener;
         public CogToolBlock cogToolBlock;
         Form1 _form = new Form1();
         public ToolBlock(String UniqueName, Form1 form)
         {
+            
             // Update internal variables
             _form = form;
-
+            AppName = UniqueName;
 
             //return File Path, File Name and File Type
             fileInfo = GetProgramPath(Application.ExecutablePath.ToString());
@@ -100,14 +96,17 @@ namespace CognexVisionProForm
         public string ToolName
         {
             get
-            {
-                return cogToolBlock.Name;
+            { 
+                if(cogToolBlock != null)
+                {
+                    return cogToolBlock.Name;
+                }
+                else
+                {
+                    return "send help";
+                }
             }
 
-        }
-        public string ToolBlockName
-        {
-            get { return cogToolBlock.Name; }
         }
         public ICogRunStatus RunStatus
         {
@@ -120,12 +119,11 @@ namespace CognexVisionProForm
             CameraListener.Write(DateTime.Now.ToString("MM/dd/yyyy hh:mm tt") + ": ");
             CameraListener.WriteLine("Entered Load Vision Applicaiton");
 
-            AppName = InAppName;
             ArchiveDate = DateTime.Now.ToString("yyyyMMddHHmmss");
 
 
             //get file information about selected file
-            newFile = GetProgramPath(AppName);
+            newFile = GetProgramPath(InAppName);
 
             string newFileExtension = newFile[2];
             string newFileName = newFile[1];
@@ -138,7 +136,7 @@ namespace CognexVisionProForm
                 if (System.IO.File.Exists(ExecutablePath + "\\" + InternalAppName))
                 {
                     //if a program already exists shut it down and move it to an archive folder with date stamp
-                    if (cogToolBlock != null) { CloseToolBlock(); }
+                    if (cogToolBlock != null) { Cleaning(); }
 
                     //move existing loaded file archive folder with time stamp
                     System.IO.File.Move(ExecutablePath + "\\" + InternalAppName, ArchiveDir + "Archive_" + ArchiveDate + ".vpp");
@@ -253,7 +251,14 @@ namespace CognexVisionProForm
         private void GetInfoFromTool()
         {
 
-            CogOutputCount = cogToolBlock.Outputs.Count;            
+            int CogOutputCount = cogToolBlock.Outputs.Count;
+
+            ToolOutput = new CogToolBlockTerminal[CogOutputCount];
+            for(int i = 0; i < ToolOutput.Length;i++)
+            {
+                ToolOutput[i] = cogToolBlock.Outputs[i];
+            }
+
 
             ToolReady = true;
             ResultUpdated = true;
@@ -261,7 +266,7 @@ namespace CognexVisionProForm
             CameraListener.Write(DateTime.Now.ToString("MM/dd/yyyy hh:mm tt") + ": ");
             CameraListener.WriteLine("Numer of Ouptuss - " + (CogOutputCount));
         }
-        public void CloseToolBlock()
+        public void Cleaning()
         {
             //clean up for vision pro
             if(cogToolBlock != null)

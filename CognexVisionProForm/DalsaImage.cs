@@ -25,12 +25,28 @@ class DalsaImage
     public SapAcqDeviceToBuf m_Xfer;
     public SapView m_View;
     public object SelectedServer;
+    Stopwatch acqTimeWatch;
+    double acqTime;
+    double snapTime;
 
     Form1 _form = new Form1();
 
     public DalsaImage(Form1 Sender)
     {
+        acqTimeWatch = new Stopwatch();
         _form = Sender;
+    }
+    public double AcqTime
+    {
+        get { return acqTime; }
+    }
+    public double SnapTime
+    {
+        get { return snapTime; }
+    }
+    public int BufferIndex
+    {
+        get { return m_Buffers.Index; }
     }
 
     public void CreateBufferFromFile(string FileName)
@@ -61,7 +77,7 @@ class DalsaImage
         m_Xfer = new SapAcqDeviceToBuf(m_AcqDevice, m_Buffers);    
 
         // End of frame event
-        m_Xfer.Pairs[0].EventType = SapXferPair.XferEventType.EndOfFrame;
+        m_Xfer.Pairs[0].EventType = SapXferPair.XferEventType.EndOfTransfer;
         m_Xfer.XferNotify += new SapXferNotifyHandler(xfer_XferNotify);
         m_Xfer.XferNotifyContext = this;
 
@@ -69,25 +85,28 @@ class DalsaImage
         m_Buffers.Create();
         m_Xfer.Pairs[0].Cycle = SapXferPair.CycleMode.NextWithTrash;
         m_Xfer.Create();
-
-
     }
 
     public void SnapPicture()
     {
-        m_Xfer.Snap();
-        m_Xfer.Wait(2000);
+        acqTimeWatch.Start();
+        if(m_Xfer.Snap())
+        {
+            m_Xfer.Wait(5000);
+            snapTime = acqTimeWatch.ElapsedMilliseconds;
+        }
     }
 
     public void GrabPicture()
     {
         m_Xfer.Grab();
+        m_Xfer.Wait(3000);
     }
 
     public void Freeze()
     {
         m_Xfer.Freeze();
-        m_Xfer.Wait(1000);
+        m_Xfer.Wait(3000);
     }
 
     public void Abort()
@@ -130,16 +149,14 @@ class DalsaImage
     {
         m_Buffers.GetAddress(BufferIndex, out BufferAddress);
         _form.Camera1TriggerToolBlock();
+        acqTimeWatch.Stop();
+        acqTime = acqTimeWatch.ElapsedMilliseconds;
+        acqTimeWatch.Reset();
     }
 
     static void SapXferPair_XferNotify(Object sender, SapXferNotifyEventArgs args)
     {
         MessageBox.Show("Transfer Pair Notfy event handler");        
-    }
-
-    public int BufferIndex
-    {
-        get { return m_Buffers.Index; }
     }
 
 }

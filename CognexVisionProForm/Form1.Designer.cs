@@ -35,15 +35,15 @@ namespace CognexVisionProForm
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabImage = new System.Windows.Forms.TabPage();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.lbToolData = new System.Windows.Forms.ListBox();
+            this.label32 = new System.Windows.Forms.Label();
             this.bttnC1Abort = new System.Windows.Forms.Button();
             this.bttnC1Freeze = new System.Windows.Forms.Button();
             this.bttnC1Grab = new System.Windows.Forms.Button();
             this.bttnC1Snap = new System.Windows.Forms.Button();
-            this.cogDisplay1 = new Cognex.VisionPro.Display.CogDisplay();
             this.txtC1ImageTime = new System.Windows.Forms.Label();
-            this.txtC1Job1RunStatus = new System.Windows.Forms.Label();
-            this.txtC1Job1ProcTime = new System.Windows.Forms.Label();
-            this.txtC1Job1Name = new System.Windows.Forms.Label();
+            this.cogDisplay1 = new Cognex.VisionPro.Display.CogDisplay();
             this.tabFrameGrabber = new System.Windows.Forms.TabPage();
             this.cbCameraConnected = new System.Windows.Forms.CheckBox();
             this.bttnConnectCamera = new System.Windows.Forms.Button();
@@ -115,21 +115,34 @@ namespace CognexVisionProForm
             this.label6 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.tabToolBlock = new System.Windows.Forms.TabPage();
+            this.cogToolBlockEditV21 = new Cognex.VisionPro.ToolBlock.CogToolBlockEditV2();
+            this.Camera1_DisplayStatusBar = new Cognex.VisionPro.CogDisplayStatusBarV2();
             this.label4 = new System.Windows.Forms.Label();
             this.cbCameraSelected = new System.Windows.Forms.ComboBox();
-            this.Camera1_JobEdit = new Cognex.VisionPro.QuickBuild.CogJobEdit();
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.label32 = new System.Windows.Forms.Label();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.label33 = new System.Windows.Forms.Label();
+            this.numIP1 = new System.Windows.Forms.NumericUpDown();
+            this.numIP2 = new System.Windows.Forms.NumericUpDown();
+            this.numIP3 = new System.Windows.Forms.NumericUpDown();
+            this.numIP4 = new System.Windows.Forms.NumericUpDown();
+            this.bttnPLC = new System.Windows.Forms.Button();
+            this.button1 = new System.Windows.Forms.Button();
+            this.button2 = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tabImage.SuspendLayout();
+            this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.cogDisplay1)).BeginInit();
             this.tabFrameGrabber.SuspendLayout();
             this.tabLicenseCheck.SuspendLayout();
             this.tabFileControl.SuspendLayout();
             this.tabPartData.SuspendLayout();
             this.tabToolBlock.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.Camera1_JobEdit)).BeginInit();
-            this.panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.cogToolBlockEditV21)).BeginInit();
+            this.tabPage1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numIP1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numIP2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numIP3)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numIP4)).BeginInit();
             this.SuspendLayout();
             // 
             // tabControl1
@@ -140,10 +153,11 @@ namespace CognexVisionProForm
             this.tabControl1.Controls.Add(this.tabFileControl);
             this.tabControl1.Controls.Add(this.tabPartData);
             this.tabControl1.Controls.Add(this.tabToolBlock);
+            this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Location = new System.Drawing.Point(12, 12);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(1066, 701);
+            this.tabControl1.Size = new System.Drawing.Size(1066, 733);
             this.tabControl1.TabIndex = 1;
             // 
             // tabImage
@@ -153,10 +167,44 @@ namespace CognexVisionProForm
             this.tabImage.Location = new System.Drawing.Point(4, 22);
             this.tabImage.Name = "tabImage";
             this.tabImage.Padding = new System.Windows.Forms.Padding(3);
-            this.tabImage.Size = new System.Drawing.Size(1058, 675);
+            this.tabImage.Size = new System.Drawing.Size(1058, 707);
             this.tabImage.TabIndex = 1;
             this.tabImage.Text = "Image";
             this.tabImage.UseVisualStyleBackColor = true;
+            // 
+            // panel1
+            // 
+            this.panel1.BackColor = System.Drawing.Color.LightGray;
+            this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.panel1.Controls.Add(this.lbToolData);
+            this.panel1.Controls.Add(this.label32);
+            this.panel1.Controls.Add(this.bttnC1Abort);
+            this.panel1.Controls.Add(this.bttnC1Freeze);
+            this.panel1.Controls.Add(this.bttnC1Grab);
+            this.panel1.Controls.Add(this.bttnC1Snap);
+            this.panel1.Controls.Add(this.txtC1ImageTime);
+            this.panel1.Location = new System.Drawing.Point(829, 6);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(223, 366);
+            this.panel1.TabIndex = 20;
+            // 
+            // lbToolData
+            // 
+            this.lbToolData.FormattingEnabled = true;
+            this.lbToolData.Location = new System.Drawing.Point(17, 188);
+            this.lbToolData.Name = "lbToolData";
+            this.lbToolData.Size = new System.Drawing.Size(182, 160);
+            this.lbToolData.TabIndex = 22;
+            // 
+            // label32
+            // 
+            this.label32.AutoSize = true;
+            this.label32.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label32.Location = new System.Drawing.Point(46, 11);
+            this.label32.Name = "label32";
+            this.label32.Size = new System.Drawing.Size(125, 24);
+            this.label32.TabIndex = 21;
+            this.label32.Text = "CAMERA 01";
             // 
             // bttnC1Abort
             // 
@@ -198,6 +246,15 @@ namespace CognexVisionProForm
             this.bttnC1Snap.UseVisualStyleBackColor = true;
             this.bttnC1Snap.Click += new System.EventHandler(this.bttnC1Snap_Click);
             // 
+            // txtC1ImageTime
+            // 
+            this.txtC1ImageTime.AutoSize = true;
+            this.txtC1ImageTime.Location = new System.Drawing.Point(66, 172);
+            this.txtC1ImageTime.Name = "txtC1ImageTime";
+            this.txtC1ImageTime.Size = new System.Drawing.Size(84, 13);
+            this.txtC1ImageTime.TabIndex = 13;
+            this.txtC1ImageTime.Text = "Acquisition Time";
+            // 
             // cogDisplay1
             // 
             this.cogDisplay1.ColorMapLowerClipColor = System.Drawing.Color.Black;
@@ -215,42 +272,6 @@ namespace CognexVisionProForm
             this.cogDisplay1.Size = new System.Drawing.Size(823, 669);
             this.cogDisplay1.TabIndex = 15;
             // 
-            // txtC1ImageTime
-            // 
-            this.txtC1ImageTime.AutoSize = true;
-            this.txtC1ImageTime.Location = new System.Drawing.Point(66, 172);
-            this.txtC1ImageTime.Name = "txtC1ImageTime";
-            this.txtC1ImageTime.Size = new System.Drawing.Size(84, 13);
-            this.txtC1ImageTime.TabIndex = 13;
-            this.txtC1ImageTime.Text = "Acquisition Time";
-            // 
-            // txtC1Job1RunStatus
-            // 
-            this.txtC1Job1RunStatus.AutoSize = true;
-            this.txtC1Job1RunStatus.Location = new System.Drawing.Point(78, 212);
-            this.txtC1Job1RunStatus.Name = "txtC1Job1RunStatus";
-            this.txtC1Job1RunStatus.Size = new System.Drawing.Size(60, 13);
-            this.txtC1Job1RunStatus.TabIndex = 10;
-            this.txtC1Job1RunStatus.Text = "Run Status";
-            // 
-            // txtC1Job1ProcTime
-            // 
-            this.txtC1Job1ProcTime.AutoSize = true;
-            this.txtC1Job1ProcTime.Location = new System.Drawing.Point(66, 199);
-            this.txtC1Job1ProcTime.Name = "txtC1Job1ProcTime";
-            this.txtC1Job1ProcTime.Size = new System.Drawing.Size(85, 13);
-            this.txtC1Job1ProcTime.TabIndex = 9;
-            this.txtC1Job1ProcTime.Text = "Processing Time";
-            // 
-            // txtC1Job1Name
-            // 
-            this.txtC1Job1Name.AutoSize = true;
-            this.txtC1Job1Name.Location = new System.Drawing.Point(81, 186);
-            this.txtC1Job1Name.Name = "txtC1Job1Name";
-            this.txtC1Job1Name.Size = new System.Drawing.Size(55, 13);
-            this.txtC1Job1Name.TabIndex = 8;
-            this.txtC1Job1Name.Text = "Job Name";
-            // 
             // tabFrameGrabber
             // 
             this.tabFrameGrabber.Controls.Add(this.cbCameraConnected);
@@ -261,7 +282,7 @@ namespace CognexVisionProForm
             this.tabFrameGrabber.Location = new System.Drawing.Point(4, 22);
             this.tabFrameGrabber.Name = "tabFrameGrabber";
             this.tabFrameGrabber.Padding = new System.Windows.Forms.Padding(3);
-            this.tabFrameGrabber.Size = new System.Drawing.Size(1058, 675);
+            this.tabFrameGrabber.Size = new System.Drawing.Size(1058, 707);
             this.tabFrameGrabber.TabIndex = 0;
             this.tabFrameGrabber.Text = "FrameGrabber";
             this.tabFrameGrabber.UseVisualStyleBackColor = true;
@@ -321,7 +342,7 @@ namespace CognexVisionProForm
             this.tabLicenseCheck.Location = new System.Drawing.Point(4, 22);
             this.tabLicenseCheck.Name = "tabLicenseCheck";
             this.tabLicenseCheck.Padding = new System.Windows.Forms.Padding(3);
-            this.tabLicenseCheck.Size = new System.Drawing.Size(1058, 675);
+            this.tabLicenseCheck.Size = new System.Drawing.Size(1058, 707);
             this.tabLicenseCheck.TabIndex = 2;
             this.tabLicenseCheck.Text = "LicenseCheck";
             this.tabLicenseCheck.UseVisualStyleBackColor = true;
@@ -365,7 +386,7 @@ namespace CognexVisionProForm
             this.tabFileControl.Location = new System.Drawing.Point(4, 22);
             this.tabFileControl.Name = "tabFileControl";
             this.tabFileControl.Padding = new System.Windows.Forms.Padding(3);
-            this.tabFileControl.Size = new System.Drawing.Size(1058, 675);
+            this.tabFileControl.Size = new System.Drawing.Size(1058, 707);
             this.tabFileControl.TabIndex = 3;
             this.tabFileControl.Text = "File Control";
             this.tabFileControl.UseVisualStyleBackColor = true;
@@ -508,7 +529,7 @@ namespace CognexVisionProForm
             this.tabPartData.Location = new System.Drawing.Point(4, 22);
             this.tabPartData.Name = "tabPartData";
             this.tabPartData.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPartData.Size = new System.Drawing.Size(1058, 675);
+            this.tabPartData.Size = new System.Drawing.Size(1058, 707);
             this.tabPartData.TabIndex = 4;
             this.tabPartData.Text = "Part Data";
             this.tabPartData.UseVisualStyleBackColor = true;
@@ -930,16 +951,41 @@ namespace CognexVisionProForm
             // 
             // tabToolBlock
             // 
+            this.tabToolBlock.Controls.Add(this.cogToolBlockEditV21);
+            this.tabToolBlock.Controls.Add(this.Camera1_DisplayStatusBar);
             this.tabToolBlock.Controls.Add(this.label4);
             this.tabToolBlock.Controls.Add(this.cbCameraSelected);
-            this.tabToolBlock.Controls.Add(this.Camera1_JobEdit);
             this.tabToolBlock.Location = new System.Drawing.Point(4, 22);
             this.tabToolBlock.Name = "tabToolBlock";
             this.tabToolBlock.Padding = new System.Windows.Forms.Padding(3);
-            this.tabToolBlock.Size = new System.Drawing.Size(1058, 675);
+            this.tabToolBlock.Size = new System.Drawing.Size(1058, 707);
             this.tabToolBlock.TabIndex = 5;
             this.tabToolBlock.Text = "Tool Block";
             this.tabToolBlock.UseVisualStyleBackColor = true;
+            // 
+            // cogToolBlockEditV21
+            // 
+            this.cogToolBlockEditV21.AllowDrop = true;
+            this.cogToolBlockEditV21.ContextMenuCustomizer = null;
+            this.cogToolBlockEditV21.Cursor = System.Windows.Forms.Cursors.Default;
+            this.cogToolBlockEditV21.Location = new System.Drawing.Point(6, 30);
+            this.cogToolBlockEditV21.MinimumSize = new System.Drawing.Size(489, 0);
+            this.cogToolBlockEditV21.Name = "cogToolBlockEditV21";
+            this.cogToolBlockEditV21.ShowNodeToolTips = true;
+            this.cogToolBlockEditV21.Size = new System.Drawing.Size(1046, 578);
+            this.cogToolBlockEditV21.SuspendElectricRuns = false;
+            this.cogToolBlockEditV21.TabIndex = 18;
+            // 
+            // Camera1_DisplayStatusBar
+            // 
+            this.Camera1_DisplayStatusBar.CoordinateSpaceName = "*\\#";
+            this.Camera1_DisplayStatusBar.CoordinateSpaceName3D = "*\\#";
+            this.Camera1_DisplayStatusBar.Location = new System.Drawing.Point(6, 617);
+            this.Camera1_DisplayStatusBar.Name = "Camera1_DisplayStatusBar";
+            this.Camera1_DisplayStatusBar.RightToLeft = System.Windows.Forms.RightToLeft.No;
+            this.Camera1_DisplayStatusBar.Size = new System.Drawing.Size(1049, 22);
+            this.Camera1_DisplayStatusBar.TabIndex = 17;
+            this.Camera1_DisplayStatusBar.Use3DCoordinateSpaceTree = false;
             // 
             // label4
             // 
@@ -961,46 +1007,130 @@ namespace CognexVisionProForm
             this.cbCameraSelected.SelectedIndexChanged += new System.EventHandler(this.cbCameraSelected_SelectedIndexChanged);
             this.cbCameraSelected.DragDrop += new System.Windows.Forms.DragEventHandler(this.cbCameraSelected_DragDrop);
             // 
-            // Camera1_JobEdit
+            // tabPage1
             // 
-            this.Camera1_JobEdit.AllowDrop = true;
-            this.Camera1_JobEdit.ContextMenuCustomizer = null;
-            this.Camera1_JobEdit.Location = new System.Drawing.Point(0, 62);
-            this.Camera1_JobEdit.MinimumSize = new System.Drawing.Size(489, 0);
-            this.Camera1_JobEdit.Name = "Camera1_JobEdit";
-            this.Camera1_JobEdit.ShowNodeToolTips = true;
-            this.Camera1_JobEdit.Size = new System.Drawing.Size(1059, 614);
-            this.Camera1_JobEdit.SuspendElectricRuns = false;
-            this.Camera1_JobEdit.TabIndex = 0;
-            this.Camera1_JobEdit.ToolSyncObject = null;
+            this.tabPage1.Controls.Add(this.button2);
+            this.tabPage1.Controls.Add(this.button1);
+            this.tabPage1.Controls.Add(this.bttnPLC);
+            this.tabPage1.Controls.Add(this.numIP4);
+            this.tabPage1.Controls.Add(this.numIP3);
+            this.tabPage1.Controls.Add(this.numIP2);
+            this.tabPage1.Controls.Add(this.numIP1);
+            this.tabPage1.Controls.Add(this.label33);
+            this.tabPage1.Location = new System.Drawing.Point(4, 22);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage1.Size = new System.Drawing.Size(1058, 707);
+            this.tabPage1.TabIndex = 6;
+            this.tabPage1.Text = "tabPage1";
+            this.tabPage1.UseVisualStyleBackColor = true;
             // 
-            // panel1
+            // label33
             // 
-            this.panel1.BackColor = System.Drawing.Color.LightGray;
-            this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.panel1.Controls.Add(this.label32);
-            this.panel1.Controls.Add(this.bttnC1Abort);
-            this.panel1.Controls.Add(this.bttnC1Freeze);
-            this.panel1.Controls.Add(this.txtC1Job1Name);
-            this.panel1.Controls.Add(this.bttnC1Grab);
-            this.panel1.Controls.Add(this.txtC1Job1ProcTime);
-            this.panel1.Controls.Add(this.bttnC1Snap);
-            this.panel1.Controls.Add(this.txtC1Job1RunStatus);
-            this.panel1.Controls.Add(this.txtC1ImageTime);
-            this.panel1.Location = new System.Drawing.Point(829, 6);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(223, 240);
-            this.panel1.TabIndex = 20;
+            this.label33.AutoSize = true;
+            this.label33.Location = new System.Drawing.Point(22, 17);
+            this.label33.Name = "label33";
+            this.label33.Size = new System.Drawing.Size(75, 13);
+            this.label33.TabIndex = 16;
+            this.label33.Text = "PLC IP Adress";
             // 
-            // label32
+            // numIP1
             // 
-            this.label32.AutoSize = true;
-            this.label32.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label32.Location = new System.Drawing.Point(46, 11);
-            this.label32.Name = "label32";
-            this.label32.Size = new System.Drawing.Size(125, 24);
-            this.label32.TabIndex = 21;
-            this.label32.Text = "CAMERA 01";
+            this.numIP1.Location = new System.Drawing.Point(103, 15);
+            this.numIP1.Maximum = new decimal(new int[] {
+            255,
+            0,
+            0,
+            0});
+            this.numIP1.Name = "numIP1";
+            this.numIP1.Size = new System.Drawing.Size(47, 20);
+            this.numIP1.TabIndex = 17;
+            this.numIP1.Value = new decimal(new int[] {
+            255,
+            0,
+            0,
+            0});
+            // 
+            // numIP2
+            // 
+            this.numIP2.Location = new System.Drawing.Point(156, 15);
+            this.numIP2.Maximum = new decimal(new int[] {
+            255,
+            0,
+            0,
+            0});
+            this.numIP2.Name = "numIP2";
+            this.numIP2.Size = new System.Drawing.Size(47, 20);
+            this.numIP2.TabIndex = 18;
+            this.numIP2.Value = new decimal(new int[] {
+            255,
+            0,
+            0,
+            0});
+            // 
+            // numIP3
+            // 
+            this.numIP3.Location = new System.Drawing.Point(209, 15);
+            this.numIP3.Maximum = new decimal(new int[] {
+            255,
+            0,
+            0,
+            0});
+            this.numIP3.Name = "numIP3";
+            this.numIP3.Size = new System.Drawing.Size(47, 20);
+            this.numIP3.TabIndex = 19;
+            this.numIP3.Value = new decimal(new int[] {
+            255,
+            0,
+            0,
+            0});
+            // 
+            // numIP4
+            // 
+            this.numIP4.Location = new System.Drawing.Point(262, 15);
+            this.numIP4.Maximum = new decimal(new int[] {
+            255,
+            0,
+            0,
+            0});
+            this.numIP4.Name = "numIP4";
+            this.numIP4.Size = new System.Drawing.Size(47, 20);
+            this.numIP4.TabIndex = 20;
+            this.numIP4.Value = new decimal(new int[] {
+            255,
+            0,
+            0,
+            0});
+            // 
+            // bttnPLC
+            // 
+            this.bttnPLC.Location = new System.Drawing.Point(25, 58);
+            this.bttnPLC.Name = "bttnPLC";
+            this.bttnPLC.Size = new System.Drawing.Size(182, 24);
+            this.bttnPLC.TabIndex = 21;
+            this.bttnPLC.Text = "CONNECT TO PLC";
+            this.bttnPLC.UseVisualStyleBackColor = true;
+            this.bttnPLC.Click += new System.EventHandler(this.bttnPLC_Click);
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(25, 88);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(182, 24);
+            this.button1.TabIndex = 22;
+            this.button1.Text = "WRITE TO PLC";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(25, 118);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(182, 24);
+            this.button2.TabIndex = 23;
+            this.button2.Text = "READ FROM PLC";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
             // Form1
             // 
@@ -1014,6 +1144,8 @@ namespace CognexVisionProForm
             this.Load += new System.EventHandler(this.Form1_Load);
             this.tabControl1.ResumeLayout(false);
             this.tabImage.ResumeLayout(false);
+            this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.cogDisplay1)).EndInit();
             this.tabFrameGrabber.ResumeLayout(false);
             this.tabFrameGrabber.PerformLayout();
@@ -1025,9 +1157,13 @@ namespace CognexVisionProForm
             this.tabPartData.PerformLayout();
             this.tabToolBlock.ResumeLayout(false);
             this.tabToolBlock.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.Camera1_JobEdit)).EndInit();
-            this.panel1.ResumeLayout(false);
-            this.panel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.cogToolBlockEditV21)).EndInit();
+            this.tabPage1.ResumeLayout(false);
+            this.tabPage1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numIP1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numIP2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numIP3)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numIP4)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -1040,9 +1176,6 @@ namespace CognexVisionProForm
         internal System.Windows.Forms.ListBox LicenseCheckList;
         private System.Windows.Forms.TextBox tbExpireDate;
         private System.Windows.Forms.Button btnLicenseCheck;
-        private System.Windows.Forms.Label txtC1Job1RunStatus;
-        private System.Windows.Forms.Label txtC1Job1ProcTime;
-        private System.Windows.Forms.Label txtC1Job1Name;
         private System.Windows.Forms.TabPage tabFileControl;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label1;
@@ -1115,11 +1248,22 @@ namespace CognexVisionProForm
         private System.Windows.Forms.Button bttnC1Abort;
         private System.Windows.Forms.Button bttnC1Freeze;
         private System.Windows.Forms.TabPage tabToolBlock;
-        private Cognex.VisionPro.QuickBuild.CogJobEdit Camera1_JobEdit;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.ComboBox cbCameraSelected;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Label label32;
+        private Cognex.VisionPro.ToolBlock.CogToolBlockEditV2 cogToolBlockEditV21;
+        private Cognex.VisionPro.CogDisplayStatusBarV2 Camera1_DisplayStatusBar;
+        private System.Windows.Forms.ListBox lbToolData;
+        private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.NumericUpDown numIP4;
+        private System.Windows.Forms.NumericUpDown numIP3;
+        private System.Windows.Forms.NumericUpDown numIP2;
+        private System.Windows.Forms.NumericUpDown numIP1;
+        private System.Windows.Forms.Label label33;
+        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button bttnPLC;
     }
 }
 
