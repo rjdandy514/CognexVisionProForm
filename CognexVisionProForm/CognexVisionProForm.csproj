@@ -118,6 +118,9 @@
   <ItemGroup>
     <Compile Include="Calculations.cs" />
     <Compile Include="CameraAcq.cs" />
+    <Compile Include="Code.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="DalsaImage.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>

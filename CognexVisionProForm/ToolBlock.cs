@@ -14,7 +14,6 @@ namespace CognexVisionProForm
         //Internal Variable
         string AppName;
       
-        private string[] newFile;
         string InternalAppName;
         string ArchiveDate;
         public string ArchiveDir;
@@ -48,12 +47,9 @@ namespace CognexVisionProForm
             _form = form;
             AppName = UniqueName;
 
-            //return File Path, File Name and File Type
-            fileInfo = GetProgramPath(Application.ExecutablePath.ToString());
-
-            ExecutablePath = fileInfo[0];
-            ExecutableName = fileInfo[1];
-            ExecutableExtension = fileInfo[2];
+            ExecutableExtension = Path.GetExtension(Application.ExecutablePath);
+            ExecutableName = Path.GetFileNameWithoutExtension(Application.ExecutablePath);
+            ExecutablePath = Path.GetDirectoryName(Application.ExecutablePath);
 
             //Create Directory for Log File Archive location for previous log files
             LogDir = ExecutablePath + "\\" + UniqueName + "LogFile\\";
@@ -96,15 +92,10 @@ namespace CognexVisionProForm
         public string ToolName
         {
             get
-            { 
-                if(cogToolBlock != null)
-                {
-                    return cogToolBlock.Name;
-                }
-                else
-                {
-                    return "send help";
-                }
+            {
+                if (cogToolBlock != null) { return cogToolBlock.Name; }
+
+                else { return "Tool Block not looaded yet"; }
             }
 
         }
@@ -121,13 +112,13 @@ namespace CognexVisionProForm
 
             ArchiveDate = DateTime.Now.ToString("yyyyMMddHHmmss");
 
+            string newFileExtension = Path.GetExtension(InAppName);
+            string newFileName = Path.GetFileNameWithoutExtension(InAppName);
+            string newFilePath = Path.GetDirectoryName(InAppName);
 
-            //get file information about selected file
-            newFile = GetProgramPath(InAppName);
 
-            string newFileExtension = newFile[2];
-            string newFileName = newFile[1];
-            string newFilePath = newFile[0];
+
+
 
 
             //confirm selected file is the correct file type
@@ -159,10 +150,10 @@ namespace CognexVisionProForm
         {
             try
             {
-                if (System.IO.File.Exists(fileInfo[0] + "\\" + InternalAppName) == true)
+                if (System.IO.File.Exists(ExecutablePath + "\\" + InternalAppName) == true)
                 {
                     
-                    cogToolBlock = CogSerializer.LoadObjectFromFile(fileInfo[0] + "\\" + InternalAppName) as CogToolBlock;
+                    cogToolBlock = CogSerializer.LoadObjectFromFile(ExecutablePath + "\\" + InternalAppName) as CogToolBlock;
                     cogToolBlock.Ran += new EventHandler(Subject_Ran);
                     cogToolBlock.Name = AppName;
 
@@ -184,40 +175,7 @@ namespace CognexVisionProForm
                 CameraListener.WriteLine(ex.Message);
             }
         }
-        private string[] GetProgramPath(string RawString)
-        {
-            string[] FilePathSplit;
-            string[] FileExtensionSplit;
-            string[] returnString;
-
-            string filePath;
-            string fileExtension;
-            string fileName;
-
-            filePath = "";
-            fileExtension = "";
-            fileName = "";
-
-            // split the file path to individual folders
-            FilePathSplit = RawString.Split(Convert.ToChar("\\"));
-
-            // split file to name and extension
-            FileExtensionSplit = FilePathSplit[FilePathSplit.Length - 1].Split(Convert.ToChar("."));
-            fileName = FileExtensionSplit[0];
-            fileExtension = FileExtensionSplit[FileExtensionSplit.Length - 1];
-
-            // build correct directory and return  all information
-            filePath = FilePathSplit[0];
-            for (int i = 1; i < FilePathSplit.Length - 1; i++)
-            {
-                filePath = filePath + "\\" + FilePathSplit[i];
-            }
-
-            returnString = new string[3] { filePath, fileName, fileExtension };
-            return returnString;
-
-
-        }
+        
         public void ToolRun(CogImage8Grey InputImage)
         {
             ResultUpdated = false;

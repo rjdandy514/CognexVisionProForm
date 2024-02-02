@@ -120,14 +120,14 @@ namespace CognexVisionProForm
             this.label4 = new System.Windows.Forms.Label();
             this.cbCameraSelected = new System.Windows.Forms.ComboBox();
             this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.label33 = new System.Windows.Forms.Label();
-            this.numIP1 = new System.Windows.Forms.NumericUpDown();
-            this.numIP2 = new System.Windows.Forms.NumericUpDown();
-            this.numIP3 = new System.Windows.Forms.NumericUpDown();
-            this.numIP4 = new System.Windows.Forms.NumericUpDown();
+            this.cbHeartbeat = new System.Windows.Forms.CheckBox();
             this.bttnPLC = new System.Windows.Forms.Button();
-            this.button1 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
+            this.numIP4 = new System.Windows.Forms.NumericUpDown();
+            this.numIP3 = new System.Windows.Forms.NumericUpDown();
+            this.numIP2 = new System.Windows.Forms.NumericUpDown();
+            this.numIP1 = new System.Windows.Forms.NumericUpDown();
+            this.label33 = new System.Windows.Forms.Label();
+            this.bttnC1Config = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tabImage.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -139,10 +139,10 @@ namespace CognexVisionProForm
             this.tabToolBlock.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.cogToolBlockEditV21)).BeginInit();
             this.tabPage1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numIP1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numIP2)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numIP3)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numIP4)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numIP3)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numIP2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numIP1)).BeginInit();
             this.SuspendLayout();
             // 
             // tabControl1
@@ -274,6 +274,7 @@ namespace CognexVisionProForm
             // 
             // tabFrameGrabber
             // 
+            this.tabFrameGrabber.Controls.Add(this.bttnC1Config);
             this.tabFrameGrabber.Controls.Add(this.cbCameraConnected);
             this.tabFrameGrabber.Controls.Add(this.bttnConnectCamera);
             this.tabFrameGrabber.Controls.Add(this.cbDeviceList);
@@ -911,7 +912,6 @@ namespace CognexVisionProForm
             this.label11.Size = new System.Drawing.Size(104, 13);
             this.label11.TabIndex = 21;
             this.label11.Text = "Nominal Angle (Rad)";
-            this.label11.Click += new System.EventHandler(this.label11_Click);
             // 
             // label10
             // 
@@ -1005,12 +1005,10 @@ namespace CognexVisionProForm
             this.cbCameraSelected.TabIndex = 1;
             this.cbCameraSelected.DropDown += new System.EventHandler(this.cbCameraSelected_DropDown);
             this.cbCameraSelected.SelectedIndexChanged += new System.EventHandler(this.cbCameraSelected_SelectedIndexChanged);
-            this.cbCameraSelected.DragDrop += new System.Windows.Forms.DragEventHandler(this.cbCameraSelected_DragDrop);
             // 
             // tabPage1
             // 
-            this.tabPage1.Controls.Add(this.button2);
-            this.tabPage1.Controls.Add(this.button1);
+            this.tabPage1.Controls.Add(this.cbHeartbeat);
             this.tabPage1.Controls.Add(this.bttnPLC);
             this.tabPage1.Controls.Add(this.numIP4);
             this.tabPage1.Controls.Add(this.numIP3);
@@ -1022,47 +1020,40 @@ namespace CognexVisionProForm
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
             this.tabPage1.Size = new System.Drawing.Size(1058, 707);
             this.tabPage1.TabIndex = 6;
-            this.tabPage1.Text = "tabPage1";
+            this.tabPage1.Text = "PLC Connection";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
-            // label33
+            // cbHeartbeat
             // 
-            this.label33.AutoSize = true;
-            this.label33.Location = new System.Drawing.Point(22, 17);
-            this.label33.Name = "label33";
-            this.label33.Size = new System.Drawing.Size(75, 13);
-            this.label33.TabIndex = 16;
-            this.label33.Text = "PLC IP Adress";
+            this.cbHeartbeat.AutoCheck = false;
+            this.cbHeartbeat.Location = new System.Drawing.Point(315, 12);
+            this.cbHeartbeat.Name = "cbHeartbeat";
+            this.cbHeartbeat.Size = new System.Drawing.Size(118, 24);
+            this.cbHeartbeat.TabIndex = 24;
+            this.cbHeartbeat.Text = "Heartbeat";
             // 
-            // numIP1
+            // bttnPLC
             // 
-            this.numIP1.Location = new System.Drawing.Point(103, 15);
-            this.numIP1.Maximum = new decimal(new int[] {
+            this.bttnPLC.Location = new System.Drawing.Point(25, 58);
+            this.bttnPLC.Name = "bttnPLC";
+            this.bttnPLC.Size = new System.Drawing.Size(182, 24);
+            this.bttnPLC.TabIndex = 21;
+            this.bttnPLC.Text = "CONNECT TO PLC";
+            this.bttnPLC.UseVisualStyleBackColor = true;
+            this.bttnPLC.Click += new System.EventHandler(this.bttnPLC_Click);
+            // 
+            // numIP4
+            // 
+            this.numIP4.Location = new System.Drawing.Point(262, 15);
+            this.numIP4.Maximum = new decimal(new int[] {
             255,
             0,
             0,
             0});
-            this.numIP1.Name = "numIP1";
-            this.numIP1.Size = new System.Drawing.Size(47, 20);
-            this.numIP1.TabIndex = 17;
-            this.numIP1.Value = new decimal(new int[] {
-            255,
-            0,
-            0,
-            0});
-            // 
-            // numIP2
-            // 
-            this.numIP2.Location = new System.Drawing.Point(156, 15);
-            this.numIP2.Maximum = new decimal(new int[] {
-            255,
-            0,
-            0,
-            0});
-            this.numIP2.Name = "numIP2";
-            this.numIP2.Size = new System.Drawing.Size(47, 20);
-            this.numIP2.TabIndex = 18;
-            this.numIP2.Value = new decimal(new int[] {
+            this.numIP4.Name = "numIP4";
+            this.numIP4.Size = new System.Drawing.Size(47, 20);
+            this.numIP4.TabIndex = 20;
+            this.numIP4.Value = new decimal(new int[] {
             255,
             0,
             0,
@@ -1085,52 +1076,58 @@ namespace CognexVisionProForm
             0,
             0});
             // 
-            // numIP4
+            // numIP2
             // 
-            this.numIP4.Location = new System.Drawing.Point(262, 15);
-            this.numIP4.Maximum = new decimal(new int[] {
+            this.numIP2.Location = new System.Drawing.Point(156, 15);
+            this.numIP2.Maximum = new decimal(new int[] {
             255,
             0,
             0,
             0});
-            this.numIP4.Name = "numIP4";
-            this.numIP4.Size = new System.Drawing.Size(47, 20);
-            this.numIP4.TabIndex = 20;
-            this.numIP4.Value = new decimal(new int[] {
+            this.numIP2.Name = "numIP2";
+            this.numIP2.Size = new System.Drawing.Size(47, 20);
+            this.numIP2.TabIndex = 18;
+            this.numIP2.Value = new decimal(new int[] {
             255,
             0,
             0,
             0});
             // 
-            // bttnPLC
+            // numIP1
             // 
-            this.bttnPLC.Location = new System.Drawing.Point(25, 58);
-            this.bttnPLC.Name = "bttnPLC";
-            this.bttnPLC.Size = new System.Drawing.Size(182, 24);
-            this.bttnPLC.TabIndex = 21;
-            this.bttnPLC.Text = "CONNECT TO PLC";
-            this.bttnPLC.UseVisualStyleBackColor = true;
-            this.bttnPLC.Click += new System.EventHandler(this.bttnPLC_Click);
+            this.numIP1.Location = new System.Drawing.Point(103, 15);
+            this.numIP1.Maximum = new decimal(new int[] {
+            255,
+            0,
+            0,
+            0});
+            this.numIP1.Name = "numIP1";
+            this.numIP1.Size = new System.Drawing.Size(47, 20);
+            this.numIP1.TabIndex = 17;
+            this.numIP1.Value = new decimal(new int[] {
+            255,
+            0,
+            0,
+            0});
             // 
-            // button1
+            // label33
             // 
-            this.button1.Location = new System.Drawing.Point(25, 88);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(182, 24);
-            this.button1.TabIndex = 22;
-            this.button1.Text = "WRITE TO PLC";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.label33.AutoSize = true;
+            this.label33.Location = new System.Drawing.Point(22, 17);
+            this.label33.Name = "label33";
+            this.label33.Size = new System.Drawing.Size(75, 13);
+            this.label33.TabIndex = 16;
+            this.label33.Text = "PLC IP Adress";
             // 
-            // button2
+            // bttnC1Config
             // 
-            this.button2.Location = new System.Drawing.Point(25, 118);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(182, 24);
-            this.button2.TabIndex = 23;
-            this.button2.Text = "READ FROM PLC";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
+            this.bttnC1Config.Location = new System.Drawing.Point(9, 46);
+            this.bttnC1Config.Name = "bttnC1Config";
+            this.bttnC1Config.Size = new System.Drawing.Size(115, 23);
+            this.bttnC1Config.TabIndex = 20;
+            this.bttnC1Config.Text = "Select ConfigFile";
+            this.bttnC1Config.UseVisualStyleBackColor = true;
+            this.bttnC1Config.Click += new System.EventHandler(this.bttnC1Config_Click);
             // 
             // Form1
             // 
@@ -1160,10 +1157,10 @@ namespace CognexVisionProForm
             ((System.ComponentModel.ISupportInitialize)(this.cogToolBlockEditV21)).EndInit();
             this.tabPage1.ResumeLayout(false);
             this.tabPage1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numIP1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numIP2)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numIP3)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numIP4)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numIP3)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numIP2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numIP1)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -1261,9 +1258,9 @@ namespace CognexVisionProForm
         private System.Windows.Forms.NumericUpDown numIP2;
         private System.Windows.Forms.NumericUpDown numIP1;
         private System.Windows.Forms.Label label33;
-        private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button bttnPLC;
+        private System.Windows.Forms.CheckBox cbHeartbeat;
+        private System.Windows.Forms.Button bttnC1Config;
     }
 }
 

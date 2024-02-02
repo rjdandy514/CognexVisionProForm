@@ -24,10 +24,12 @@ class DalsaImage
     public SapBuffer m_Buffers;
     public SapAcqDeviceToBuf m_Xfer;
     public SapView m_View;
+    public ServerCategory m_ServerCategory = ServerCategory.ServerAll;
     public object SelectedServer;
     Stopwatch acqTimeWatch;
     double acqTime;
     double snapTime;
+    string configFile;
 
     Form1 _form = new Form1();
 
@@ -48,6 +50,17 @@ class DalsaImage
     {
         get { return m_Buffers.Index; }
     }
+    public string CongfigFile
+    {
+        get { return configFile; }
+        set { configFile = value; }
+    }
+    public enum ServerCategory
+    {
+        ServerAll,
+        ServerAcq,
+        ServerAcqDevice
+    };
 
     public void CreateBufferFromFile(string FileName)
     {
@@ -72,7 +85,7 @@ class DalsaImage
         Cleaning();
 
         m_ServerLocation = new SapLocation(selectedServer, selectedResource);
-        m_AcqDevice = new SapAcqDevice(m_ServerLocation, "");
+        m_AcqDevice = new SapAcqDevice(m_ServerLocation, configFile);
         m_Buffers = new SapBufferWithTrash(4, m_AcqDevice, SapBuffer.MemoryType.ScatterGather);
         m_Xfer = new SapAcqDeviceToBuf(m_AcqDevice, m_Buffers);    
 
@@ -147,10 +160,10 @@ class DalsaImage
 
     public void xfer_XferNotify(object sender, SapXferNotifyEventArgs argsNotify)
     {
+        acqTime = acqTimeWatch.ElapsedMilliseconds;
         m_Buffers.GetAddress(BufferIndex, out BufferAddress);
         _form.Camera1TriggerToolBlock();
         acqTimeWatch.Stop();
-        acqTime = acqTimeWatch.ElapsedMilliseconds;
         acqTimeWatch.Reset();
     }
 
