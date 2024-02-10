@@ -36,6 +36,7 @@ namespace CognexVisionProForm
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabImage = new System.Windows.Forms.TabPage();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.bttnC1LogImages = new System.Windows.Forms.Button();
             this.lbToolData = new System.Windows.Forms.ListBox();
             this.label32 = new System.Windows.Forms.Label();
             this.bttnC1Abort = new System.Windows.Forms.Button();
@@ -45,6 +46,12 @@ namespace CognexVisionProForm
             this.txtC1ImageTime = new System.Windows.Forms.Label();
             this.cogDisplay1 = new Cognex.VisionPro.Display.CogDisplay();
             this.tabFrameGrabber = new System.Windows.Forms.TabPage();
+            this.tbC1TB1Name = new System.Windows.Forms.TextBox();
+            this.cbC1Tb1FileFound = new System.Windows.Forms.CheckBox();
+            this.cbConfigFileFound = new System.Windows.Forms.CheckBox();
+            this.cbConfigFileReq = new System.Windows.Forms.CheckBox();
+            this.bttnC1TB1FileSelect = new System.Windows.Forms.Button();
+            this.bttnC1Config = new System.Windows.Forms.Button();
             this.cbCameraConnected = new System.Windows.Forms.CheckBox();
             this.bttnConnectCamera = new System.Windows.Forms.Button();
             this.cbDeviceList = new System.Windows.Forms.ComboBox();
@@ -55,13 +62,10 @@ namespace CognexVisionProForm
             this.tbExpireDate = new System.Windows.Forms.TextBox();
             this.LicenseCheckList = new System.Windows.Forms.ListBox();
             this.tabFileControl = new System.Windows.Forms.TabPage();
-            this.bttnNewJob = new System.Windows.Forms.Button();
             this.bttnLog = new System.Windows.Forms.Button();
             this.bttnArchive = new System.Windows.Forms.Button();
-            this.txtLoadFile = new System.Windows.Forms.Label();
             this.txtLogFile = new System.Windows.Forms.Label();
             this.txtArchive = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.tabPartData = new System.Windows.Forms.TabPage();
@@ -127,7 +131,6 @@ namespace CognexVisionProForm
             this.numIP2 = new System.Windows.Forms.NumericUpDown();
             this.numIP1 = new System.Windows.Forms.NumericUpDown();
             this.label33 = new System.Windows.Forms.Label();
-            this.bttnC1Config = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tabImage.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -176,6 +179,7 @@ namespace CognexVisionProForm
             // 
             this.panel1.BackColor = System.Drawing.Color.LightGray;
             this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.panel1.Controls.Add(this.bttnC1LogImages);
             this.panel1.Controls.Add(this.lbToolData);
             this.panel1.Controls.Add(this.label32);
             this.panel1.Controls.Add(this.bttnC1Abort);
@@ -188,12 +192,22 @@ namespace CognexVisionProForm
             this.panel1.Size = new System.Drawing.Size(223, 366);
             this.panel1.TabIndex = 20;
             // 
+            // bttnC1LogImages
+            // 
+            this.bttnC1LogImages.Location = new System.Drawing.Point(19, 174);
+            this.bttnC1LogImages.Name = "bttnC1LogImages";
+            this.bttnC1LogImages.Size = new System.Drawing.Size(182, 24);
+            this.bttnC1LogImages.TabIndex = 23;
+            this.bttnC1LogImages.Text = "Log Images";
+            this.bttnC1LogImages.UseVisualStyleBackColor = true;
+            this.bttnC1LogImages.Click += new System.EventHandler(this.bttnC1LogImages_Click);
+            // 
             // lbToolData
             // 
             this.lbToolData.FormattingEnabled = true;
-            this.lbToolData.Location = new System.Drawing.Point(17, 188);
+            this.lbToolData.Location = new System.Drawing.Point(19, 264);
             this.lbToolData.Name = "lbToolData";
-            this.lbToolData.Size = new System.Drawing.Size(182, 160);
+            this.lbToolData.Size = new System.Drawing.Size(182, 82);
             this.lbToolData.TabIndex = 22;
             // 
             // label32
@@ -249,7 +263,7 @@ namespace CognexVisionProForm
             // txtC1ImageTime
             // 
             this.txtC1ImageTime.AutoSize = true;
-            this.txtC1ImageTime.Location = new System.Drawing.Point(66, 172);
+            this.txtC1ImageTime.Location = new System.Drawing.Point(68, 248);
             this.txtC1ImageTime.Name = "txtC1ImageTime";
             this.txtC1ImageTime.Size = new System.Drawing.Size(84, 13);
             this.txtC1ImageTime.TabIndex = 13;
@@ -274,6 +288,11 @@ namespace CognexVisionProForm
             // 
             // tabFrameGrabber
             // 
+            this.tabFrameGrabber.Controls.Add(this.tbC1TB1Name);
+            this.tabFrameGrabber.Controls.Add(this.cbC1Tb1FileFound);
+            this.tabFrameGrabber.Controls.Add(this.cbConfigFileFound);
+            this.tabFrameGrabber.Controls.Add(this.cbConfigFileReq);
+            this.tabFrameGrabber.Controls.Add(this.bttnC1TB1FileSelect);
             this.tabFrameGrabber.Controls.Add(this.bttnC1Config);
             this.tabFrameGrabber.Controls.Add(this.cbCameraConnected);
             this.tabFrameGrabber.Controls.Add(this.bttnConnectCamera);
@@ -287,6 +306,61 @@ namespace CognexVisionProForm
             this.tabFrameGrabber.TabIndex = 0;
             this.tabFrameGrabber.Text = "FrameGrabber";
             this.tabFrameGrabber.UseVisualStyleBackColor = true;
+            // 
+            // tbC1TB1Name
+            // 
+            this.tbC1TB1Name.Location = new System.Drawing.Point(130, 76);
+            this.tbC1TB1Name.Name = "tbC1TB1Name";
+            this.tbC1TB1Name.Size = new System.Drawing.Size(148, 20);
+            this.tbC1TB1Name.TabIndex = 25;
+            this.tbC1TB1Name.Leave += new System.EventHandler(this.tbC1TB1Name_Leave);
+            // 
+            // cbC1Tb1FileFound
+            // 
+            this.cbC1Tb1FileFound.AutoCheck = false;
+            this.cbC1Tb1FileFound.Location = new System.Drawing.Point(297, 74);
+            this.cbC1Tb1FileFound.Name = "cbC1Tb1FileFound";
+            this.cbC1Tb1FileFound.Size = new System.Drawing.Size(147, 24);
+            this.cbC1Tb1FileFound.TabIndex = 24;
+            this.cbC1Tb1FileFound.Text = "Tool Block Found";
+            // 
+            // cbConfigFileFound
+            // 
+            this.cbConfigFileFound.AutoCheck = false;
+            this.cbConfigFileFound.Location = new System.Drawing.Point(297, 45);
+            this.cbConfigFileFound.Name = "cbConfigFileFound";
+            this.cbConfigFileFound.Size = new System.Drawing.Size(147, 24);
+            this.cbConfigFileFound.TabIndex = 23;
+            this.cbConfigFileFound.Text = "Configuration File Found";
+            // 
+            // cbConfigFileReq
+            // 
+            this.cbConfigFileReq.AutoCheck = false;
+            this.cbConfigFileReq.Location = new System.Drawing.Point(130, 46);
+            this.cbConfigFileReq.Name = "cbConfigFileReq";
+            this.cbConfigFileReq.Size = new System.Drawing.Size(190, 24);
+            this.cbConfigFileReq.TabIndex = 22;
+            this.cbConfigFileReq.Text = "Configuration File Required";
+            // 
+            // bttnC1TB1FileSelect
+            // 
+            this.bttnC1TB1FileSelect.Location = new System.Drawing.Point(9, 75);
+            this.bttnC1TB1FileSelect.Name = "bttnC1TB1FileSelect";
+            this.bttnC1TB1FileSelect.Size = new System.Drawing.Size(115, 23);
+            this.bttnC1TB1FileSelect.TabIndex = 21;
+            this.bttnC1TB1FileSelect.Text = "Select New Job";
+            this.bttnC1TB1FileSelect.UseVisualStyleBackColor = true;
+            this.bttnC1TB1FileSelect.Click += new System.EventHandler(this.bttnC1TB1FileSelect_Click);
+            // 
+            // bttnC1Config
+            // 
+            this.bttnC1Config.Location = new System.Drawing.Point(9, 46);
+            this.bttnC1Config.Name = "bttnC1Config";
+            this.bttnC1Config.Size = new System.Drawing.Size(115, 23);
+            this.bttnC1Config.TabIndex = 20;
+            this.bttnC1Config.Text = "Select ConfigFile";
+            this.bttnC1Config.UseVisualStyleBackColor = true;
+            this.bttnC1Config.Click += new System.EventHandler(this.bttnC1Config_Click);
             // 
             // cbCameraConnected
             // 
@@ -314,7 +388,6 @@ namespace CognexVisionProForm
             this.cbDeviceList.Name = "cbDeviceList";
             this.cbDeviceList.Size = new System.Drawing.Size(166, 21);
             this.cbDeviceList.TabIndex = 17;
-            this.cbDeviceList.DropDown += new System.EventHandler(this.cbDeviceList_DropDown);
             // 
             // cbServerList
             // 
@@ -323,7 +396,6 @@ namespace CognexVisionProForm
             this.cbServerList.Name = "cbServerList";
             this.cbServerList.Size = new System.Drawing.Size(185, 21);
             this.cbServerList.TabIndex = 16;
-            this.cbServerList.DropDown += new System.EventHandler(this.cbServerList_DropDown);
             this.cbServerList.SelectedIndexChanged += new System.EventHandler(this.cbServerList_SelectedIndexChanged);
             // 
             // label31
@@ -375,13 +447,10 @@ namespace CognexVisionProForm
             // 
             // tabFileControl
             // 
-            this.tabFileControl.Controls.Add(this.bttnNewJob);
             this.tabFileControl.Controls.Add(this.bttnLog);
             this.tabFileControl.Controls.Add(this.bttnArchive);
-            this.tabFileControl.Controls.Add(this.txtLoadFile);
             this.tabFileControl.Controls.Add(this.txtLogFile);
             this.tabFileControl.Controls.Add(this.txtArchive);
-            this.tabFileControl.Controls.Add(this.label3);
             this.tabFileControl.Controls.Add(this.label2);
             this.tabFileControl.Controls.Add(this.label1);
             this.tabFileControl.Location = new System.Drawing.Point(4, 22);
@@ -391,16 +460,6 @@ namespace CognexVisionProForm
             this.tabFileControl.TabIndex = 3;
             this.tabFileControl.Text = "File Control";
             this.tabFileControl.UseVisualStyleBackColor = true;
-            // 
-            // bttnNewJob
-            // 
-            this.bttnNewJob.Location = new System.Drawing.Point(6, 77);
-            this.bttnNewJob.Name = "bttnNewJob";
-            this.bttnNewJob.Size = new System.Drawing.Size(115, 23);
-            this.bttnNewJob.TabIndex = 17;
-            this.bttnNewJob.Text = "Select New Job";
-            this.bttnNewJob.UseVisualStyleBackColor = true;
-            this.bttnNewJob.Click += new System.EventHandler(this.bttnNewJob_Click);
             // 
             // bttnLog
             // 
@@ -422,15 +481,6 @@ namespace CognexVisionProForm
             this.bttnArchive.UseVisualStyleBackColor = true;
             this.bttnArchive.Click += new System.EventHandler(this.bttnArchive_Click);
             // 
-            // txtLoadFile
-            // 
-            this.txtLoadFile.AutoSize = true;
-            this.txtLoadFile.Location = new System.Drawing.Point(211, 82);
-            this.txtLoadFile.Name = "txtLoadFile";
-            this.txtLoadFile.Size = new System.Drawing.Size(58, 13);
-            this.txtLoadFile.TabIndex = 14;
-            this.txtLoadFile.Text = "txtLoadFile";
-            // 
             // txtLogFile
             // 
             this.txtLogFile.AutoSize = true;
@@ -448,15 +498,6 @@ namespace CognexVisionProForm
             this.txtArchive.Size = new System.Drawing.Size(54, 13);
             this.txtArchive.TabIndex = 12;
             this.txtArchive.Text = "txtArchive";
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(127, 82);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(78, 13);
-            this.label3.TabIndex = 11;
-            this.label3.Text = "Load New File:";
             // 
             // label2
             // 
@@ -1119,16 +1160,6 @@ namespace CognexVisionProForm
             this.label33.TabIndex = 16;
             this.label33.Text = "PLC IP Adress";
             // 
-            // bttnC1Config
-            // 
-            this.bttnC1Config.Location = new System.Drawing.Point(9, 46);
-            this.bttnC1Config.Name = "bttnC1Config";
-            this.bttnC1Config.Size = new System.Drawing.Size(115, 23);
-            this.bttnC1Config.TabIndex = 20;
-            this.bttnC1Config.Text = "Select ConfigFile";
-            this.bttnC1Config.UseVisualStyleBackColor = true;
-            this.bttnC1Config.Click += new System.EventHandler(this.bttnC1Config_Click);
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1176,13 +1207,10 @@ namespace CognexVisionProForm
         private System.Windows.Forms.TabPage tabFileControl;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label txtLoadFile;
         private System.Windows.Forms.Label txtLogFile;
         private System.Windows.Forms.Label txtArchive;
-        private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Button bttnArchive;
         private System.Windows.Forms.Button bttnLog;
-        private System.Windows.Forms.Button bttnNewJob;
         private System.Windows.Forms.Label txtC1ImageTime;
         private System.Windows.Forms.TabPage tabPartData;
         private System.Windows.Forms.Label label5;
@@ -1261,6 +1289,12 @@ namespace CognexVisionProForm
         private System.Windows.Forms.Button bttnPLC;
         private System.Windows.Forms.CheckBox cbHeartbeat;
         private System.Windows.Forms.Button bttnC1Config;
+        private System.Windows.Forms.Button bttnC1TB1FileSelect;
+        private System.Windows.Forms.CheckBox cbC1Tb1FileFound;
+        private System.Windows.Forms.CheckBox cbConfigFileFound;
+        private System.Windows.Forms.CheckBox cbConfigFileReq;
+        private System.Windows.Forms.Button bttnC1LogImages;
+        private System.Windows.Forms.TextBox tbC1TB1Name;
     }
 }
 

@@ -31,12 +31,14 @@ namespace CognexVisionProForm
         private int ExpireCount = 0;
 
         private bool ExpireError = false;
-        private ToolBlock BlobCount;
-        private ToolBlock BlobCount2;
+        private ToolBlock Camera01Tb01;
+        private ToolBlock Camera01Tb02;
 
         private Calculations Camera01Calc;
 
         private PlcComms MainPLC;
+
+        public TextWriterTraceListener appListener;
 
         private double FF_Radians;
         private double FF_L;
@@ -53,6 +55,15 @@ namespace CognexVisionProForm
         double Robot_X;
         double Robot_Y;
         double Robot_Degree;
+
+        string exeFileExtension;
+        string exeFileName;
+        string exeFilePath;
+
+        string C1Tb1Name;
+        string ServerNotFound = "No Server Found";
+        string m_ServerName;
+        int m_ResourceIndex;
 
         private Timer pollingTimer;
 
@@ -73,7 +84,7 @@ namespace CognexVisionProForm
 
             //Camera Status: info related to camera and general system
             CameraStatus[0] = heartBeat;
-            CameraStatus[1] = Camera01Acq.m_Xfer.Connected;
+            CameraStatus[1] = Camera01Acq.Connected;
             CameraStatus[2] = cogLicenseOk;
             CameraStatus[3] = false;
             CameraStatus[4] = false;
@@ -82,9 +93,9 @@ namespace CognexVisionProForm
             CameraStatus.CopyTo(MainPLC.PCtoPLC_Data,0);
 
             //Tool Status: info related to Camera Tool 1
-            ToolStatus01[0] = BlobCount.ToolReady;
-            ToolStatus01[1] = BlobCount.ResultUpdated;
-            ToolStatus01[2] = Convert.ToBoolean(BlobCount.RunStatus.Result);
+            ToolStatus01[0] = Camera01Tb01.ToolReady;
+            ToolStatus01[1] = Camera01Tb01.ResultUpdated;
+            ToolStatus01[2] = Convert.ToBoolean(Camera01Tb01.RunStatus.Result);
             ToolStatus01[3] = false;
             ToolStatus01[4] = false;
             ToolStatus01[5] = false;
@@ -94,8 +105,8 @@ namespace CognexVisionProForm
 
             //All data variables
             MainPLC.PCtoPLC_Data[8] = Convert.ToInt32(Camera01Acq.AcqTime*100);
-            MainPLC.PCtoPLC_Data[9] = Convert.ToInt32(BlobCount.RunStatus.TotalTime*100);
-            MainPLC.PCtoPLC_Data[10] = Convert.ToInt32(BlobCount2.RunStatus.TotalTime * 100);
+            MainPLC.PCtoPLC_Data[9] = Convert.ToInt32(Camera01Tb01.RunStatus.TotalTime*100);
+            MainPLC.PCtoPLC_Data[10] = Convert.ToInt32(Camera01Tb02.RunStatus.TotalTime * 100);
 
 
             if (CommsUp)
@@ -112,27 +123,32 @@ namespace CognexVisionProForm
         private void Form1_Load(object sender, EventArgs e)
         {
             this.Text = "Eclipse Vision Application";
+
+            exeFileExtension = Path.GetExtension(System.Windows.Forms.Application.ExecutablePath);
+            exeFileName = Path.GetFileNameWithoutExtension(System.Windows.Forms.Application.ExecutablePath);
+            exeFilePath = Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath);
+            
+            InitializeLogging();
             InitializeAcquisition();
+            LoadSettings();
+            InitializeServerList();
+            InitializeResourceList();
+
             CheckLicense();
             if(cogLicenseOk)
             {
-                BlobCount.InitializeJobManager();
-                BlobCount2.InitializeJobManager();
+                Camera01Tb01.InitializeJobManager();
+                Camera01Tb02.InitializeJobManager();
             }
             else
             {
                 MessageBox.Show("Cognex VisionPro License did not load properly");
                 tabControl1.SelectedIndex = 2;
             }
-            
-            txtArchive.Text = BlobCount.ArchiveDir;
-            txtLogFile.Text = BlobCount.LogDir;
-            txtLoadFile.Text = ToolBlockLocation;
 
-            numIP1.Value = 10;
-            numIP2.Value = 2;
-            numIP3.Value = 4;
-            numIP4.Value = 10;
+            cbConfigFileFound.Checked = Camera01Acq.ConfigFilePresent;
+            cbC1Tb1FileFound.Checked = Camera01Tb01.ToolFilePresent;
+
         }
         private void btnLicenseCheck_Click(object sender, EventArgs e)
         {
@@ -140,11 +156,15 @@ namespace CognexVisionProForm
         }
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            BlobCount.Cleaning();
+            Camera01Tb01.Cleaning();
             Camera01Acq.Cleaning();
             MainPLC.Cleaning();
             cogToolBlockEditV21.Dispose();
             pollingTimer.Dispose();
+            appListener.Close();
+            appListener.Dispose();
+
+            SaveSettings();
         }
         private void bttnArchive_Click(object sender, EventArgs e)
         {
@@ -154,16 +174,11 @@ namespace CognexVisionProForm
         {
             Process.Start(txtLogFile.Text);
         }
-        private void bttnNewJob_Click(object sender, EventArgs e)
+        private void bttnC1TB1FileSelect_Click(object sender, EventArgs e)
         {
-            OpenFileDialog openFileDialog1 = new OpenFileDialog();
-            openFileDialog1.InitialDirectory = ToolBlockLocation;
-            openFileDialog1.Title = "Select To Job File to be Loaded";
-            openFileDialog1.ShowDialog();
 
-            txtLoadFile.Text = openFileDialog1.FileName;
-
-            BlobCount.LoadvisionProject(openFileDialog1.FileName);
+            Camera01Tb01.LoadvisionProject();
+            cbC1Tb1FileFound.Checked = Camera01Tb01.ToolFilePresent;
         }
         private void btnPartCalc_Click(object sender, EventArgs e)
         {
@@ -252,62 +267,13 @@ namespace CognexVisionProForm
         }
         private void cbServerList_SelectedIndexChanged(object sender, EventArgs e)
         {
+            MyListBoxItem item = (MyListBoxItem)cbServerList.SelectedItem;
+            bool configFileRequired = item.ItemData;
+            cbConfigFileReq.Checked = configFileRequired;
+            m_ServerName = item.ToString();
 
-        }
-        private void cbServerList_DropDown(object sender, EventArgs e)
-        {
-            cbServerList.Items.Clear();
-            for (int i = 0; i < SapManager.GetServerCount(); i++)
-            {
-                // Does this server support "Acq" (frame-grabber) or "AcqDevice" (camera)?
-                bool bAcq = (Camera01Acq.m_ServerCategory == ServerCategory.ServerAcq || Camera01Acq.m_ServerCategory == ServerCategory.ServerAll) &&
-                           (SapManager.GetResourceCount(i, SapManager.ResourceType.Acq) > 0);
-                bool bAcqDevice = (Camera01Acq.m_ServerCategory == ServerCategory.ServerAcqDevice || Camera01Acq.m_ServerCategory == ServerCategory.ServerAll) &&
-                (SapManager.GetResourceCount(i, SapManager.ResourceType.AcqDevice) > 0 && 
-                            (SapManager.GetResourceCount(i, SapManager.ResourceType.Acq) == 0));
+            InitializeResourceList();
 
-
-                if(bAcq)
-                {
-                    string serverName = SapManager.GetServerName(i);
-                    cbServerList.Items.Add(serverName);
-                }
-                else if(bAcqDevice)
-                {
-                    string serverName = SapManager.GetServerName(i);
-
-                }
-                
-                
-
-            }
-        }
-        private void cbDeviceList_DropDown(object sender, EventArgs e)
-        {
-            string SelectedServer = cbServerList.SelectedItem.ToString();
-            cbDeviceList.Items.Clear();
-
-            int AcqCount = SapManager.GetResourceCount(SelectedServer.ToString(), SapManager.ResourceType.Acq);
-            int AcqDeviceCount = SapManager.GetResourceCount(SelectedServer.ToString(), SapManager.ResourceType.AcqDevice);
-
-            if (AcqCount > 0)
-            {
-                for (int i = 0; i < AcqCount; i++)
-                {
-                    Console.WriteLine(SapManager.GetResourceName(SelectedServer.ToString(), SapManager.ResourceType.Acq, i));
-                    string AcqName = SapManager.GetResourceName(SelectedServer.ToString(), SapManager.ResourceType.AcqDevice, i);
-                    cbDeviceList.Items.Add(AcqName);
-                }
-            }
-
-            if (AcqDeviceCount > 0)
-            {
-                for (int i = 0; i < AcqDeviceCount; i++)
-                {
-                    string AcqDevice = SapManager.GetResourceName(SelectedServer.ToString(), SapManager.ResourceType.AcqDevice, i);
-                    cbDeviceList.Items.Add(AcqDevice);
-                }
-            }
         }
         private void bttnConnectCamera_Click(object sender, EventArgs e)
         {
@@ -315,34 +281,16 @@ namespace CognexVisionProForm
             {
                 Camera01Acq.CreateCamera(cbServerList.SelectedItem.ToString(), cbDeviceList.SelectedIndex);
             }
-            if(Camera01Acq.m_Xfer != null)
-            {
-                if (Camera01Acq.m_Xfer.Connected && Camera01Acq.m_Xfer.Initialized)
-                {
-                    cbCameraConnected.Checked = true;
-                }
-                else
-                {
-                    MessageBox.Show("FAILED TO CONNECT SELECTED CAMERA");
-                    cbCameraConnected.Checked = false;
-                }
-            }
+            if (Camera01Acq.Connected) { cbCameraConnected.Checked = true; }
             else
             {
-                MessageBox.Show("SELECTED CAMERA IS NOT VALID");
+                MessageBox.Show("FAILED TO CONNECT SELECTED CAMERA");
+                cbCameraConnected.Checked = false;
             }
         }
         private void bttnC1Snap_Click(object sender, EventArgs e)
         {
-            if(cbCameraConnected.Checked)
-            {
-                Camera01Acq.SnapPicture();
-            }
-            else
-            {
-                MessageBox.Show("NO CAMERA IS CONNECTED");
-                tabControl1.SelectedIndex = 1;
-            }
+            Camera1Trigger();
         }
         private void bttnC1Grab_Click(object sender, EventArgs e)
         {
@@ -383,18 +331,18 @@ namespace CognexVisionProForm
         private void cbCameraSelected_DropDown(object sender, EventArgs e)
         {
             cbCameraSelected.Items.Clear();
-            cbCameraSelected.Items.Add(BlobCount.ToolName);
-            cbCameraSelected.Items.Add(BlobCount2.ToolName);
+            cbCameraSelected.Items.Add(Camera01Tb01.ToolName);
+            cbCameraSelected.Items.Add(Camera01Tb02.ToolName);
         }
         private void cbCameraSelected_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (cbCameraSelected.SelectedItem.ToString() == BlobCount.ToolName)
+            if (cbCameraSelected.SelectedItem.ToString() == Camera01Tb01.ToolName)
             {
-                cogToolBlockEditV21.Subject = BlobCount.cogToolBlock;
+                cogToolBlockEditV21.Subject = Camera01Tb01.cogToolBlock;
             }
-            else if(cbCameraSelected.SelectedItem.ToString() == BlobCount2.ToolName)
+            else if(cbCameraSelected.SelectedItem.ToString() == Camera01Tb02.ToolName)
             {
-                cogToolBlockEditV21.Subject = BlobCount2.cogToolBlock;
+                cogToolBlockEditV21.Subject = Camera01Tb02.cogToolBlock;
             }
             if(cogToolBlockEditV21.Subject != null)
             {
@@ -413,20 +361,65 @@ namespace CognexVisionProForm
             }
 
         }
-
         private void bttnC1Config_Click(object sender, EventArgs e)
         {
-            OpenFileDialog openFileDialog1 = new OpenFileDialog();
-            openFileDialog1.InitialDirectory = ToolBlockLocation;
-            openFileDialog1.Title = "Select To Job File to be Loaded";
-            openFileDialog1.ShowDialog();
-            
-            Camera01Acq.CongfigFile = openFileDialog1.FileName;
+            Camera01Acq.LoadConfigFile();
+            cbConfigFileFound.Checked = Camera01Acq.ConfigFilePresent;
 
-            string congfigFileExtension = Path.GetExtension(Camera01Acq.CongfigFile);
-            string congfigFileName = Path.GetFileNameWithoutExtension(Camera01Acq.CongfigFile);
-            string congfigFilePath = Path.GetDirectoryName(Camera01Acq.CongfigFile);
-            
+        }
+        class MyListBoxItem
+        {
+            public MyListBoxItem(string Text)
+            {
+                Camdesc = Text;
+                itemData = false;
+            }
+
+            public MyListBoxItem(string Text, bool ItemData)
+            {
+                Camdesc = Text;
+                itemData = ItemData;
+            }
+
+            public bool ItemData
+            {
+                get
+                {
+                    return itemData;
+                }
+                set
+                {
+                    itemData = value;
+                }
+            }
+
+            public override string ToString()
+            {
+                return Camdesc;
+            }
+
+            private string Camdesc;
+            private bool itemData;
+        }
+        private void bttnC1LogImages_Click(object sender, EventArgs e)
+        {
+            if (Camera01Acq.SaveImageSelected) 
+            {
+                Camera01Acq.SaveImageSelected = false;
+                bttnC1LogImages.Text = "Log Images";
+            }
+            else if(!Camera01Acq.SaveImageSelected)
+            {
+                Camera01Acq.SaveImageSelected = true;
+                bttnC1LogImages.Text = "Log Images - Active";
+            }
+        }
+
+        private void tbC1TB1Name_Leave(object sender, EventArgs e)
+        {
+            Camera01Tb01.ToolName = tbC1TB1Name.Text.ToString();
+        }
     }
+
 }
 
