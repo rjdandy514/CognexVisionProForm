@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Cognex.VisionPro;
 using Microsoft.Win32;
+using System.Drawing;
 
 class DalsaImage
 {
@@ -16,6 +17,7 @@ class DalsaImage
     SapAcqDevice m_AcqDevice;
     SapAcquisition m_Acquisition;
     public SapBuffer m_Buffers;
+    public SapBuffer m_ArchiveBuffers;
     SapAcqDeviceToBuf m_AcqDeviceXfer;
     SapAcqToBuf m_AcqXfer;
     ServerCategory m_ServerCategory = ServerCategory.ServerAll;
@@ -29,35 +31,29 @@ class DalsaImage
     Stopwatch acqTimeWatch;
     double acqTime;
     double snapTime;
-    
+
+    string ImageFilePath;
     string configFile;
     string configFileLocation;
     string configFileType = "ConfigFile";
     string configFileExtension = ".cff";
     bool configFilePresent;
+    bool archiveImageActive;
     string cameraName;
+    string loadServerSelect;
+    int loadResourceIndex;
+    FileInfo[] archiveImageArray;
+    int archiveImageCount;
+    int archiveImageIndex;
+
 
     Form1 form = new Form1();
     
     
-    public DalsaImage(string CameraName, Form1 Form)
+    public DalsaImage(Form1 Form)
     {
-        cameraName = CameraName;
         acqTimeWatch = new Stopwatch();
         form = Form;
-
-        configFileLocation = form.ExeFilePath + "\\" + cameraName + "_" + configFileType + configFileExtension;
-        if (File.Exists(configFileLocation)) 
-        {
-            configFilePresent = true;
-            configFile = configFileLocation; 
-        }
-        else 
-        {
-            configFilePresent = false;
-            configFile = ""; 
-        }
-
         form.LoggingStatment(cameraName + ": DalsaImage Class created");
     }
     public double AcqTime
@@ -80,6 +76,22 @@ class DalsaImage
     public string CameraName
     {
         get { return cameraName; }
+        set 
+        { 
+            cameraName = value;
+            ImageFilePath = form.ExeFilePath + "\\" + cameraName + "_Images\\";
+            configFileLocation = form.ExeFilePath + "\\" + cameraName + "_" + configFileType + configFileExtension;
+            if (File.Exists(configFileLocation))
+            {
+                configFilePresent = true;
+                configFile = configFileLocation;
+            }
+            else
+            {
+                configFilePresent = false;
+                configFile = "";
+            }
+        }
     }
     public bool Connected
     {
@@ -90,6 +102,7 @@ class DalsaImage
             else { return false; }
         }
     }
+
     public bool ConfigFilePresent
     {
         get => configFilePresent;
@@ -105,27 +118,82 @@ class DalsaImage
     {
         get => m_ServerCategory;
     }
+    public string LoadServerSelect
+    {
+        get => loadServerSelect;
+        set => loadServerSelect = value;
+    }
+    public int LoadResourceIndex
+    {
+        get => loadResourceIndex;
+        set => loadResourceIndex = value;
+    }
     public bool SaveImageSelected
     {
         get => saveImageSelected;
         set => saveImageSelected = value;
     }
-    public void CreateBufferFromFile(string FileName)
+    public bool ArchiveIMageActive
+    { 
+        get => archiveImageActive; 
+        set => archiveImageActive = value;
+    }
+    public int ArchiveImageCount
     {
+        get 
+        {
+            FindArchivedImages();
+            return archiveImageCount; 
+        }
+    }
+    public int ArchiveImageIndex
+    { 
+        get { return archiveImageIndex; }
+        set {  archiveImageIndex = value; }
+    }
+    public void FindArchivedImages()
+    {
+        //Confirm Directory Exists
+        System.IO.Directory.CreateDirectory(ImageFilePath);
+        //Create Directory Type
+        DirectoryInfo imageDirInfo = new DirectoryInfo(ImageFilePath);
+        //Create Array of names if files
+        archiveImageArray = imageDirInfo.GetFiles();
+        
+        if (archiveImageArray.Length > 0) { archiveImageCount = archiveImageArray.Length; }
+        else { archiveImageCount = -1; }
+
+    }
+    public void CreateBufferFromFile()
+    {
+        if (archiveImageCount == -1) {return; }
+        if (archiveImageIndex > archiveImageCount - 1) { archiveImageIndex = 0; }
+        if (archiveImageIndex < 0 ) { archiveImageIndex = archiveImageCount - 1; }
+
+        string filename = ImageFilePath + archiveImageArray[archiveImageIndex].Name;
+
         // Allocate buffer with parameters compatible to file (does not load it)
-        m_Buffers = new SapBuffer(FileName, SapBuffer.MemoryType.Default);
+        m_ArchiveBuffers = new SapBuffer(filename, SapBuffer.MemoryType.Default);
         // Create buffer object
-        if (!m_Buffers.Create())
+        if (!m_ArchiveBuffers.Create())
         {
             Cleaning();
             return;
         }
         // Load file
-        if (!m_Buffers.Load(FileName, -1))
+        if (!m_ArchiveBuffers.Load(filename, -1))
         {
             Cleaning();
             return;
         }
+
+        m_ArchiveBuffers.GetAddress(m_ArchiveBuffers.Index, out imageAddress);
+
+        imageWidth = m_ArchiveBuffers.Width;
+        imageHeight = m_ArchiveBuffers.Height;
+        imageFormat = m_ArchiveBuffers.XferParams.Format;
+
+        form.Camera1TriggerToolBlock();
     }
     public void LoadConfigFile()
     {
@@ -136,12 +204,12 @@ class DalsaImage
         form.LoggingStatment(cameraName + ": new log file from: " + configFile);
 
     }
-    public void CreateCamera(string selectedServer, int selectedResource)
+    public void CreateCamera()
     {
-        form.LoggingStatment($"{cameraName}: CreateCamera from {selectedServer}  {selectedResource} ");
+        form.LoggingStatment($"{cameraName}: CreateCamera from {loadServerSelect}  {loadResourceIndex} ");
         Cleaning();
 
-        m_ServerLocation = new SapLocation(selectedServer, selectedResource);
+        m_ServerLocation = new SapLocation(loadServerSelect, loadResourceIndex);
 
 
         if (SapManager.GetResourceCount(m_ServerLocation, SapManager.ResourceType.Acq) > 0)
@@ -151,7 +219,7 @@ class DalsaImage
             m_Acquisition = new SapAcquisition(m_ServerLocation, configFile);
             m_Buffers = new SapBufferWithTrash(2, m_Acquisition, SapBuffer.MemoryType.ScatterGather);
             m_AcqXfer = new SapAcqToBuf(m_Acquisition, m_Buffers);
-
+            
             // End of frame event
             m_AcqXfer.Pairs[0].EventType = SapXferPair.XferEventType.EndOfTransfer;
             m_AcqXfer.XferNotify += new SapXferNotifyHandler(XferNotify);
@@ -187,6 +255,7 @@ class DalsaImage
         }
         if (m_Buffers != null && !m_Buffers.Initialized)
         {
+            archiveImageActive = false;
             m_Buffers.Create();
         }
         if (m_AcqDeviceXfer != null && !m_AcqDeviceXfer.Initialized)
@@ -254,7 +323,6 @@ class DalsaImage
     }
     public void SaveImageBMP()
     {
-        string ImageFilePath = form.ExeFilePath + "\\" + CameraName + "_Images\\";
         System.IO.Directory.CreateDirectory(ImageFilePath);
 
         DirectoryInfo ImageDirInfo = new DirectoryInfo(ImageFilePath);
@@ -288,7 +356,12 @@ class DalsaImage
         {
             m_Buffers.Destroy();
             m_Buffers.Dispose();
-        }       
+        }
+        if (m_ArchiveBuffers != null)
+        {
+            m_ArchiveBuffers.Destroy();
+            m_ArchiveBuffers.Dispose();
+        }
     }
     public ICogImage RawToCogImage()
     {

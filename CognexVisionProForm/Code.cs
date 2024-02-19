@@ -33,7 +33,7 @@ namespace CognexVisionProForm
         {
             get { return exeFilePath; }
         }
-        public void InitializeAcquisition()
+        public void InitializeClasses()
         {
             Trace.AutoFlush = true;
             Trace.Indent();
@@ -42,18 +42,24 @@ namespace CognexVisionProForm
             pollingTimer.Tick += new EventHandler(pollingTimer_Tick);
             pollingTimer.Interval = 200; // in miliseconds
 
-            Camera01Acq = new DalsaImage("Camera01", this);
-
+            Camera01Acq = new DalsaImage(this);
             Camera01Calc = new Calculations();
-
-            Camera01Tb01 = new ToolBlock("Camera 01 Toolblock 01", this);
-            Camera01Tb02 = new ToolBlock("Camera 01 Toolblock 02", this);
-
-            
+            for (int i = 0; i < toolblockArray.Length; i++) { toolblockArray[i] = new ToolBlock(this); }
 
             MainPLC = new PlcComms(this);
 
             LoggingStatment($"InitializeAcquisition Complete");
+        }
+        public void InitializeJobManager()
+        {
+            for (int i = 0; i < toolblockArray.Length; i++) 
+            { 
+                if(toolblockArray[i].ToolFilePresent)
+                {
+                    toolblockArray[i].InitializeJobManager();
+                }
+                
+            }
         }
         public void InitializeLogging()
         {
@@ -112,8 +118,8 @@ namespace CognexVisionProForm
 
             
             //select the server that was used last time
-            int ServerNameFoundIndex = cbServerList.FindString(m_ServerName, 0);
-            if (!string.IsNullOrEmpty(m_ServerName) && ServerNameFoundIndex != -1)
+            int ServerNameFoundIndex = cbServerList.FindString(Camera01Acq.LoadServerSelect, 0);
+            if (!string.IsNullOrEmpty(Camera01Acq.LoadServerSelect) && ServerNameFoundIndex != -1)
             {
                 cbServerList.SelectedIndex = ServerNameFoundIndex;
             }
@@ -126,10 +132,7 @@ namespace CognexVisionProForm
                 cbServerList.Items.Add(new MyListBoxItem(ServerNotFound, false));
                 cbServerList.SelectedIndex = 0;
             }
-
-            m_ServerName = cbServerList.SelectedItem.ToString();
-
-
+            Camera01Acq.LoadServerSelect = cbServerList.SelectedItem.ToString();
         }
         public void InitializeResourceList()
         {
@@ -137,17 +140,17 @@ namespace CognexVisionProForm
             int AcqDeviceCount = 0;
 
             cbDeviceList.Items.Clear();
-            if(!string.IsNullOrEmpty(m_ServerName) && m_ServerName != ServerNotFound)
+            if(!string.IsNullOrEmpty(Camera01Acq.LoadServerSelect) && Camera01Acq.LoadServerSelect != ServerNotFound)
             {
-                AcqCount = SapManager.GetResourceCount(m_ServerName, SapManager.ResourceType.Acq);
-                AcqDeviceCount = SapManager.GetResourceCount(m_ServerName, SapManager.ResourceType.AcqDevice);
+                AcqCount = SapManager.GetResourceCount(Camera01Acq.LoadServerSelect, SapManager.ResourceType.Acq);
+                AcqDeviceCount = SapManager.GetResourceCount(Camera01Acq.LoadServerSelect, SapManager.ResourceType.AcqDevice);
             }
 
             if (AcqCount > 0)
             {
                 for (int i = 0; i < AcqCount; i++)
                 {
-                    string AcqName = SapManager.GetResourceName(m_ServerName, SapManager.ResourceType.AcqDevice, i);
+                    string AcqName = SapManager.GetResourceName(Camera01Acq.LoadServerSelect, SapManager.ResourceType.AcqDevice, i);
                     cbDeviceList.Items.Add(AcqName);
                 }
             }
@@ -156,7 +159,7 @@ namespace CognexVisionProForm
             {
                 for (int i = 0; i < AcqDeviceCount; i++)
                 {
-                    string AcqDevice = SapManager.GetResourceName(m_ServerName, SapManager.ResourceType.AcqDevice, i);
+                    string AcqDevice = SapManager.GetResourceName(Camera01Acq.LoadServerSelect, SapManager.ResourceType.AcqDevice, i);
                     cbDeviceList.Items.Add(AcqDevice);
                 }
             }
@@ -164,11 +167,11 @@ namespace CognexVisionProForm
             if(AcqCount == 0 && AcqDeviceCount == 0)
             {
                 cbDeviceList.Items.Add("No Camera Found");
-                m_ResourceIndex = 0;
+                Camera01Acq.LoadResourceIndex = 0;
             }
 
 
-                cbDeviceList.SelectedIndex = m_ResourceIndex;
+                cbDeviceList.SelectedIndex = Camera01Acq.LoadResourceIndex;
 
             
         }
@@ -180,7 +183,7 @@ namespace CognexVisionProForm
         delegate void Camera1TriggerToolBlockCallBack();
         public void Camera1Trigger()
         {
-            if (cbCameraConnected.Checked)
+            if (Camera01Acq.Connected)
             {
                 Camera01Acq.SnapPicture();
 
@@ -188,6 +191,13 @@ namespace CognexVisionProForm
                 {
                     Camera01Acq.SaveImageBMP();
                 }
+            }
+            else if(Camera01Acq.ArchiveIMageActive)
+            {
+
+                Camera01Acq.CreateBufferFromFile();
+                Camera01Acq.ArchiveImageIndex++;
+
             }
             else
             {
@@ -199,8 +209,10 @@ namespace CognexVisionProForm
         {
             ICogImage Camera01Image = Camera01Acq.MarshalToCogImage();
 
-            Camera01Tb01.ToolRun(Camera01Image as CogImage8Grey);
-            Camera01Tb02.ToolRun(Camera01Image as CogImage8Grey);
+            for(int i = 0;i < toolblockArray.Length;i++)
+            {
+                toolblockArray[i].ToolRun(Camera01Image as CogImage8Grey);
+            }
 
             if (this.cogDisplay1.InvokeRequired)
             {
@@ -209,8 +221,23 @@ namespace CognexVisionProForm
             }
             else
             {
+                cogWidth = panel1.Location.X - 5;
+                cogHeight = tabControl1.Size.Height - 5;
+
+                double zoomWidth = Convert.ToDouble(cogWidth) / Convert.ToDouble(Camera01Image.Width);
+                double zoomHeight = Convert.ToDouble(cogHeight) / Convert.ToDouble(Camera01Image.Height);
+
+                if(zoomWidth < zoomHeight)
+                {
+                    cogDisplay1.Zoom = zoomWidth;
+                }
+                else if(zoomHeight < zoomWidth)
+                {
+                    cogDisplay1.Zoom = zoomHeight;
+                }
+                
                 cogDisplay1.Image = Camera01Image;
-                cogDisplay1.Fit();
+
                 cogDisplay1.Width = Convert.ToInt16(Convert.ToDouble(Camera01Image.Width) * cogDisplay1.Zoom);
                 cogDisplay1.Height = Convert.ToInt16(Convert.ToDouble(Camera01Image.Height) * cogDisplay1.Zoom);
             }
@@ -218,18 +245,49 @@ namespace CognexVisionProForm
         public void Camera1ToolBlockUpdate()
         {
             txtC1ImageTime.Text = Camera01Acq.AcqTime.ToString();
-            if (Camera01Tb01.ResultUpdated)
+
+            lbToolData.Items.Clear();
+
+            for (int i = 0; i < toolblockArray.Length; i++)
             {
-                lbToolData.Items.Clear();
+                cbCameraSelected.Items.Add(toolblockArray[i].ToolName);
 
-                lbToolData.Items.Add(Camera01Tb01.ToolName);
-                lbToolData.Items.Add(Camera01Tb01.RunStatus.Result.ToString());
-                lbToolData.Items.Add(Camera01Tb01.RunStatus.TotalTime.ToString());
-
-                for (int i = 0; i < Camera01Tb01.ToolOutput.Length; i++)
+                if (toolblockArray[i].ResultUpdated)
                 {
-                    lbToolData.Items.Add($"{Camera01Tb01.ToolOutput[i].Name} - {Camera01Tb01.ToolOutput[i].Value}");
+                    lbToolData.Items.Add(toolblockArray[i].ToolName);
+                    lbToolData.Items.Add(toolblockArray[i].RunStatus.Result.ToString());
+                    lbToolData.Items.Add(toolblockArray[i].RunStatus.TotalTime.ToString());
+
+                    for (int e = 0; e < toolblockArray[i].ToolOutput.Length; e++)
+                    {
+                        lbToolData.Items.Add($"{toolblockArray[i].ToolOutput[e].Name} - {toolblockArray[i].ToolOutput[e].Value}");
+                    }
                 }
+            }
+
+            lbToolData.Height =  lbToolData.PreferredHeight;
+            
+        }
+        public void UpdateFrameGrabberTab()
+        {
+            cbConfigFileFound.Checked = Camera01Acq.ConfigFilePresent;
+            cbCameraConnected.Checked = Camera01Acq.Connected;
+            tbCameraName.Text = Camera01Acq.CameraName;
+            tbArchiveCount.Text = Camera01Acq.ArchiveImageCount.ToString();
+            tbArchiveIndex.Text = Camera01Acq.ArchiveImageIndex.ToString();
+            cbArchiveActive.Checked = Camera01Acq.ArchiveIMageActive;
+            cbToolBlock.Items.Clear();
+            for (int i = 0; i < toolblockArray.Length; i++)
+            {
+                if (toolblockArray[i].ToolFilePresent)
+                {
+                    cbToolBlock.Items.Add(toolblockArray[i].ToolName);
+                }
+                else
+                {
+                    cbToolBlock.Items.Add($"Empty{i}");
+                }
+
             }
         }
         public void CheckLicense()
@@ -252,18 +310,27 @@ namespace CognexVisionProForm
         }
         public void Import(string DeviceID, String FileType, String Extension)
         {
+            string newfigFile = "";
+            string newfigFileExtension = "";
+            string newfigFileName = "";
+            string newfigFilePath = "";
 
             // get file from file explorer
             OpenFileDialog openFileDialog1 = new OpenFileDialog();
             openFileDialog1.InitialDirectory = ToolBlockLocation;
             openFileDialog1.Title = "Select Configuration File";
-            openFileDialog1.ShowDialog();
-
-            string newfigFile = openFileDialog1.FileName;
-            string newfigFileExtension = Path.GetExtension(newfigFile);
-            string newfigFileName = Path.GetFileNameWithoutExtension(newfigFile);
-            string newfigFilePath = Path.GetDirectoryName(newfigFile);
-
+            
+            if(openFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                newfigFile = openFileDialog1.FileName;
+                newfigFileExtension = Path.GetExtension(newfigFile);
+                newfigFileName = Path.GetFileNameWithoutExtension(newfigFile);
+                newfigFilePath = Path.GetDirectoryName(newfigFile);
+            }
+            else
+            {
+                return;
+            }
             //CONFIRM SELECTED FILE IS CORRECT TYPE, IF NOT END WITH MESSAGE
             if (newfigFileExtension != Extension) 
             {
@@ -326,9 +393,14 @@ namespace CognexVisionProForm
             RegistryKey RegKey = Registry.CurrentUser.CreateSubKey(KeyPath);
 
             // Write config file name and location (server and resource)
-            RegKey.SetValue("Camera1_Name", tbC1TB1Name.Text);
-            RegKey.SetValue("Camera1_Server", serverListSelected.ToString());
-            RegKey.SetValue("Camera1_Resource", cbDeviceList.SelectedIndex);
+            RegKey.SetValue("Camera1_Name", Camera01Acq.CameraName);
+            RegKey.SetValue("Camera1_Server", Camera01Acq.LoadServerSelect);
+            RegKey.SetValue("Camera1_Resource", Camera01Acq.LoadResourceIndex);
+            
+            for(int i = 0;i<toolblockArray.Length; i++)
+            {
+                RegKey.SetValue($"Camera1_ToolBlock{i}", toolblockArray[i].ToolName);
+            }
 
             //save IP address used for PLC
             RegKey.SetValue("MainPLC_IP1", Convert.ToInt32(numIP1.Value));
@@ -343,9 +415,14 @@ namespace CognexVisionProForm
             if (RegKey != null)
             {
                 // Read location (server and resource) and file name
-                tbC1TB1Name.Text = RegKey.GetValue("Camera1_Name", "").ToString();
-                m_ServerName = RegKey.GetValue("Camera1_Server", "").ToString();
-                m_ResourceIndex = (int)RegKey.GetValue("Camera1_Resource", 0);
+                Camera01Acq.CameraName = RegKey.GetValue("Camera1_Name", "").ToString();
+                Camera01Acq.LoadServerSelect = RegKey.GetValue("Camera1_Server", "").ToString();
+                Camera01Acq.LoadResourceIndex = (int)RegKey.GetValue("Camera1_Resource", 0);
+
+                for (int i = 0; i < toolblockArray.Length; i++)
+                {
+                    toolblockArray[i].ToolName = (RegKey.GetValue($"Camera1_ToolBlock{i}", "").ToString());
+                }
 
                 //retreaving information for IP address
                 numIP1.Value = (int)RegKey.GetValue("MainPLC_IP1", 0);

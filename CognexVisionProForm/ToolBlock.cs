@@ -25,24 +25,10 @@ namespace CognexVisionProForm
 
         public CogToolBlock cogToolBlock;
         Form1 form = new Form1();
-        public ToolBlock(String ToolName, Form1 Form)
+        public ToolBlock(Form1 Form)
         {
             // Update internal variables
             form = Form;
-            toolName = ToolName;
-            
-
-            toolFileLocation = form.ExeFilePath + "\\" + toolName + "_" + toolFileType + toolFileExtension; ;
-            if (File.Exists(toolFileLocation))
-            {
-                toolFilePresent = true;
-                toolFile = toolFileLocation;
-            }
-            else
-            {
-                toolFilePresent = false;
-                toolFile = "";
-            }
         }
 
         public string ToolName
@@ -50,15 +36,26 @@ namespace CognexVisionProForm
             get
             {
                 if (cogToolBlock != null) { return cogToolBlock.Name; }
+                else if (!String.IsNullOrEmpty(toolName)) { return toolName; }
                 else { return "Tool Block not looaded yet"; }
             }
             set
             {
-                if(cogToolBlock != null)
-                {
-                    cogToolBlock.Name = value;
-                }
+                if (cogToolBlock != null) { cogToolBlock.Name = value; }
                 toolName = value.ToString();
+                
+                toolFileLocation = form.ExeFilePath + "\\" + toolName + "_" + toolFileType + toolFileExtension;
+                
+                if (File.Exists(toolFileLocation))
+                {
+                    toolFilePresent = true;
+                    toolFile = toolFileLocation;
+                }
+                else
+                {
+                    toolFilePresent = false;
+                    toolFile = "";
+                }
             }
         }
         public ICogRunStatus RunStatus
@@ -89,6 +86,19 @@ namespace CognexVisionProForm
             if (cogToolBlock != null) { Cleaning(); }
 
             form.Import(toolName, toolFileType, toolFileExtension);
+
+            toolFileLocation = form.ExeFilePath + "\\" + toolName + "_" + toolFileType + toolFileExtension;
+            
+            if (File.Exists(toolFileLocation))
+            {
+                toolFilePresent = true;
+                toolFile = toolFileLocation;
+            }
+            else
+            {
+                toolFilePresent = false;
+                toolFile = "";
+            }
         }
         public void InitializeJobManager()
         {

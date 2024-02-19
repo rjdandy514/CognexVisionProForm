@@ -19,6 +19,8 @@ namespace CognexVisionProForm
 {
     public partial class Form1 : Form
     {
+        private int cogHeight;
+        private int cogWidth;
         private bool heartBeat = false;
         private bool CommsUp = false;
 
@@ -31,8 +33,8 @@ namespace CognexVisionProForm
         private int ExpireCount = 0;
 
         private bool ExpireError = false;
-        private ToolBlock Camera01Tb01;
-        private ToolBlock Camera01Tb02;
+
+        private ToolBlock[] toolblockArray = new ToolBlock[4];
 
         private Calculations Camera01Calc;
 
@@ -62,8 +64,7 @@ namespace CognexVisionProForm
 
         string C1Tb1Name;
         string ServerNotFound = "No Server Found";
-        string m_ServerName;
-        int m_ResourceIndex;
+
 
         private Timer pollingTimer;
 
@@ -91,22 +92,29 @@ namespace CognexVisionProForm
             CameraStatus[5] = false;
             CameraStatus[6] = false;
             CameraStatus.CopyTo(MainPLC.PCtoPLC_Data,0);
-
-            //Tool Status: info related to Camera Tool 1
-            ToolStatus01[0] = Camera01Tb01.ToolReady;
-            ToolStatus01[1] = Camera01Tb01.ResultUpdated;
-            ToolStatus01[2] = Convert.ToBoolean(Camera01Tb01.RunStatus.Result);
-            ToolStatus01[3] = false;
-            ToolStatus01[4] = false;
-            ToolStatus01[5] = false;
-            ToolStatus01[6] = false;
+            
+            for (int i = 0; i < toolblockArray.Length; i++)
+            {
+                toolblockArray[i].Cleaning();
+                //Tool Status: info related to Camera Tool 1
+                ToolStatus01[8*i+0] = toolblockArray[i].ToolReady;
+                ToolStatus01[8*i+1] = toolblockArray[i].ResultUpdated;
+                ToolStatus01[8 * i + 2] = Convert.ToBoolean(toolblockArray[i].RunStatus.Result);
+                ToolStatus01[8 * i + 3] = false;
+                ToolStatus01[8 * i + 4] = false;
+                ToolStatus01[8 * i + 5] = false;
+                ToolStatus01[8 * i + 6] = false;
+                ToolStatus01[8 * i + 7] = false;
+            }
             ToolStatus01.CopyTo(MainPLC.PCtoPLC_Data, 1);
-
 
             //All data variables
             MainPLC.PCtoPLC_Data[8] = Convert.ToInt32(Camera01Acq.AcqTime*100);
-            MainPLC.PCtoPLC_Data[9] = Convert.ToInt32(Camera01Tb01.RunStatus.TotalTime*100);
-            MainPLC.PCtoPLC_Data[10] = Convert.ToInt32(Camera01Tb02.RunStatus.TotalTime * 100);
+
+            for (int i = 0; i < toolblockArray.Length; i++)
+            {
+                MainPLC.PCtoPLC_Data[9+i] = Convert.ToInt32(toolblockArray[i].RunStatus.TotalTime * 100);
+            }
 
 
             if (CommsUp)
@@ -117,8 +125,6 @@ namespace CognexVisionProForm
                     MainPLC.WritePlcTag();
                 }
             }
-            
-            
         }
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -129,26 +135,20 @@ namespace CognexVisionProForm
             exeFilePath = Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath);
             
             InitializeLogging();
-            InitializeAcquisition();
+            InitializeClasses();
             LoadSettings();
             InitializeServerList();
             InitializeResourceList();
+            InitializeJobManager();
 
             CheckLicense();
-            if(cogLicenseOk)
-            {
-                Camera01Tb01.InitializeJobManager();
-                Camera01Tb02.InitializeJobManager();
-            }
-            else
+            if(!cogLicenseOk)
             {
                 MessageBox.Show("Cognex VisionPro License did not load properly");
                 tabControl1.SelectedIndex = 2;
             }
-
-            cbConfigFileFound.Checked = Camera01Acq.ConfigFilePresent;
-            cbC1Tb1FileFound.Checked = Camera01Tb01.ToolFilePresent;
-
+            cogHeight = cogDisplay1.Height;
+            cogWidth = cogDisplay1.Width; 
         }
         private void btnLicenseCheck_Click(object sender, EventArgs e)
         {
@@ -156,7 +156,10 @@ namespace CognexVisionProForm
         }
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            Camera01Tb01.Cleaning();
+            for (int i = 0; i < toolblockArray.Length; i++)
+            {
+                toolblockArray[i].Cleaning();
+            }
             Camera01Acq.Cleaning();
             MainPLC.Cleaning();
             cogToolBlockEditV21.Dispose();
@@ -177,8 +180,13 @@ namespace CognexVisionProForm
         private void bttnC1TB1FileSelect_Click(object sender, EventArgs e)
         {
 
-            Camera01Tb01.LoadvisionProject();
-            cbC1Tb1FileFound.Checked = Camera01Tb01.ToolFilePresent;
+            string toolNameUpdated = "Camera01_" + tbC1TB1Name.Text.ToString();
+            int toolSelected = cbToolBlock.SelectedIndex;
+            toolblockArray[toolSelected].ToolName = toolNameUpdated;
+            toolblockArray[toolSelected].LoadvisionProject();
+            toolblockArray[toolSelected].InitializeJobManager();
+
+            cbToolBlock.Items[toolSelected] = toolNameUpdated;
         }
         private void btnPartCalc_Click(object sender, EventArgs e)
         {
@@ -270,16 +278,18 @@ namespace CognexVisionProForm
             MyListBoxItem item = (MyListBoxItem)cbServerList.SelectedItem;
             bool configFileRequired = item.ItemData;
             cbConfigFileReq.Checked = configFileRequired;
-            m_ServerName = item.ToString();
+            Camera01Acq.LoadServerSelect = item.ToString();
 
             InitializeResourceList();
 
         }
         private void bttnConnectCamera_Click(object sender, EventArgs e)
         {
-            if (cbServerList.SelectedItem != null && cbDeviceList.SelectedItem != null)
+            Camera01Acq.LoadResourceIndex = cbDeviceList.SelectedIndex;
+
+            if (Camera01Acq.LoadServerSelect != null && Camera01Acq.LoadResourceIndex != -1)
             {
-                Camera01Acq.CreateCamera(cbServerList.SelectedItem.ToString(), cbDeviceList.SelectedIndex);
+                Camera01Acq.CreateCamera();
             }
             if (Camera01Acq.Connected) { cbCameraConnected.Checked = true; }
             else
@@ -331,19 +341,21 @@ namespace CognexVisionProForm
         private void cbCameraSelected_DropDown(object sender, EventArgs e)
         {
             cbCameraSelected.Items.Clear();
-            cbCameraSelected.Items.Add(Camera01Tb01.ToolName);
-            cbCameraSelected.Items.Add(Camera01Tb02.ToolName);
+            for (int i = 0; i < toolblockArray.Length; i++)
+            {
+                cbCameraSelected.Items.Add(toolblockArray[i].ToolName);
+            }
         }
         private void cbCameraSelected_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (cbCameraSelected.SelectedItem.ToString() == Camera01Tb01.ToolName)
+
+            if(toolblockArray[cbCameraSelected.SelectedIndex].ToolReady)
             {
-                cogToolBlockEditV21.Subject = Camera01Tb01.cogToolBlock;
+                cogToolBlockEditV21.Subject = toolblockArray[cbCameraSelected.SelectedIndex].cogToolBlock;
             }
-            else if(cbCameraSelected.SelectedItem.ToString() == Camera01Tb02.ToolName)
-            {
-                cogToolBlockEditV21.Subject = Camera01Tb02.cogToolBlock;
-            }
+            
+
+           
             if(cogToolBlockEditV21.Subject != null)
             {
                 cogToolBlockEditV21.Subject.Run();
@@ -367,40 +379,6 @@ namespace CognexVisionProForm
             cbConfigFileFound.Checked = Camera01Acq.ConfigFilePresent;
 
         }
-        class MyListBoxItem
-        {
-            public MyListBoxItem(string Text)
-            {
-                Camdesc = Text;
-                itemData = false;
-            }
-
-            public MyListBoxItem(string Text, bool ItemData)
-            {
-                Camdesc = Text;
-                itemData = ItemData;
-            }
-
-            public bool ItemData
-            {
-                get
-                {
-                    return itemData;
-                }
-                set
-                {
-                    itemData = value;
-                }
-            }
-
-            public override string ToString()
-            {
-                return Camdesc;
-            }
-
-            private string Camdesc;
-            private bool itemData;
-        }
         private void bttnC1LogImages_Click(object sender, EventArgs e)
         {
             if (Camera01Acq.SaveImageSelected) 
@@ -414,10 +392,38 @@ namespace CognexVisionProForm
                 bttnC1LogImages.Text = "Log Images - Active";
             }
         }
-
-        private void tbC1TB1Name_Leave(object sender, EventArgs e)
+        private void bttnArchiveImage_Click(object sender, EventArgs e)
         {
-            Camera01Tb01.ToolName = tbC1TB1Name.Text.ToString();
+            if (!Camera01Acq.ArchiveIMageActive)
+            {
+                Camera01Acq.FindArchivedImages();
+                if (Camera01Acq.ArchiveImageCount > 0) { Camera01Acq.ArchiveIMageActive = true; }
+            }
+            else { Camera01Acq.ArchiveIMageActive = false; }
+            cbArchiveActive.Checked = Camera01Acq.ArchiveIMageActive;
+        }
+        private void cbToolBlock_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            cbC1Tb1FileFound.Checked = toolblockArray[cbToolBlock.SelectedIndex].ToolFilePresent;
+        }
+        private void cogToolBlockEditV21_Load(object sender, EventArgs e)
+        {
+
+        }
+        private void tabControl1_TabIndexChanged(object sender, EventArgs e)
+        {
+ 
+        }
+        private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (tabControl1.SelectedIndex == 1)
+            {
+                UpdateFrameGrabberTab();
+            }
+        }
+        private void tbCameraName_TextChanged(object sender, EventArgs e)
+        {
+            Camera01Acq.CameraName = tbCameraName.Text;
         }
     }
 
