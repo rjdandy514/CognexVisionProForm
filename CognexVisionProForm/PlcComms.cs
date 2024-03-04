@@ -27,9 +27,8 @@ namespace CognexVisionProForm
         public int[] PlcToPC_Data = new int[32];
         public int[]PCtoPLC_Data = new int[32];
         string IP_Address;
-        BitArray DintArray;
         Ping pinger;
-
+        
         public PlcComms(Form1 Sender)
         {
             _form = new Form1();

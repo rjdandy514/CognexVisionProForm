@@ -14,6 +14,9 @@ using System.Net.NetworkInformation;
 using System.Collections;
 using static DalsaImage;
 using System.IO;
+using System.Linq;
+using System.Net.Http.Headers;
+using System.Drawing;
 
 namespace CognexVisionProForm
 {
@@ -24,17 +27,31 @@ namespace CognexVisionProForm
         private bool heartBeat = false;
         private bool CommsUp = false;
 
+        private BitArray CameraControl;
+        private BitArray CameraStatus;
+
+        private BitArray toolControl;
+        private BitArray toolStatus;
+        private bool toolRunComplete;
+        private int toolRunCount;
+        private int toolCompleteCount;
+
         private CogStringCollection LicenseCheck;
         private bool cogLicenseOk;
 
-        private DalsaImage Camera01Acq;
+        int selectedCameraId;
+        public DalsaImage[] CameraAcqArray;
+        ICogImage CameraImage;
+        bool cameraSnapComplete;
+        public CameraControl[] cameraControl;
 
-        private string ToolBlockLocation;
+
+        int toolBlockRunComplete;
         private int ExpireCount = 0;
 
         private bool ExpireError = false;
 
-        private ToolBlock[] toolblockArray = new ToolBlock[4];
+        private ToolBlock[,] toolblockArray;
 
         private Calculations Camera01Calc;
 
@@ -58,13 +75,10 @@ namespace CognexVisionProForm
         double Robot_Y;
         double Robot_Degree;
 
-        string exeFileExtension;
-        string exeFileName;
-        string exeFilePath;
+        int cameraCount;
+        int toolCount;
 
-        string C1Tb1Name;
         string ServerNotFound = "No Server Found";
-
 
         private Timer pollingTimer;
 
@@ -75,46 +89,17 @@ namespace CognexVisionProForm
         
         private void pollingTimer_Tick(object sender, EventArgs e)
         {
+            pollingTimer.Stop();
             if (heartBeat) { heartBeat = false; }
             else { heartBeat = true; }
 
             cbHeartbeat.Checked = heartBeat;
 
-            BitArray CameraStatus = new BitArray(32, false);
-            BitArray ToolStatus01 = new BitArray(32, false);
+            PlcRead();
 
-            //Camera Status: info related to camera and general system
-            CameraStatus[0] = heartBeat;
-            CameraStatus[1] = Camera01Acq.Connected;
-            CameraStatus[2] = cogLicenseOk;
-            CameraStatus[3] = false;
-            CameraStatus[4] = false;
-            CameraStatus[5] = false;
-            CameraStatus[6] = false;
-            CameraStatus.CopyTo(MainPLC.PCtoPLC_Data,0);
-            
-            for (int i = 0; i < toolblockArray.Length; i++)
-            {
-                toolblockArray[i].Cleaning();
-                //Tool Status: info related to Camera Tool 1
-                ToolStatus01[8*i+0] = toolblockArray[i].ToolReady;
-                ToolStatus01[8*i+1] = toolblockArray[i].ResultUpdated;
-                ToolStatus01[8 * i + 2] = Convert.ToBoolean(toolblockArray[i].RunStatus.Result);
-                ToolStatus01[8 * i + 3] = false;
-                ToolStatus01[8 * i + 4] = false;
-                ToolStatus01[8 * i + 5] = false;
-                ToolStatus01[8 * i + 6] = false;
-                ToolStatus01[8 * i + 7] = false;
-            }
-            ToolStatus01.CopyTo(MainPLC.PCtoPLC_Data, 1);
+            CameraAcqArray[selectedCameraId].Trigger = CameraControl[0];
 
-            //All data variables
-            MainPLC.PCtoPLC_Data[8] = Convert.ToInt32(Camera01Acq.AcqTime*100);
-
-            for (int i = 0; i < toolblockArray.Length; i++)
-            {
-                MainPLC.PCtoPLC_Data[9+i] = Convert.ToInt32(toolblockArray[i].RunStatus.TotalTime * 100);
-            }
+            PlcWrite();
 
 
             if (CommsUp)
@@ -125,20 +110,26 @@ namespace CognexVisionProForm
                     MainPLC.WritePlcTag();
                 }
             }
+            pollingTimer.Start();
         }
         private void Form1_Load(object sender, EventArgs e)
         {
             this.Text = "Eclipse Vision Application";
+           
+            string LogDir = Utilities.ExeFilePath + "\\LogFile\\";
+            string ArchiveLogDir = LogDir + "Archive\\";
+            Utilities.InitializeLog(LogDir, ArchiveLogDir);
 
-            exeFileExtension = Path.GetExtension(System.Windows.Forms.Application.ExecutablePath);
-            exeFileName = Path.GetFileNameWithoutExtension(System.Windows.Forms.Application.ExecutablePath);
-            exeFilePath = Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath);
-            
-            InitializeLogging();
+            cameraCount = 3;
+            toolCount = 4;
+            CameraAcqArray = new DalsaImage[cameraCount];
+            toolblockArray = new ToolBlock[cameraCount, toolCount];
+            cameraControl = new CameraControl[cameraCount];
+
             InitializeClasses();
             LoadSettings();
-            InitializeServerList();
-            InitializeResourceList();
+            InitializeServerList(0);
+            InitializeResourceList(0);
             InitializeJobManager();
 
             CheckLicense();
@@ -147,8 +138,6 @@ namespace CognexVisionProForm
                 MessageBox.Show("Cognex VisionPro License did not load properly");
                 tabControl1.SelectedIndex = 2;
             }
-            cogHeight = cogDisplay1.Height;
-            cogWidth = cogDisplay1.Width; 
         }
         private void btnLicenseCheck_Click(object sender, EventArgs e)
         {
@@ -156,16 +145,21 @@ namespace CognexVisionProForm
         }
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            for (int i = 0; i < toolblockArray.Length; i++)
+            for (int j = 0; j < cameraCount; j++)
             {
-                toolblockArray[i].Cleaning();
+                CameraAcqArray[j].Cleaning();
+                
+                for (int i = 0; i < toolCount; i++)
+                {
+                    toolblockArray[j, i].Cleaning();
+                }
             }
-            Camera01Acq.Cleaning();
+            
+            
             MainPLC.Cleaning();
             cogToolBlockEditV21.Dispose();
             pollingTimer.Dispose();
-            appListener.Close();
-            appListener.Dispose();
+            Utilities.Closing();
 
             SaveSettings();
         }
@@ -177,16 +171,23 @@ namespace CognexVisionProForm
         {
             Process.Start(txtLogFile.Text);
         }
-        private void bttnC1TB1FileSelect_Click(object sender, EventArgs e)
+        private void bttnToolBockFileSelect_Click(object sender, EventArgs e)
         {
-
-            string toolNameUpdated = "Camera01_" + tbC1TB1Name.Text.ToString();
+            
+            string toolNameUpdated = tbC1TB1Name.Text.ToString();
             int toolSelected = cbToolBlock.SelectedIndex;
-            toolblockArray[toolSelected].ToolName = toolNameUpdated;
-            toolblockArray[toolSelected].LoadvisionProject();
-            toolblockArray[toolSelected].InitializeJobManager();
 
-            cbToolBlock.Items[toolSelected] = toolNameUpdated;
+
+            if (toolSelected >= 0 && toolSelected < toolCount)
+            {
+                toolblockArray[0, toolSelected].Name = toolNameUpdated;
+                toolblockArray[0, toolSelected].LoadvisionProject();
+                toolblockArray[0, toolSelected].InitializeJobManager();
+
+                cbToolBlock.Items[toolSelected] = toolNameUpdated;
+            }
+
+            
         }
         private void btnPartCalc_Click(object sender, EventArgs e)
         {
@@ -278,80 +279,46 @@ namespace CognexVisionProForm
             MyListBoxItem item = (MyListBoxItem)cbServerList.SelectedItem;
             bool configFileRequired = item.ItemData;
             cbConfigFileReq.Checked = configFileRequired;
-            Camera01Acq.LoadServerSelect = item.ToString();
+            CameraAcqArray[selectedCameraId].LoadServerSelect = item.ToString();
 
-            InitializeResourceList();
+            InitializeResourceList(selectedCameraId);
 
         }
         private void bttnConnectCamera_Click(object sender, EventArgs e)
         {
-            Camera01Acq.LoadResourceIndex = cbDeviceList.SelectedIndex;
+            if(!CameraAcqArray[selectedCameraId].Connected)
+            {
+                CameraAcqArray[selectedCameraId].LoadServerSelect = cbServerList.SelectedItem.ToString();
+                CameraAcqArray[selectedCameraId].LoadResourceIndex = cbDeviceList.SelectedIndex;
 
-            if (Camera01Acq.LoadServerSelect != null && Camera01Acq.LoadResourceIndex != -1)
-            {
-                Camera01Acq.CreateCamera();
+                if (CameraAcqArray[selectedCameraId].LoadServerSelect != null && CameraAcqArray[selectedCameraId].LoadResourceIndex != -1)
+                {
+                    CameraAcqArray[selectedCameraId].CreateCamera();
+                }
+                if(!CameraAcqArray[selectedCameraId].Connected)
+                {
+                    MessageBox.Show("Failed to conenct");
+                }
+                
             }
-            if (Camera01Acq.Connected) { cbCameraConnected.Checked = true; }
-            else
-            {
-                MessageBox.Show("FAILED TO CONNECT SELECTED CAMERA");
-                cbCameraConnected.Checked = false;
-            }
-        }
-        private void bttnC1Snap_Click(object sender, EventArgs e)
-        {
-            Camera1Trigger();
-        }
-        private void bttnC1Grab_Click(object sender, EventArgs e)
-        {
-            if (cbCameraConnected.Checked)
-            {
-                Camera01Acq.GrabPicture();
-            }
-            else
-            {
-                MessageBox.Show("NO CAMERA IS CONNECTED");
-                tabControl1.SelectedIndex = 1;
-            }
-        }
-        private void bttnC1Freeze_Click(object sender, EventArgs e)
-        {
-            if (cbCameraConnected.Checked)
-            {
-                Camera01Acq.Freeze();
-            }
-            else
-            {
-                MessageBox.Show("NO CAMERA IS CONNECTED");
-                tabControl1.SelectedIndex = 1;
-            }
-        }
-        private void bttnC1Abort_Click(object sender, EventArgs e)
-        {
-            if (cbCameraConnected.Checked)
-            {
-                Camera01Acq.Abort();
-            }
-            else
-            {
-                MessageBox.Show("NO CAMERA IS CONNECTED");
-                tabControl1.SelectedIndex = 1;
-            }
+            else { CameraAcqArray[selectedCameraId].Disconnect(); }
+
+            cbCameraConnected.Checked = CameraAcqArray[selectedCameraId].Connected;
         }
         private void cbCameraSelected_DropDown(object sender, EventArgs e)
         {
-            cbCameraSelected.Items.Clear();
-            for (int i = 0; i < toolblockArray.Length; i++)
+            cbToolBlockSelected.Items.Clear();
+            for (int i = 0; i < toolblockArray.GetLength(1); i++)
             {
-                cbCameraSelected.Items.Add(toolblockArray[i].ToolName);
+                cbToolBlockSelected.Items.Add(toolblockArray[0,i].Name);
             }
         }
         private void cbCameraSelected_SelectedIndexChanged(object sender, EventArgs e)
         {
 
-            if(toolblockArray[cbCameraSelected.SelectedIndex].ToolReady)
+            if(toolblockArray[0,cbToolBlockSelected.SelectedIndex].ToolReady)
             {
-                cogToolBlockEditV21.Subject = toolblockArray[cbCameraSelected.SelectedIndex].cogToolBlock;
+                cogToolBlockEditV21.Subject = toolblockArray[0, cbToolBlockSelected.SelectedIndex].cogToolBlock;
             }
             
 
@@ -375,55 +342,138 @@ namespace CognexVisionProForm
         }
         private void bttnC1Config_Click(object sender, EventArgs e)
         {
-            Camera01Acq.LoadConfigFile();
-            cbConfigFileFound.Checked = Camera01Acq.ConfigFilePresent;
+            CameraAcqArray[selectedCameraId].LoadConfigFile();
+            cbConfigFileFound.Checked = CameraAcqArray[selectedCameraId].ConfigFilePresent;
 
-        }
-        private void bttnC1LogImages_Click(object sender, EventArgs e)
-        {
-            if (Camera01Acq.SaveImageSelected) 
-            {
-                Camera01Acq.SaveImageSelected = false;
-                bttnC1LogImages.Text = "Log Images";
-            }
-            else if(!Camera01Acq.SaveImageSelected)
-            {
-                Camera01Acq.SaveImageSelected = true;
-                bttnC1LogImages.Text = "Log Images - Active";
-            }
         }
         private void bttnArchiveImage_Click(object sender, EventArgs e)
         {
-            if (!Camera01Acq.ArchiveIMageActive)
+            if(CameraAcqArray[selectedCameraId].Connected)
             {
-                Camera01Acq.FindArchivedImages();
-                if (Camera01Acq.ArchiveImageCount > 0) { Camera01Acq.ArchiveIMageActive = true; }
+                CameraAcqArray[selectedCameraId].Disconnect();
+                cbCameraConnected.Checked = CameraAcqArray[selectedCameraId].Connected;
             }
-            else { Camera01Acq.ArchiveIMageActive = false; }
-            cbArchiveActive.Checked = Camera01Acq.ArchiveIMageActive;
+
+            if (!CameraAcqArray[selectedCameraId].ArchiveImageActive)
+            {
+                CameraAcqArray[selectedCameraId].FindArchivedImages();
+                if (CameraAcqArray[selectedCameraId].ArchiveImageCount > 0) 
+                { 
+                    CameraAcqArray[selectedCameraId].ArchiveImageActive = true;
+                    
+                }
+            }
+            else { CameraAcqArray[selectedCameraId].ArchiveImageActive = false; }
+            cbArchiveActive.Checked = CameraAcqArray[selectedCameraId].ArchiveImageActive;
         }
         private void cbToolBlock_SelectedIndexChanged(object sender, EventArgs e)
         {
-            cbC1Tb1FileFound.Checked = toolblockArray[cbToolBlock.SelectedIndex].ToolFilePresent;
+            cbC1Tb1FileFound.Checked = toolblockArray[0,cbToolBlock.SelectedIndex].FilePresent;
+            tbToolBlockName.Text = toolblockArray[0, cbToolBlock.SelectedIndex].Name;
         }
         private void cogToolBlockEditV21_Load(object sender, EventArgs e)
         {
 
         }
-        private void tabControl1_TabIndexChanged(object sender, EventArgs e)
-        {
- 
-        }
         private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (tabControl1.SelectedIndex == 1)
+            if(tabControl1.SelectedIndex == 0)
+            {
+                if (CameraAcqArray[0].Connected || CameraAcqArray[0].ArchiveImageActive)
+                {
+                    LoadForm(this.Camera1Panel, cameraControl[0]);
+
+                }
+                if (CameraAcqArray[1].Connected || CameraAcqArray[1].ArchiveImageActive)
+                {
+                    LoadForm(this.Camera2Panel, cameraControl[1]);
+
+                }
+                if (CameraAcqArray[2].Connected || CameraAcqArray[2].ArchiveImageActive)
+                {
+                    LoadForm(this.Camera3Panel, cameraControl[2]);
+                }
+            }
+            else if (tabControl1.SelectedIndex == 1)
             {
                 UpdateFrameGrabberTab();
             }
+            else if(tabControl1.SelectedIndex == 2)
+            {
+
+            }
+            else if(tabControl1.SelectedIndex == 7)
+            {
+            }
         }
-        private void tbCameraName_TextChanged(object sender, EventArgs e)
+
+        private void cbCameraIdSelected_SelectedIndexChanged(object sender, EventArgs e)
         {
-            Camera01Acq.CameraName = tbCameraName.Text;
+            selectedCameraId = cbCameraIdSelected.SelectedIndex;
+            
+            cbConfigFileFound.Checked = CameraAcqArray[selectedCameraId].ConfigFilePresent;
+            cbCameraConnected.Checked = CameraAcqArray[selectedCameraId].Connected;
+            tbCameraName.Text = CameraAcqArray[selectedCameraId].Name;
+            
+            tbArchiveCount.Text = CameraAcqArray[selectedCameraId].ArchiveImageCount.ToString();
+            tbArchiveIndex.Text = CameraAcqArray[selectedCameraId].ArchiveImageIndex.ToString();
+            cbArchiveActive.Checked = CameraAcqArray[selectedCameraId].ArchiveImageActive;
+
+            InitializeServerList(selectedCameraId);
+            InitializeResourceList(selectedCameraId);
+
+
+            for (int i = 0; i < toolCount; i++)
+            {
+                if (toolblockArray[0, i].FilePresent) { cbToolBlock.Items.Add(toolblockArray[0, i].Name); }
+                else { cbToolBlock.Items.Add($"Empty{i}"); }
+            }
+            cbToolBlock.SelectedIndex = 0;
+        }
+
+        private void bttnCameraNameUpdate_Click(object sender, EventArgs e)
+        {
+            CameraAcqArray[cbCameraIdSelected.SelectedIndex].Name = tbCameraName.Text;
+        }
+
+        private void bttnGlobalSnap_Click(object sender, EventArgs e)
+        {
+            for(int i = 0; i < cameraCount;i++)
+            {
+                if(CameraAcqArray[i].Connected || CameraAcqArray[i].ArchiveImageActive)
+                {
+                    CameraTrigger(i);
+                }
+            }
+        }
+
+        private void tbCamersDesc_Leave(object sender, EventArgs e)
+        {
+            CameraAcqArray[selectedCameraId].Description = tbCamersDesc.Text;
+        }
+
+        private void Form1_Resize(object sender, EventArgs e)
+        {
+
+            
+            Camera1Panel.Height = this.tabControl1.Height / 2 - 2;
+            Camera1Panel.Width = this.tabControl1.Width / 2 - 2;
+            Camera1Panel.Location = new Point(0, 0);
+
+            Camera2Panel.Height = this.tabControl1.Height / 2 - 2;
+            Camera2Panel.Width = this.tabControl1.Width / 2 - 2;
+            Camera2Panel.Location = new Point(tabControl1.Width - Camera2Panel.Width, 0);
+
+            Camera3Panel.Height = this.tabControl1.Height / 2 - 2;
+            Camera3Panel.Width = this.tabControl1.Width / 2 - 2;
+            Camera3Panel.Location = new Point(0, tabControl1.Height - Camera2Panel.Height);
+
+            Camera4Panel.Height = this.tabControl1.Height / 2 - 2;
+            Camera4Panel.Width = this.tabControl1.Width / 2 - 2;
+            Camera4Panel.Location = new Point(tabControl1.Width - Camera2Panel.Width, tabControl1.Height - Camera2Panel.Height);
+
+
+
         }
     }
 

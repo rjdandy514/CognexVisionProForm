@@ -9,52 +9,61 @@ using Cognex.VisionPro;
 using Microsoft.Win32;
 using System.Drawing;
 
-class DalsaImage
+public class DalsaImage
 {
 
     IntPtr imageAddress;
-    SapLocation m_ServerLocation;
-    SapAcqDevice m_AcqDevice;
-    SapAcquisition m_Acquisition;
-    public SapBuffer m_Buffers;
-    public SapBuffer m_ArchiveBuffers;
-    SapAcqDeviceToBuf m_AcqDeviceXfer;
-    SapAcqToBuf m_AcqXfer;
-    ServerCategory m_ServerCategory = ServerCategory.ServerAll;
+    SapLocation serverLocation;
+    SapAcqDevice acqDevice;
+    SapAcquisition acquisition;
+    SapBuffer buffers;
+    SapBuffer archiveBuffers;
+    SapAcqDeviceToBuf acqDeviceXfer;
+    SapAcqToBuf acqXfer;
+    ServerCategory serverCategory = ServerCategory.ServerAll;
 
     bool saveImageSelected;
 
+    int id;
+
+    ICogImage image;
+    SapFormat imageFormat;
+    bool imageReady;
     int imageWidth;
     int imageHeight;
-    SapFormat imageFormat;
-    
+    string imageFilePath;
+
     Stopwatch acqTimeWatch;
     double acqTime;
     double snapTime;
 
-    string ImageFilePath;
     string configFile;
     string configFileLocation;
     string configFileType = "ConfigFile";
     string configFileExtension = ".cff";
     bool configFilePresent;
+
     bool archiveImageActive;
-    string cameraName;
-    string loadServerSelect;
-    int loadResourceIndex;
     FileInfo[] archiveImageArray;
     int archiveImageCount;
     int archiveImageIndex;
+    
+    bool trigger;
+    bool triggerMem = false;
+    
+    string cameraName;
+    
+    string loadServerSelect;
+    string loadResourceName;
+    int loadResourceIndex;
 
 
     Form1 form = new Form1();
-    
-    
     public DalsaImage(Form1 Form)
     {
         acqTimeWatch = new Stopwatch();
         form = Form;
-        form.LoggingStatment(cameraName + ": DalsaImage Class created");
+        Utilities.LoggingStatment(cameraName + ": DalsaImage Class created");
     }
     public double AcqTime
     {
@@ -66,21 +75,21 @@ class DalsaImage
     }
     public int BufferIndex
     {
-        get { return m_Buffers.Index; }
+        get {return buffers.Index; }
     }
     public string CongfigFile
     {
         get { return configFile; }
         set { configFile = value; }
     }
-    public string CameraName
+    public string Name
     {
         get { return cameraName; }
         set 
         { 
             cameraName = value;
-            ImageFilePath = form.ExeFilePath + "\\" + cameraName + "_Images\\";
-            configFileLocation = form.ExeFilePath + "\\" + cameraName + "_" + configFileType + configFileExtension;
+            imageFilePath = Utilities.ExeFilePath + "\\Camera" + id.ToString("00")+ "\\Images\\";
+            configFileLocation = Utilities.ExeFilePath + "\\Camera" + id.ToString("00") + "\\" + configFileType + configFileExtension;
             if (File.Exists(configFileLocation))
             {
                 configFilePresent = true;
@@ -93,16 +102,35 @@ class DalsaImage
             }
         }
     }
+    public string Description
+    { get; set; }
+    public int Id
+    {
+        get => id;
+        set => id = value;
+    }
     public bool Connected
     {
         get 
         {
-            if (m_AcqDeviceXfer != null) { return m_AcqDeviceXfer.Connected && m_AcqDeviceXfer.Initialized; }
-            else if (m_AcqXfer != null) { return m_AcqXfer.Connected && m_AcqXfer.Initialized; }
+            if (acqDeviceXfer != null) { return acqDeviceXfer.Connected && acqDeviceXfer.Initialized; }
+            else if (acqXfer != null) { return acqXfer.Connected && acqXfer.Initialized; }
             else { return false; }
         }
     }
-
+    public bool Trigger
+    {
+        get
+        {
+            return trigger;
+        }
+        set
+        {
+            trigger = value;
+            if (trigger && !triggerMem) { SnapPicture(); }
+            triggerMem = trigger;
+        }
+    }
     public bool ConfigFilePresent
     {
         get => configFilePresent;
@@ -116,12 +144,17 @@ class DalsaImage
     };
     public ServerCategory ServerType
     {
-        get => m_ServerCategory;
+        get => serverCategory;
     }
     public string LoadServerSelect
     {
         get => loadServerSelect;
         set => loadServerSelect = value;
+    }
+    public string LoadResourceName
+    {
+        get => loadResourceName;
+        set => loadResourceName = value;
     }
     public int LoadResourceIndex
     {
@@ -133,7 +166,7 @@ class DalsaImage
         get => saveImageSelected;
         set => saveImageSelected = value;
     }
-    public bool ArchiveIMageActive
+    public bool ArchiveImageActive
     { 
         get => archiveImageActive; 
         set => archiveImageActive = value;
@@ -151,12 +184,29 @@ class DalsaImage
         get { return archiveImageIndex; }
         set {  archiveImageIndex = value; }
     }
+    public bool ImageReady
+    {
+        get => imageReady;
+    }
+    public ICogImage Image
+    {
+        get => image;
+    }
     public void FindArchivedImages()
     {
         //Confirm Directory Exists
-        System.IO.Directory.CreateDirectory(ImageFilePath);
+        if(!String.IsNullOrEmpty(imageFilePath))
+        {
+
+        }
+        else
+        {
+            archiveImageCount = -1;
+            return;
+        }
+        System.IO.Directory.CreateDirectory(imageFilePath);
         //Create Directory Type
-        DirectoryInfo imageDirInfo = new DirectoryInfo(ImageFilePath);
+        DirectoryInfo imageDirInfo = new DirectoryInfo(imageFilePath);
         //Create Array of names if files
         archiveImageArray = imageDirInfo.GetFiles();
         
@@ -166,202 +216,223 @@ class DalsaImage
     }
     public void CreateBufferFromFile()
     {
+        acqTimeWatch.Start();
+
         if (archiveImageCount == -1) {return; }
         if (archiveImageIndex > archiveImageCount - 1) { archiveImageIndex = 0; }
         if (archiveImageIndex < 0 ) { archiveImageIndex = archiveImageCount - 1; }
 
-        string filename = ImageFilePath + archiveImageArray[archiveImageIndex].Name;
+        string filename = imageFilePath + archiveImageArray[archiveImageIndex].Name;
 
         // Allocate buffer with parameters compatible to file (does not load it)
-        m_ArchiveBuffers = new SapBuffer(filename, SapBuffer.MemoryType.Default);
+        archiveBuffers = new SapBuffer(filename, SapBuffer.MemoryType.Default);
         // Create buffer object
-        if (!m_ArchiveBuffers.Create())
+        if (!archiveBuffers.Create())
         {
             Cleaning();
             return;
         }
         // Load file
-        if (!m_ArchiveBuffers.Load(filename, -1))
+        if (!archiveBuffers.Load(filename, -1))
         {
             Cleaning();
             return;
         }
 
-        m_ArchiveBuffers.GetAddress(m_ArchiveBuffers.Index, out imageAddress);
+        UpdateImageData();
 
-        imageWidth = m_ArchiveBuffers.Width;
-        imageHeight = m_ArchiveBuffers.Height;
-        imageFormat = m_ArchiveBuffers.XferParams.Format;
-
-        form.Camera1TriggerToolBlock();
     }
     public void LoadConfigFile()
     {
-        form.Import(cameraName, "ConfigFile", ".cff");
+        string filePath = Utilities.ExeFilePath + "\\Camera" + id.ToString("00");
+        Utilities.Import(filePath,cameraName, "ConfigFile", ".cff");
         configFile = configFileLocation;
         configFilePresent = true;
 
-        form.LoggingStatment(cameraName + ": new log file from: " + configFile);
+        Utilities.LoggingStatment(cameraName + ": new log file from: " + configFile);
 
     }
     public void CreateCamera()
     {
-        form.LoggingStatment($"{cameraName}: CreateCamera from {loadServerSelect}  {loadResourceIndex} ");
+        Utilities.LoggingStatment($"{cameraName}: CreateCamera from {loadServerSelect}  {loadResourceIndex} ");
         Cleaning();
 
-        m_ServerLocation = new SapLocation(loadServerSelect, loadResourceIndex);
+        serverLocation = new SapLocation(loadServerSelect, loadResourceIndex);
 
 
-        if (SapManager.GetResourceCount(m_ServerLocation, SapManager.ResourceType.Acq) > 0)
+        if (SapManager.GetResourceCount(serverLocation, SapManager.ResourceType.Acq) > 0)
         {
-            m_ServerCategory = ServerCategory.ServerAcq;
+            serverCategory = ServerCategory.ServerAcq;
 
-            m_Acquisition = new SapAcquisition(m_ServerLocation, configFile);
-            m_Buffers = new SapBufferWithTrash(2, m_Acquisition, SapBuffer.MemoryType.ScatterGather);
-            m_AcqXfer = new SapAcqToBuf(m_Acquisition, m_Buffers);
+            acquisition = new SapAcquisition(serverLocation, configFile);
+            buffers = new SapBufferWithTrash(2, acquisition, SapBuffer.MemoryType.ScatterGather);
+            acqXfer = new SapAcqToBuf(acquisition, buffers);
             
             // End of frame event
-            m_AcqXfer.Pairs[0].EventType = SapXferPair.XferEventType.EndOfTransfer;
-            m_AcqXfer.XferNotify += new SapXferNotifyHandler(XferNotify);
-            m_AcqXfer.Pairs[0].Cycle = SapXferPair.CycleMode.NextWithTrash;
-            m_AcqXfer.XferNotifyContext = this;
+            acqXfer.Pairs[0].EventType = SapXferPair.XferEventType.EndOfTransfer;
+            acqXfer.XferNotify += new SapXferNotifyHandler(XferNotify);
+            acqXfer.Pairs[0].Cycle = SapXferPair.CycleMode.NextWithTrash;
+            acqXfer.XferNotifyContext = this;
 
             // event for signal status
-            m_Acquisition.SignalNotify += new SapSignalNotifyHandler(GetSignalStatus);
-            m_Acquisition.SignalNotifyContext = this;
+            acquisition.SignalNotify += new SapSignalNotifyHandler(GetSignalStatus);
+            acquisition.SignalNotifyContext = this;
         }      
-        else if (SapManager.GetResourceCount(m_ServerLocation, SapManager.ResourceType.AcqDevice) > 0)
+        else if (SapManager.GetResourceCount(serverLocation, SapManager.ResourceType.AcqDevice) > 0)
         {
-            m_ServerCategory = ServerCategory.ServerAcqDevice;
-            m_AcqDevice = new SapAcqDevice(m_ServerLocation, configFile);
-            m_Buffers = new SapBufferWithTrash(4, m_AcqDevice, SapBuffer.MemoryType.ScatterGather);
-            m_AcqDeviceXfer = new SapAcqDeviceToBuf(m_AcqDevice, m_Buffers);
+            serverCategory = ServerCategory.ServerAcqDevice;
+            acqDevice = new SapAcqDevice(serverLocation, configFile);
+            buffers = new SapBufferWithTrash(4, acqDevice, SapBuffer.MemoryType.ScatterGather);
+            acqDeviceXfer = new SapAcqDeviceToBuf(acqDevice, buffers);
 
             // End of frame event
-            m_AcqDeviceXfer.Pairs[0].EventType = SapXferPair.XferEventType.EndOfTransfer;
-            m_AcqDeviceXfer.XferNotify += new SapXferNotifyHandler(XferNotify);
-            m_AcqDeviceXfer.XferNotifyContext = this;
-            m_AcqDeviceXfer.Pairs[0].Cycle = SapXferPair.CycleMode.NextWithTrash;
+            acqDeviceXfer.Pairs[0].EventType = SapXferPair.XferEventType.EndOfTransfer;
+            acqDeviceXfer.XferNotify += new SapXferNotifyHandler(XferNotify);
+            acqDeviceXfer.XferNotifyContext = this;
+            acqDeviceXfer.Pairs[0].Cycle = SapXferPair.CycleMode.NextWithTrash;
         }
 
 
-        if(m_Acquisition != null && !m_Acquisition.Initialized)
+        if(acquisition != null && !acquisition.Initialized)
         {
-            m_Acquisition.Create();
+            acquisition.Create();
         }
-        if (m_AcqDevice != null && !m_AcqDevice.Initialized)
+        if (acqDevice != null && !acqDevice.Initialized)
         {
-            m_AcqDevice.Create();
+            acqDevice.Create();
         }
-        if (m_Buffers != null && !m_Buffers.Initialized)
+        if (buffers != null && !buffers.Initialized)
         {
             archiveImageActive = false;
-            m_Buffers.Create();
+            buffers.Create();
         }
-        if (m_AcqDeviceXfer != null && !m_AcqDeviceXfer.Initialized)
+        if (acqDeviceXfer != null && !acqDeviceXfer.Initialized)
         {
-            m_AcqDeviceXfer.Create();
+            acqDeviceXfer.Create();
         }
     }
     public void SnapPicture()
     {
+        imageReady = false;
+
         acqTimeWatch.Start();
-        if(m_AcqDeviceXfer.Connected)
+        if(acqDeviceXfer.Connected)
         {
-            if (m_AcqDeviceXfer.Snap())
+            if (acqDeviceXfer.Snap())
             {
-                m_AcqDeviceXfer.Wait(5000);
+                
                 snapTime = acqTimeWatch.ElapsedMilliseconds;
+                acqDeviceXfer.Wait(5000);
             }
         }
-        else if(m_AcqXfer.Connected)
+        else if(acqXfer.Connected)
         {
-            if (m_AcqXfer.Snap())
+            if (acqXfer.Snap())
             {
-                m_AcqXfer.Wait(5000);
+                acqXfer.Wait(5000);
                 snapTime = acqTimeWatch.ElapsedMilliseconds;
             }
-        }
-        
-    }
-    public void GrabPicture()
-    {
-        if (m_AcqDeviceXfer.Connected)
-        {
-            m_AcqDeviceXfer.Grab();
-            m_AcqDeviceXfer.Wait(3000);
-        }
-        else if (m_AcqXfer.Connected)
-        {
-            m_AcqXfer.Grab();
-            m_AcqXfer.Wait(3000);
-        }
-    }
-    public void Freeze()
-    {
-        if (m_AcqDeviceXfer.Connected)
-        {
-            m_AcqDeviceXfer.Freeze();
-            m_AcqDeviceXfer.Wait(3000);
-        }
-        else if (m_AcqXfer.Connected)
-        {
-            m_AcqXfer.Freeze();
-            m_AcqXfer.Wait(3000);
         }
     }
     public void Abort()
     {
-        if (m_AcqDeviceXfer.Connected)
+        if (acqDeviceXfer.Connected)
         {
-            m_AcqDeviceXfer.Abort();
+            acqDeviceXfer.Abort();
         }
-        else if (m_AcqXfer.Connected)
+        else if (acqXfer.Connected)
         {
-            m_AcqXfer.Abort();
+            acqXfer.Abort();
         }
+        imageReady = true;
     }
     public void SaveImageBMP()
     {
-        System.IO.Directory.CreateDirectory(ImageFilePath);
+        System.IO.Directory.CreateDirectory(imageFilePath);
 
-        DirectoryInfo ImageDirInfo = new DirectoryInfo(ImageFilePath);
-        double ImageDirSize = form.DirSize(ImageDirInfo);
+        DirectoryInfo ImageDirInfo = new DirectoryInfo(imageFilePath);
+        double ImageDirSize = Utilities.DirSize(ImageDirInfo);
         string ImageFileName = "Image_" + DateTime.Now.ToString("yyyyMMddHHmmssffff") +".bmp";
         if (ImageDirSize < 2000)
         {
-            m_Buffers.Save(ImageFilePath + ImageFileName, "-format bmp");
+            buffers.Save(imageFilePath + ImageFileName, "-format bmp");
         }
-        else { MessageBox.Show($"{CameraName} Image folder has reached {ImageDirSize}MB"); }
+        else { MessageBox.Show($"{Name} Image folder has reached {ImageDirSize}MB"); }
 
 
         
-        form.LoggingStatment($"{cameraName}: Save Image to BMP ");
+        Utilities.LoggingStatment($"{cameraName}: Save Image to BMP ");
+    }
+    public void Disconnect()
+    {
+        if (acqDeviceXfer != null)
+        {
+            acqDeviceXfer.Disconnect();
+            acqDeviceXfer.Destroy();
+        }
+
+        if (acqDevice != null)
+        {
+            acqDevice.Destroy();
+        }
     }
     public void Cleaning()
     {
-        if (m_AcqDeviceXfer != null)
+        if (acqDeviceXfer != null)
         {
-            m_AcqDeviceXfer.Destroy();
-            m_AcqDeviceXfer.Dispose();
+            acqDeviceXfer.Destroy();
+            acqDeviceXfer.Dispose();
         }
 
-        if (m_AcqDevice != null)
+        if (acqDevice != null)
         {
-            m_AcqDevice.Destroy();
-            m_AcqDevice.Dispose();
+            acqDevice.Destroy();
+            acqDevice.Dispose();
         }
 
-        if (m_Buffers != null)
+        if (buffers != null)
         {
-            m_Buffers.Destroy();
-            m_Buffers.Dispose();
+            buffers.Destroy();
+            buffers.Dispose();
         }
-        if (m_ArchiveBuffers != null)
+        if (archiveBuffers != null)
         {
-            m_ArchiveBuffers.Destroy();
-            m_ArchiveBuffers.Dispose();
+            archiveBuffers.Destroy();
+            archiveBuffers.Dispose();
         }
+    }
+    public void UpdateImageData()
+    {
+        acqTime = acqTimeWatch.ElapsedMilliseconds;
+
+        // logic for using Camera
+        if (buffers != null) 
+        { 
+            buffers.GetAddress(buffers.Index, out imageAddress);
+            imageWidth = buffers.Width;
+            imageHeight = buffers.Height;
+            imageFormat = buffers.XferParams.Format;
+        }
+        //logic for using saved images
+        else if(archiveBuffers != null)
+        {
+            archiveBuffers.GetAddress(archiveBuffers.Index, out imageAddress);
+            imageWidth = archiveBuffers.Width;
+            imageHeight = archiveBuffers.Height;
+            imageFormat = archiveBuffers.XferParams.Format;
+        }
+
+        //Save Dalsa Image to Cog Image
+        image = MarshalToCogImage();
+
+        // Save Image as BMP to pre-defined location
+        if (buffers != null && saveImageSelected) { SaveImageBMP(); }
+
+        imageReady = true;
+        form.CameraSnapComplete = true;
+
+        acqTimeWatch.Stop();
+        acqTimeWatch.Reset();
     }
     public ICogImage RawToCogImage()
     {
@@ -408,24 +479,12 @@ class DalsaImage
     }
     public void XferNotify(object sender, SapXferNotifyEventArgs argsNotify)
     {
-        acqTime = acqTimeWatch.ElapsedMilliseconds;
-        
-        m_Buffers.GetAddress(BufferIndex, out imageAddress);
-        
-        imageWidth = m_Buffers.Width;
-        imageHeight = m_Buffers.Height;
-        imageFormat = m_Buffers.XferParams.Format;
-        
-        form.Camera1TriggerToolBlock();
-        
-        acqTimeWatch.Stop();
-        acqTimeWatch.Reset();
+        UpdateImageData();
     }
     static void GetSignalStatus(object sender, SapSignalNotifyEventArgs argsSignal)
     {
         SapAcquisition.AcqSignalStatus signalStatus = argsSignal.SignalStatus;
     }
-
     static void SapXferPair_XferNotify(Object sender, SapXferNotifyEventArgs args)
     {
         MessageBox.Show("Transfer Pair Notfy event handler");        

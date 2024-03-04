@@ -16,92 +16,89 @@ using System.IO;
 using Cognex.Vision.Implementation;
 using Microsoft.Win32;
 using static DalsaImage;
+using System.Reflection;
 
 namespace CognexVisionProForm
 {
     public partial class Form1
     {
-        public string ExeFileExtension
+        public bool CameraSnapComplete
         {
-            get { return exeFileExtension; } 
+            set
+            {
+                cameraSnapComplete = value;
+                CameraUpdate();
+                cameraSnapComplete = false;
+
+            }
         }
-        public string ExeFileName
+        public int ToolBlockRunComplete
         {
-            get { return exeFileName; }
-        }
-        public string ExeFilePath
-        {
-            get { return exeFilePath; }
+            set
+            {
+                toolBlockRunComplete = value;
+                toolCompleteCount++;
+
+                //ToolBlockUpdate(toolBlockRunComplete);
+                //what until all tools are triggered and complete
+                if (toolRunComplete && toolCompleteCount == toolRunCount && tabControl1.SelectedIndex == 0)
+                {
+                    UpdateImageTab();
+                }
+                
+                toolBlockRunComplete = 0;
+            }
         }
         public void InitializeClasses()
         {
-            Trace.AutoFlush = true;
-            Trace.Indent();
+            
 
             pollingTimer = new Timer();
             pollingTimer.Tick += new EventHandler(pollingTimer_Tick);
             pollingTimer.Interval = 200; // in miliseconds
 
-            Camera01Acq = new DalsaImage(this);
             Camera01Calc = new Calculations();
-            for (int i = 0; i < toolblockArray.Length; i++) { toolblockArray[i] = new ToolBlock(this); }
+
+            for (int j = 0; j < cameraCount; j++) 
+            {
+                CameraAcqArray[j] = new DalsaImage(this);
+                CameraAcqArray[j].Id = j;
+                cameraControl[j] = new CameraControl(this, CameraAcqArray[j]);
+
+                for (int i = 0;i < toolCount; i++)
+                {
+                    toolblockArray[j, i] = new ToolBlock(this);
+                    toolblockArray[j, i].Id = i;
+                    toolblockArray[j, i].CameraId = j;
+                }
+            }
 
             MainPLC = new PlcComms(this);
 
-            LoggingStatment($"InitializeAcquisition Complete");
+            Utilities.LoggingStatment($"InitializeAcquisition Complete");
         }
         public void InitializeJobManager()
         {
-            for (int i = 0; i < toolblockArray.Length; i++) 
+            for (int i = 0; i < toolblockArray.GetLength(1); i++) 
             { 
-                if(toolblockArray[i].ToolFilePresent)
+                if(toolblockArray[0,i].FilePresent)
                 {
-                    toolblockArray[i].InitializeJobManager();
+                    toolblockArray[0,i].InitializeJobManager();
                 }
                 
             }
         }
-        public void InitializeLogging()
+        public void InitializeServerList(int cameraIndex)
         {
-            string LogDir = exeFilePath + "\\LogFile\\";
-            string ArchiveLogDir = LogDir + "Archive\\";
-
-            System.IO.Directory.CreateDirectory(LogDir);
-            System.IO.Directory.CreateDirectory(ArchiveLogDir);
-
-            string LogFile = LogDir + "Log.log";
-
-            //If file already exist, rename and move to archive folder
-            if (System.IO.File.Exists(LogFile) == true)
-            {
-                DirectoryInfo LogeDirInfo = new DirectoryInfo(LogDir);
-                double logSize = DirSize(LogeDirInfo);
-
-                if (logSize > 10)
-                {
-                    MessageBox.Show(logSize.ToString());
-                    Archive(LogFile);
-                }
-                else { MessageBox.Show($"Log File not large enough to archive: {logSize} MB"); }
-
-            }
-            //Create Trace Class for camera
-            appListener = new TextWriterTraceListener(LogFile);
-            Trace.Close();
-            Trace.Listeners.Add(appListener);
-            appListener.WriteLine("------------------------------------------------------------------------");
-            appListener.WriteLine(" Log Initiated created: " + DateTime.Now.ToString("MM/dd/yyyy hh:mm tt"));
-        }
-        public void InitializeServerList()
-        {
+            
             cbServerList.Items.Clear();
             for (int i = 0; i < SapManager.GetServerCount(); i++)
             {
                 // Does this server support "Acq" (frame-grabber) or "AcqDevice" (camera)?
-                bool bAcq = (Camera01Acq.ServerType == ServerCategory.ServerAcq || Camera01Acq.ServerType == ServerCategory.ServerAll) &&
+                bool bAcq = (CameraAcqArray[cameraIndex].ServerType == ServerCategory.ServerAcq || CameraAcqArray[cameraIndex].ServerType == ServerCategory.ServerAll) &&
                                 (SapManager.GetResourceCount(i, SapManager.ResourceType.Acq) > 0);
 
-                bool bAcqDevice = (Camera01Acq.ServerType == ServerCategory.ServerAcqDevice || Camera01Acq.ServerType == ServerCategory.ServerAll) &&
+                bool bAcqDevice = (CameraAcqArray[cameraIndex].ServerType == ServerCategory.ServerAcqDevice || CameraAcqArray[cameraIndex].ServerType == ServerCategory.ServerAll) &&
                                     (SapManager.GetResourceCount(i, SapManager.ResourceType.AcqDevice) > 0 &&
                                     (SapManager.GetResourceCount(i, SapManager.ResourceType.Acq) == 0));
 
@@ -116,10 +113,9 @@ namespace CognexVisionProForm
                 }
             }
 
-            
             //select the server that was used last time
-            int ServerNameFoundIndex = cbServerList.FindString(Camera01Acq.LoadServerSelect, 0);
-            if (!string.IsNullOrEmpty(Camera01Acq.LoadServerSelect) && ServerNameFoundIndex != -1)
+            int ServerNameFoundIndex = cbServerList.FindString(CameraAcqArray[cameraIndex].LoadServerSelect, 0);
+            if (!string.IsNullOrEmpty(CameraAcqArray[cameraIndex].LoadServerSelect) && ServerNameFoundIndex != -1)
             {
                 cbServerList.SelectedIndex = ServerNameFoundIndex;
             }
@@ -132,26 +128,36 @@ namespace CognexVisionProForm
                 cbServerList.Items.Add(new MyListBoxItem(ServerNotFound, false));
                 cbServerList.SelectedIndex = 0;
             }
-            Camera01Acq.LoadServerSelect = cbServerList.SelectedItem.ToString();
+
+            CameraAcqArray[cameraIndex].LoadServerSelect = cbServerList.SelectedItem.ToString();
         }
-        public void InitializeResourceList()
+        public void InitializeResourceList(int cameraIndex)
         {
             int AcqCount = 0;
             int AcqDeviceCount = 0;
 
             cbDeviceList.Items.Clear();
-            if(!string.IsNullOrEmpty(Camera01Acq.LoadServerSelect) && Camera01Acq.LoadServerSelect != ServerNotFound)
+
+            //Get count of both Acq (frame-grabber) or AcqDevices (camera)
+            if (!string.IsNullOrEmpty(CameraAcqArray[cameraIndex].LoadServerSelect) && CameraAcqArray[cameraIndex].LoadServerSelect != ServerNotFound)
             {
-                AcqCount = SapManager.GetResourceCount(Camera01Acq.LoadServerSelect, SapManager.ResourceType.Acq);
-                AcqDeviceCount = SapManager.GetResourceCount(Camera01Acq.LoadServerSelect, SapManager.ResourceType.AcqDevice);
+                AcqCount = SapManager.GetResourceCount(CameraAcqArray[cameraIndex].LoadServerSelect, SapManager.ResourceType.Acq);
+                AcqDeviceCount = SapManager.GetResourceCount(CameraAcqArray[cameraIndex].LoadServerSelect, SapManager.ResourceType.AcqDevice);
             }
 
             if (AcqCount > 0)
             {
                 for (int i = 0; i < AcqCount; i++)
                 {
-                    string AcqName = SapManager.GetResourceName(Camera01Acq.LoadServerSelect, SapManager.ResourceType.AcqDevice, i);
-                    cbDeviceList.Items.Add(AcqName);
+                    string AcqName = SapManager.GetResourceName(CameraAcqArray[cameraIndex].LoadServerSelect, SapManager.ResourceType.AcqDevice, i);
+                    if(SapManager.IsResourceAvailable(CameraAcqArray[cameraIndex].LoadServerSelect, SapManager.ResourceType.Acq, i))
+                    {
+                        cbDeviceList.Items.Add(AcqName);
+                    }
+                    else
+                    {
+                        cbDeviceList.Items.Add("Not Available - Resource in Use");
+                    }
                 }
             }
 
@@ -159,45 +165,51 @@ namespace CognexVisionProForm
             {
                 for (int i = 0; i < AcqDeviceCount; i++)
                 {
-                    string AcqDevice = SapManager.GetResourceName(Camera01Acq.LoadServerSelect, SapManager.ResourceType.AcqDevice, i);
-                    cbDeviceList.Items.Add(AcqDevice);
+                    string AcqDevice = SapManager.GetResourceName(CameraAcqArray[cameraIndex].LoadServerSelect, SapManager.ResourceType.AcqDevice, i);
+                    if(SapManager.IsResourceAvailable(CameraAcqArray[cameraIndex].LoadServerSelect, SapManager.ResourceType.AcqDevice, i))
+                    {
+                        cbDeviceList.Items.Add(AcqDevice);
+                    }
+                    else
+                    {
+                        cbDeviceList.Items.Add("Not Available - Resource in Use");
+                    }
                 }
             }
 
-            if(AcqCount == 0 && AcqDeviceCount == 0)
+            if(AcqCount == 0 && AcqDeviceCount == 0|| cbDeviceList.Items.Count == 0)
             {
                 cbDeviceList.Items.Add("No Camera Found");
-                Camera01Acq.LoadResourceIndex = 0;
+                CameraAcqArray[cameraIndex].LoadResourceIndex = 0;
             }
-
-
-                cbDeviceList.SelectedIndex = Camera01Acq.LoadResourceIndex;
-
             
+            cbDeviceList.SelectedIndex = CameraAcqArray[cameraIndex].LoadResourceIndex;
+            CameraAcqArray[cameraIndex].LoadResourceName = cbDeviceList.SelectedItem.ToString();
         }
-        public void LoggingStatment(string Message)
+        public void CameraTrigger(int i)
         {
-            appListener.Write(DateTime.Now.ToString("G") + ": ");
-            appListener.WriteLine(Message);
-        }
-        delegate void Camera1TriggerToolBlockCallBack();
-        public void Camera1Trigger()
-        {
-            if (Camera01Acq.Connected)
+            if (CameraAcqArray[i].Connected)
             {
-                Camera01Acq.SnapPicture();
-
-                if(Camera01Acq.SaveImageSelected)
-                {
-                    Camera01Acq.SaveImageBMP();
-                }
+                //DalsaImage.cs looks for rising edge of trigger to snap image
+                CameraAcqArray[i].Trigger = true;
             }
-            else if(Camera01Acq.ArchiveIMageActive)
+            else if(CameraAcqArray[i].ArchiveImageActive)
             {
+                CameraAcqArray[i].CreateBufferFromFile();
+                CameraAcqArray[i].ArchiveImageIndex++;
+            }
+            else
+            {
+                MessageBox.Show("NO CAMERA IS CONNECTED");
+                tabControl1.SelectedIndex = 1;
+            }
 
-                Camera01Acq.CreateBufferFromFile();
-                Camera01Acq.ArchiveImageIndex++;
-
+        }
+        public void CameraAbort(int i)
+        {
+            if (CameraAcqArray[i].Connected)
+            {
+                CameraAcqArray[i].Abort();
             }
             else
             {
@@ -205,90 +217,98 @@ namespace CognexVisionProForm
                 tabControl1.SelectedIndex = 1;
             }
         }
-        public void Camera1TriggerToolBlock()
+        public void CameraUpdate()
         {
-            ICogImage Camera01Image = Camera01Acq.MarshalToCogImage();
-
-            for(int i = 0;i < toolblockArray.Length;i++)
+            bool allCamerasComplete = true;
+            for (int i = 0; i < cameraCount; i++)
             {
-                toolblockArray[i].ToolRun(Camera01Image as CogImage8Grey);
-            }
-
-            if (this.cogDisplay1.InvokeRequired)
-            {
-                Camera1TriggerToolBlockCallBack d = new Camera1TriggerToolBlockCallBack(Camera1TriggerToolBlock);
-                this.Invoke(d);
-            }
-            else
-            {
-                cogWidth = panel1.Location.X - 5;
-                cogHeight = tabControl1.Size.Height - 5;
-
-                double zoomWidth = Convert.ToDouble(cogWidth) / Convert.ToDouble(Camera01Image.Width);
-                double zoomHeight = Convert.ToDouble(cogHeight) / Convert.ToDouble(Camera01Image.Height);
-
-                if(zoomWidth < zoomHeight)
+                if (CameraAcqArray[i].ImageReady)
                 {
-                    cogDisplay1.Zoom = zoomWidth;
+                    cameraControl[i].Image = CameraAcqArray[i].Image;
+                    cameraControl[i].AcqTime = CameraAcqArray[i].AcqTime;
                 }
-                else if(zoomHeight < zoomWidth)
+                //if any camera that is connected is not ready exit method without 
+                if((CameraAcqArray[i].Connected || CameraAcqArray[i].ArchiveImageActive) && !CameraAcqArray[i].ImageReady)
                 {
-                    cogDisplay1.Zoom = zoomHeight;
+                    allCamerasComplete = false;
                 }
                 
-                cogDisplay1.Image = Camera01Image;
-
-                cogDisplay1.Width = Convert.ToInt16(Convert.ToDouble(Camera01Image.Width) * cogDisplay1.Zoom);
-                cogDisplay1.Height = Convert.ToInt16(Convert.ToDouble(Camera01Image.Height) * cogDisplay1.Zoom);
             }
+
+            // Run ToolBlocks that are enabled
+            if (allCamerasComplete) { ToolBlockTrigger(); }
+            
+           
         }
-        public void Camera1ToolBlockUpdate()
+        public void ToolBlockTrigger()
         {
-            txtC1ImageTime.Text = Camera01Acq.AcqTime.ToString();
+            
+            toolRunComplete = false;
+            toolRunCount = 0;
+            toolCompleteCount = 0;
 
-            lbToolData.Items.Clear();
 
-            for (int i = 0; i < toolblockArray.Length; i++)
+
+            for (int j = 0; j < cameraCount; j++)
             {
-                cbCameraSelected.Items.Add(toolblockArray[i].ToolName);
-
-                if (toolblockArray[i].ResultUpdated)
+                if ((CameraAcqArray[j].Connected || CameraAcqArray[j].ArchiveImageActive) && CameraAcqArray[j].ImageReady)
                 {
-                    lbToolData.Items.Add(toolblockArray[i].ToolName);
-                    lbToolData.Items.Add(toolblockArray[i].RunStatus.Result.ToString());
-                    lbToolData.Items.Add(toolblockArray[i].RunStatus.TotalTime.ToString());
-
-                    for (int e = 0; e < toolblockArray[i].ToolOutput.Length; e++)
+                    CameraAcqArray[j].Trigger = false;
+                    for (int i = 0; i < toolCount; i++)
                     {
-                        lbToolData.Items.Add($"{toolblockArray[i].ToolOutput[e].Name} - {toolblockArray[i].ToolOutput[e].Value}");
+                        toolblockArray[j, i].ToolEnabled = true;
+                        if(toolblockArray[0, i].ToolEnabled && toolblockArray[0, i].ToolReady)
+                        {
+                            toolRunCount++;
+                            if (i == toolCount - 1) { toolRunComplete = true; }
+                            toolblockArray[j, i].ToolRun(cameraControl[j].Image as CogImage8Grey);
+                        }
                     }
                 }
+                
+            } 
+        }
+        private delegate void Set_ToolBlockUpdate(int number);
+        public void ToolBlockUpdate(int index)
+        {
+            if(this.InvokeRequired)
+            {
+                BeginInvoke(new Set_ToolBlockUpdate(ToolBlockUpdate),index);
+                return;
             }
+        }
+        private delegate void Set_UpdateImageTab();
+        public void UpdateImageTab()
+        {
+            //create image variable for form
+            CameraImage = CameraAcqArray[selectedCameraId].Image;
 
-            lbToolData.Height =  lbToolData.PreferredHeight;
-            
         }
         public void UpdateFrameGrabberTab()
         {
-            cbConfigFileFound.Checked = Camera01Acq.ConfigFilePresent;
-            cbCameraConnected.Checked = Camera01Acq.Connected;
-            tbCameraName.Text = Camera01Acq.CameraName;
-            tbArchiveCount.Text = Camera01Acq.ArchiveImageCount.ToString();
-            tbArchiveIndex.Text = Camera01Acq.ArchiveImageIndex.ToString();
-            cbArchiveActive.Checked = Camera01Acq.ArchiveIMageActive;
-            cbToolBlock.Items.Clear();
-            for (int i = 0; i < toolblockArray.Length; i++)
-            {
-                if (toolblockArray[i].ToolFilePresent)
-                {
-                    cbToolBlock.Items.Add(toolblockArray[i].ToolName);
-                }
-                else
-                {
-                    cbToolBlock.Items.Add($"Empty{i}");
-                }
+            cbConfigFileFound.Checked = CameraAcqArray[selectedCameraId].ConfigFilePresent;
+            cbCameraConnected.Checked = CameraAcqArray[selectedCameraId].Connected;
+            tbCameraName.Text = CameraAcqArray[selectedCameraId].Name;
+            tbArchiveCount.Text = CameraAcqArray[selectedCameraId].ArchiveImageCount.ToString();
+            tbArchiveIndex.Text = CameraAcqArray[selectedCameraId].ArchiveImageIndex.ToString();
+            cbArchiveActive.Checked = CameraAcqArray[selectedCameraId].ArchiveImageActive;
 
+            cbCameraIdSelected.Items.Clear();
+            for (int i = 0; i < cameraCount; i++)
+            {
+                if (!String.IsNullOrEmpty(CameraAcqArray[i].Name)) { cbCameraIdSelected.Items.Add(CameraAcqArray[i].Name); }
+                else { cbCameraIdSelected.Items.Add($"Empty{i}"); }
             }
+
+            cbCameraIdSelected.SelectedIndex = 0;
+            
+            cbToolBlock.Items.Clear();
+            for (int i = 0; i < toolCount; i++)
+            {
+                if (toolblockArray[0, i].FilePresent) { cbToolBlock.Items.Add(toolblockArray[0, i].Name); }
+                else { cbToolBlock.Items.Add($"Empty{i}"); }
+            }
+            cbToolBlock.SelectedIndex = 0;
         }
         public void CheckLicense()
         {
@@ -308,98 +328,80 @@ namespace CognexVisionProForm
                 LicenseCheckList.Items.Add(LicenseCheck[i]);
             }
         }
-        public void Import(string DeviceID, String FileType, String Extension)
+        public void PlcRead()
         {
-            string newfigFile = "";
-            string newfigFileExtension = "";
-            string newfigFileName = "";
-            string newfigFilePath = "";
+            int[] temp = new int[1];
 
-            // get file from file explorer
-            OpenFileDialog openFileDialog1 = new OpenFileDialog();
-            openFileDialog1.InitialDirectory = ToolBlockLocation;
-            openFileDialog1.Title = "Select Configuration File";
-            
-            if(openFileDialog1.ShowDialog() == DialogResult.OK)
-            {
-                newfigFile = openFileDialog1.FileName;
-                newfigFileExtension = Path.GetExtension(newfigFile);
-                newfigFileName = Path.GetFileNameWithoutExtension(newfigFile);
-                newfigFilePath = Path.GetDirectoryName(newfigFile);
-            }
-            else
-            {
-                return;
-            }
-            //CONFIRM SELECTED FILE IS CORRECT TYPE, IF NOT END WITH MESSAGE
-            if (newfigFileExtension != Extension) 
-            {
-                MessageBox.Show("FILE DOES NOT HAVE CORRECT EXTENSION");
-                return; 
-            }
+            temp[0] = MainPLC.PlcToPC_Data[0];
+            CameraControl = new BitArray(temp);
 
-            string fullFilePath = exeFilePath + "\\" + DeviceID + "_" + FileType + Extension;
+            temp[0] = MainPLC.PlcToPC_Data[1];
+            toolControl = new BitArray(temp);
 
-            if (File.Exists(fullFilePath)) 
+
+            for (int i = 0; i < toolblockArray.GetLength(1);i++)
             {
-                Archive(fullFilePath);
+                toolblockArray[0,i].ToolEnabled = toolControl[i];
             }
-
-            File.Copy(newfigFile, fullFilePath);
         }
-        public void Archive(string FullFilePath)
+        public void PlcWrite()
         {
-            string fileExtension = Path.GetExtension(FullFilePath);
-            string fileName = Path.GetFileNameWithoutExtension(FullFilePath);
-            string filePath = Path.GetDirectoryName(FullFilePath);
+            CameraStatus = new BitArray(32, false);
+            toolStatus = new BitArray(32, false);
 
-            string archiveFolder = exeFilePath + "\\" + fileName;
+            //Camera Status: info related to camera and general system
+            CameraStatus[0] = heartBeat;
+            CameraStatus[1] = CameraAcqArray[0].Connected;
+            CameraStatus[2] = CameraAcqArray[1].Connected;
+            CameraStatus[3] = CameraAcqArray[2].Connected;
+            CameraStatus[4] = false;
+            CameraStatus[5] = false;
+            CameraStatus[6] = cogLicenseOk;
+            CameraStatus.CopyTo(MainPLC.PCtoPLC_Data, 0);
 
-
-            System.IO.Directory.CreateDirectory(archiveFolder);
-
-            DirectoryInfo ArchiveDir = new DirectoryInfo(archiveFolder);
-            double archiveSize = DirSize(ArchiveDir);
-
-            MessageBox.Show($"{fileName} current size = {archiveSize} MB");
-
-            string fullArchivePath = archiveFolder + "\\"+ "Archive_" + DateTime.Now.ToString("yyyyMMddHHmmss") + fileExtension;
-
-            File.Move(FullFilePath, fullArchivePath);
-
-        }
-        public double DirSize(DirectoryInfo Folder)
-        {
-            double size = 0;
-            // Add file sizes.
-            FileInfo[] fileArray = Folder.GetFiles();
-            foreach (FileInfo file in fileArray)
+            for (int i = 0; i < toolblockArray.GetLength(1); i++)
             {
-                size += file.Length;
+                toolblockArray[0,i].Cleaning();
+                //Tool Status: info related to Camera Tool 1
+                toolStatus[8 * i + 0] = toolblockArray[0,i].ToolReady;
+                toolStatus[8 * i + 1] = toolblockArray[0,i].ResultUpdated;
+                toolStatus[8 * i + 2] = Convert.ToBoolean(toolblockArray[0,i].RunStatus.Result);
+                toolStatus[8 * i + 3] = false;
+                toolStatus[8 * i + 4] = false;
+                toolStatus[8 * i + 5] = false;
+                toolStatus[8 * i + 6] = false;
+                toolStatus[8 * i + 7] = false;
             }
-            // Add subdirectory sizes.
-            DirectoryInfo[] dis = Folder.GetDirectories();
-            foreach (DirectoryInfo di in dis)
+            toolStatus.CopyTo(MainPLC.PCtoPLC_Data, 1);
+
+            //All data variables
+            MainPLC.PCtoPLC_Data[8] = Convert.ToInt32(CameraAcqArray[selectedCameraId].AcqTime * 100);
+
+            for (int i = 0; i < toolblockArray.GetLength(1); i++)
             {
-                size += DirSize(di);
+                MainPLC.PCtoPLC_Data[9 + i] = Convert.ToInt32(toolblockArray[0,i].RunStatus.TotalTime * 100);
             }
-            return size/1000000.00;
         }
         public void SaveSettings()
         {
             MyListBoxItem serverListSelected = (MyListBoxItem)cbServerList.SelectedItem;
-            String KeyPath = ExeFilePath + "\\RegisterKey";
+            String KeyPath = Utilities.ExeFilePath + "\\RegisterKey";
 
             RegistryKey RegKey = Registry.CurrentUser.CreateSubKey(KeyPath);
 
             // Write config file name and location (server and resource)
-            RegKey.SetValue("Camera1_Name", Camera01Acq.CameraName);
-            RegKey.SetValue("Camera1_Server", Camera01Acq.LoadServerSelect);
-            RegKey.SetValue("Camera1_Resource", Camera01Acq.LoadResourceIndex);
-            
-            for(int i = 0;i<toolblockArray.Length; i++)
+            for (int i = 0; i < cameraCount; i++)
             {
-                RegKey.SetValue($"Camera1_ToolBlock{i}", toolblockArray[i].ToolName);
+                RegKey.SetValue($"Camera{i}_Name", CameraAcqArray[i].Name);
+                RegKey.SetValue($"Camera{i}_Description", CameraAcqArray[i].Description);
+                RegKey.SetValue($"Camera{i}_Server", CameraAcqArray[i].LoadServerSelect);
+                RegKey.SetValue($"Camera{i}_Resource", CameraAcqArray[i].LoadResourceIndex);
+            }
+                
+            
+            for(int i = 0;i<toolblockArray.GetLength(1); i++)
+            {
+                RegKey.SetValue($"Camera1_ToolBlock{i}", toolblockArray[0,i].Name);
             }
 
             //save IP address used for PLC
@@ -410,18 +412,23 @@ namespace CognexVisionProForm
         }
         public void LoadSettings()
         {
-            String KeyPath = ExeFilePath + "\\RegisterKey";
+            String KeyPath = Utilities.ExeFilePath + "\\RegisterKey";
             RegistryKey RegKey = Registry.CurrentUser.OpenSubKey(KeyPath);
             if (RegKey != null)
             {
                 // Read location (server and resource) and file name
-                Camera01Acq.CameraName = RegKey.GetValue("Camera1_Name", "").ToString();
-                Camera01Acq.LoadServerSelect = RegKey.GetValue("Camera1_Server", "").ToString();
-                Camera01Acq.LoadResourceIndex = (int)RegKey.GetValue("Camera1_Resource", 0);
-
-                for (int i = 0; i < toolblockArray.Length; i++)
+                for (int i = 0; i < cameraCount; i++)
                 {
-                    toolblockArray[i].ToolName = (RegKey.GetValue($"Camera1_ToolBlock{i}", "").ToString());
+                    CameraAcqArray[i].Name = RegKey.GetValue($"Camera{i}_Name", "").ToString();
+                    CameraAcqArray[i].Description = RegKey.GetValue($"Camera{i}_Description", "").ToString();
+                    CameraAcqArray[i].LoadServerSelect = RegKey.GetValue($"Camera{i}_Server", "").ToString();
+                    CameraAcqArray[i].LoadResourceIndex = (int)RegKey.GetValue($"Camera{i}_Resource", 0);
+                }
+                    
+
+                for (int i = 0; i < toolblockArray.GetLength(1); i++)
+                {
+                    toolblockArray[0,i].Name = (RegKey.GetValue($"Camera1_ToolBlock{i}", "").ToString());
                 }
 
                 //retreaving information for IP address
@@ -434,5 +441,20 @@ namespace CognexVisionProForm
 
             }
         }
+        public void LoadForm(object Panel,object Form)
+        {
+            Panel p = Panel as Panel;
+            if(p.Controls.Count > 0)
+            {
+                p.Controls.RemoveAt(0);
+            }
+            Form f = Form as Form;
+            f.TopLevel = false;
+            f.Dock = DockStyle.Fill;
+            p.Controls.Add(f);
+            p.Tag = f;
+            f.Show();
+        }
+
     }
 }

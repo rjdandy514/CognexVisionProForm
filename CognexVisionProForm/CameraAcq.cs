@@ -79,8 +79,6 @@ namespace CognexVisionProForm
                     GC.Collect();
                     numAcqs = 0;
                 }
-                _form.Camera1TriggerToolBlock();
-
             }
             catch(CogException ce)
             {
