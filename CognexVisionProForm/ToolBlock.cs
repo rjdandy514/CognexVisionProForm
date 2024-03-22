@@ -17,16 +17,8 @@ namespace CognexVisionProForm
         string toolFileType = "ToolBlock";
         string toolFileExtension = ".vpp";
 
-        int id;
-        int cameraId;
-
 
         CogToolBlockTerminal[] toolOutput;
-
-        bool toolFilePresent;
-        bool resultUpdated;
-        bool toolReady = false;
-        bool toolEnabled;
 
         public CogToolBlock cogToolBlock;
         Form1 form = new Form1();
@@ -38,18 +30,15 @@ namespace CognexVisionProForm
 
         public int Id
         {
-            get => id; 
-            set => id = value;
+            get; set;
         }
         public int CameraId
         {
-            get => cameraId;
-            set => cameraId = value;
+            get;set;
         }
-        public bool ToolEnabled
+        public bool Enabled
         {
-            get => toolEnabled;
-            set => toolEnabled = value;
+            get; set;
         }
         public string Name
         {
@@ -68,31 +57,69 @@ namespace CognexVisionProForm
                 
                 if (File.Exists(toolFileLocation))
                 {
-                    toolFilePresent = true;
+                    FilePresent = true;
                     toolFile = toolFileLocation;
                 }
                 else
                 {
-                    toolFilePresent = false;
+                    FilePresent = false;
                     toolFile = "";
                 }
             }
         }
+        public bool Result
+        {
+            get
+            {
+                if(cogToolBlock != null)
+                {
+                    return Convert.ToBoolean(cogToolBlock.RunStatus.Result);
+                }
+                else
+                {
+                    return false;
+                }
+                
+            }
+
+        }
+        public double TotalTime
+        {
+            get
+            {
+                if(cogToolBlock != null)
+                {
+                    return cogToolBlock.RunStatus.TotalTime;
+                }
+                else
+                {
+                    return 0.0;
+                }
+                
+            }
+        }
         public ICogRunStatus RunStatus
         {
-            get { return cogToolBlock.RunStatus; }
+            get
+            {
+                if (cogToolBlock != null)
+                {
+                    return cogToolBlock.RunStatus;
+                }
+                else { return null; }
+            }
         }
         public bool ToolReady
         {
-            get { return toolReady; }
+            get;set;
         }
         public bool ResultUpdated
         {
-            get { return resultUpdated; }
+            get;set;
         }
         public bool FilePresent
         {
-            get { return toolFilePresent; }
+            get; set;
         }
         public CogToolBlockTerminal[] ToolOutput
         {
@@ -113,12 +140,12 @@ namespace CognexVisionProForm
             
             if (File.Exists(toolFileLocation))
             {
-                toolFilePresent = true;
+                FilePresent = true;
                 toolFile = toolFileLocation;
             }
             else
             {
-                toolFilePresent = false;
+                FilePresent = false;
                 toolFile = "";
             }
         }
@@ -126,19 +153,19 @@ namespace CognexVisionProForm
         {
             try
             {
-                if (toolFilePresent)
+                if (FilePresent)
                 {
                     cogToolBlock = CogSerializer.LoadObjectFromFile(toolFile) as CogToolBlock;
                     cogToolBlock.Ran += new EventHandler(Subject_Ran);
                     cogToolBlock.Name = toolName;
 
-                    toolReady = true;
+                    ToolReady = true;
 
                     Utilities.LoggingStatment($"{toolName}: Initialized complete Camera Ready");
                 }
                 else
                 {
-                    toolReady = false;
+                    ToolReady = false;
                     throw new Exception($"{toolName}: No Camera Program has Been Loaded"); 
                 }
 
@@ -147,10 +174,10 @@ namespace CognexVisionProForm
         }
         public void ToolRun(CogImage8Grey InputImage)
         {
-            if (!toolEnabled || cogToolBlock == null) { return; }
+            if (!Enabled || cogToolBlock == null) { return; }
 
-            resultUpdated = false;
-            toolReady = false;
+            ResultUpdated = false;
+            ToolReady = false;
 
             try
             {
@@ -178,9 +205,9 @@ namespace CognexVisionProForm
                 toolOutput[i] = cogToolBlock.Outputs[i];
             }
 
-            toolReady = true;
-            resultUpdated = true;
-            form.ToolBlockRunComplete = id;
+            ToolReady = true;
+            ResultUpdated = true;
+            form.ToolBlockRunComplete = Id;
 
             Utilities.LoggingStatment($"{toolName}: Numer of Ouptuss - {toolOutputCount}");
         }

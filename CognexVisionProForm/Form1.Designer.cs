@@ -40,10 +40,13 @@ namespace CognexVisionProForm
             this.numIP1 = new System.Windows.Forms.NumericUpDown();
             this.label33 = new System.Windows.Forms.Label();
             this.tabToolBlock = new System.Windows.Forms.TabPage();
+            this.label40 = new System.Windows.Forms.Label();
+            this.cbTBToolSelected = new System.Windows.Forms.ComboBox();
+            this.bttnToolBlockLoad = new System.Windows.Forms.Button();
             this.cogToolBlockEditV21 = new Cognex.VisionPro.ToolBlock.CogToolBlockEditV2();
             this.Camera1_DisplayStatusBar = new Cognex.VisionPro.CogDisplayStatusBarV2();
             this.label4 = new System.Windows.Forms.Label();
-            this.cbToolBlockSelected = new System.Windows.Forms.ComboBox();
+            this.cbTBCameraSelected = new System.Windows.Forms.ComboBox();
             this.tabPartData = new System.Windows.Forms.TabPage();
             this.VGR_DegOffset = new System.Windows.Forms.TextBox();
             this.VGR_YOffset = new System.Windows.Forms.TextBox();
@@ -116,8 +119,7 @@ namespace CognexVisionProForm
             this.tbC1TB1Name = new System.Windows.Forms.TextBox();
             this.panel4 = new System.Windows.Forms.Panel();
             this.label39 = new System.Windows.Forms.Label();
-            this.tbCamersDesc = new System.Windows.Forms.TextBox();
-            this.bttnCameraNameUpdate = new System.Windows.Forms.Button();
+            this.tbCameraDesc = new System.Windows.Forms.TextBox();
             this.cbCameraIdSelected = new System.Windows.Forms.ComboBox();
             this.label38 = new System.Windows.Forms.Label();
             this.label35 = new System.Windows.Forms.Label();
@@ -139,6 +141,8 @@ namespace CognexVisionProForm
             this.tbArchiveIndex = new System.Windows.Forms.TextBox();
             this.tbArchiveCount = new System.Windows.Forms.TextBox();
             this.tabImage = new System.Windows.Forms.TabPage();
+            this.Camera6Panel = new System.Windows.Forms.Panel();
+            this.Camera5Panel = new System.Windows.Forms.Panel();
             this.Camera4Panel = new System.Windows.Forms.Panel();
             this.Camera3Panel = new System.Windows.Forms.Panel();
             this.Camera2Panel = new System.Windows.Forms.Panel();
@@ -150,6 +154,10 @@ namespace CognexVisionProForm
             this.label32 = new System.Windows.Forms.Label();
             this.bttnGlobalAbort = new System.Windows.Forms.Button();
             this.bttnGlobalSnap = new System.Windows.Forms.Button();
+            this.label41 = new System.Windows.Forms.Label();
+            this.tbPcPlcTag = new System.Windows.Forms.TextBox();
+            this.label42 = new System.Windows.Forms.Label();
+            this.tbPlcPcTag = new System.Windows.Forms.TextBox();
             this.tabPlcConnection.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numIP4)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numIP3)).BeginInit();
@@ -172,6 +180,10 @@ namespace CognexVisionProForm
             // 
             // tabPlcConnection
             // 
+            this.tabPlcConnection.Controls.Add(this.label42);
+            this.tabPlcConnection.Controls.Add(this.tbPlcPcTag);
+            this.tabPlcConnection.Controls.Add(this.label41);
+            this.tabPlcConnection.Controls.Add(this.tbPcPlcTag);
             this.tabPlcConnection.Controls.Add(this.cbHeartbeat);
             this.tabPlcConnection.Controls.Add(this.bttnPLC);
             this.tabPlcConnection.Controls.Add(this.numIP4);
@@ -285,10 +297,13 @@ namespace CognexVisionProForm
             // 
             // tabToolBlock
             // 
+            this.tabToolBlock.Controls.Add(this.label40);
+            this.tabToolBlock.Controls.Add(this.cbTBToolSelected);
+            this.tabToolBlock.Controls.Add(this.bttnToolBlockLoad);
             this.tabToolBlock.Controls.Add(this.cogToolBlockEditV21);
             this.tabToolBlock.Controls.Add(this.Camera1_DisplayStatusBar);
             this.tabToolBlock.Controls.Add(this.label4);
-            this.tabToolBlock.Controls.Add(this.cbToolBlockSelected);
+            this.tabToolBlock.Controls.Add(this.cbTBCameraSelected);
             this.tabToolBlock.Location = new System.Drawing.Point(4, 25);
             this.tabToolBlock.Name = "tabToolBlock";
             this.tabToolBlock.Padding = new System.Windows.Forms.Padding(3);
@@ -296,6 +311,33 @@ namespace CognexVisionProForm
             this.tabToolBlock.TabIndex = 5;
             this.tabToolBlock.Text = "Tool Block";
             this.tabToolBlock.UseVisualStyleBackColor = true;
+            // 
+            // label40
+            // 
+            this.label40.AutoSize = true;
+            this.label40.Location = new System.Drawing.Point(310, 14);
+            this.label40.Name = "label40";
+            this.label40.Size = new System.Drawing.Size(103, 13);
+            this.label40.TabIndex = 22;
+            this.label40.Text = "Selected Tool Block";
+            // 
+            // cbTBToolSelected
+            // 
+            this.cbTBToolSelected.FormattingEnabled = true;
+            this.cbTBToolSelected.Location = new System.Drawing.Point(439, 10);
+            this.cbTBToolSelected.Name = "cbTBToolSelected";
+            this.cbTBToolSelected.Size = new System.Drawing.Size(121, 21);
+            this.cbTBToolSelected.TabIndex = 21;
+            // 
+            // bttnToolBlockLoad
+            // 
+            this.bttnToolBlockLoad.Location = new System.Drawing.Point(604, 8);
+            this.bttnToolBlockLoad.Name = "bttnToolBlockLoad";
+            this.bttnToolBlockLoad.Size = new System.Drawing.Size(102, 24);
+            this.bttnToolBlockLoad.TabIndex = 20;
+            this.bttnToolBlockLoad.Text = "Load Toolblock";
+            this.bttnToolBlockLoad.UseVisualStyleBackColor = true;
+            this.bttnToolBlockLoad.Click += new System.EventHandler(this.bttnToolBlockLoad_Click);
             // 
             // cogToolBlockEditV21
             // 
@@ -331,15 +373,15 @@ namespace CognexVisionProForm
             this.label4.TabIndex = 16;
             this.label4.Text = "Selected Camera";
             // 
-            // cbToolBlockSelected
+            // cbTBCameraSelected
             // 
-            this.cbToolBlockSelected.FormattingEnabled = true;
-            this.cbToolBlockSelected.Location = new System.Drawing.Point(117, 6);
-            this.cbToolBlockSelected.Name = "cbToolBlockSelected";
-            this.cbToolBlockSelected.Size = new System.Drawing.Size(121, 21);
-            this.cbToolBlockSelected.TabIndex = 1;
-            this.cbToolBlockSelected.DropDown += new System.EventHandler(this.cbCameraSelected_DropDown);
-            this.cbToolBlockSelected.SelectedIndexChanged += new System.EventHandler(this.cbCameraSelected_SelectedIndexChanged);
+            this.cbTBCameraSelected.FormattingEnabled = true;
+            this.cbTBCameraSelected.Location = new System.Drawing.Point(116, 10);
+            this.cbTBCameraSelected.Name = "cbTBCameraSelected";
+            this.cbTBCameraSelected.Size = new System.Drawing.Size(121, 21);
+            this.cbTBCameraSelected.TabIndex = 1;
+            this.cbTBCameraSelected.DropDown += new System.EventHandler(this.cbCameraSelected_DropDown);
+            this.cbTBCameraSelected.SelectedIndexChanged += new System.EventHandler(this.cbTBCameraSelected_SelectedIndexChanged);
             // 
             // tabPartData
             // 
@@ -1017,8 +1059,7 @@ namespace CognexVisionProForm
             // 
             this.panel4.BackColor = System.Drawing.Color.LightGray;
             this.panel4.Controls.Add(this.label39);
-            this.panel4.Controls.Add(this.tbCamersDesc);
-            this.panel4.Controls.Add(this.bttnCameraNameUpdate);
+            this.panel4.Controls.Add(this.tbCameraDesc);
             this.panel4.Controls.Add(this.cbCameraIdSelected);
             this.panel4.Controls.Add(this.label38);
             this.panel4.Controls.Add(this.label35);
@@ -1047,23 +1088,13 @@ namespace CognexVisionProForm
             this.label39.TabIndex = 38;
             this.label39.Text = "Camera Description:";
             // 
-            // tbCamersDesc
+            // tbCameraDesc
             // 
-            this.tbCamersDesc.Location = new System.Drawing.Point(120, 63);
-            this.tbCamersDesc.Name = "tbCamersDesc";
-            this.tbCamersDesc.Size = new System.Drawing.Size(191, 20);
-            this.tbCamersDesc.TabIndex = 37;
-            this.tbCamersDesc.Leave += new System.EventHandler(this.tbCamersDesc_Leave);
-            // 
-            // bttnCameraNameUpdate
-            // 
-            this.bttnCameraNameUpdate.Location = new System.Drawing.Point(227, 34);
-            this.bttnCameraNameUpdate.Name = "bttnCameraNameUpdate";
-            this.bttnCameraNameUpdate.Size = new System.Drawing.Size(106, 24);
-            this.bttnCameraNameUpdate.TabIndex = 36;
-            this.bttnCameraNameUpdate.Text = "Update Name";
-            this.bttnCameraNameUpdate.UseVisualStyleBackColor = true;
-            this.bttnCameraNameUpdate.Click += new System.EventHandler(this.bttnCameraNameUpdate_Click);
+            this.tbCameraDesc.Location = new System.Drawing.Point(120, 63);
+            this.tbCameraDesc.Name = "tbCameraDesc";
+            this.tbCameraDesc.Size = new System.Drawing.Size(209, 20);
+            this.tbCameraDesc.TabIndex = 37;
+            this.tbCameraDesc.Leave += new System.EventHandler(this.tbCamersDesc_Leave);
             // 
             // cbCameraIdSelected
             // 
@@ -1097,7 +1128,7 @@ namespace CognexVisionProForm
             // 
             this.tbCameraName.Location = new System.Drawing.Point(120, 36);
             this.tbCameraName.Name = "tbCameraName";
-            this.tbCameraName.Size = new System.Drawing.Size(98, 20);
+            this.tbCameraName.Size = new System.Drawing.Size(209, 20);
             this.tbCameraName.TabIndex = 32;
             // 
             // label37
@@ -1253,6 +1284,8 @@ namespace CognexVisionProForm
             // tabImage
             // 
             this.tabImage.BackColor = System.Drawing.SystemColors.AppWorkspace;
+            this.tabImage.Controls.Add(this.Camera6Panel);
+            this.tabImage.Controls.Add(this.Camera5Panel);
             this.tabImage.Controls.Add(this.Camera4Panel);
             this.tabImage.Controls.Add(this.Camera3Panel);
             this.tabImage.Controls.Add(this.Camera2Panel);
@@ -1264,35 +1297,51 @@ namespace CognexVisionProForm
             this.tabImage.TabIndex = 1;
             this.tabImage.Text = "Single Camera Control";
             // 
+            // Camera6Panel
+            // 
+            this.Camera6Panel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.Camera6Panel.Location = new System.Drawing.Point(857, 380);
+            this.Camera6Panel.Name = "Camera6Panel";
+            this.Camera6Panel.Size = new System.Drawing.Size(420, 340);
+            this.Camera6Panel.TabIndex = 26;
+            // 
+            // Camera5Panel
+            // 
+            this.Camera5Panel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.Camera5Panel.Location = new System.Drawing.Point(429, 380);
+            this.Camera5Panel.Name = "Camera5Panel";
+            this.Camera5Panel.Size = new System.Drawing.Size(420, 340);
+            this.Camera5Panel.TabIndex = 26;
+            // 
             // Camera4Panel
             // 
             this.Camera4Panel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.Camera4Panel.Location = new System.Drawing.Point(645, 372);
+            this.Camera4Panel.Location = new System.Drawing.Point(3, 377);
             this.Camera4Panel.Name = "Camera4Panel";
-            this.Camera4Panel.Size = new System.Drawing.Size(630, 340);
+            this.Camera4Panel.Size = new System.Drawing.Size(420, 340);
             this.Camera4Panel.TabIndex = 25;
             // 
             // Camera3Panel
             // 
             this.Camera3Panel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.Camera3Panel.Location = new System.Drawing.Point(6, 372);
+            this.Camera3Panel.Location = new System.Drawing.Point(857, 6);
             this.Camera3Panel.Name = "Camera3Panel";
-            this.Camera3Panel.Size = new System.Drawing.Size(622, 340);
+            this.Camera3Panel.Size = new System.Drawing.Size(420, 340);
             this.Camera3Panel.TabIndex = 25;
             // 
             // Camera2Panel
             // 
             this.Camera2Panel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.Camera2Panel.Location = new System.Drawing.Point(647, 6);
+            this.Camera2Panel.Location = new System.Drawing.Point(431, 6);
             this.Camera2Panel.Name = "Camera2Panel";
-            this.Camera2Panel.Size = new System.Drawing.Size(630, 340);
+            this.Camera2Panel.Size = new System.Drawing.Size(420, 340);
             this.Camera2Panel.TabIndex = 24;
             // 
             // Camera1Panel
             // 
             this.Camera1Panel.Location = new System.Drawing.Point(8, 6);
             this.Camera1Panel.Name = "Camera1Panel";
-            this.Camera1Panel.Size = new System.Drawing.Size(620, 340);
+            this.Camera1Panel.Size = new System.Drawing.Size(420, 340);
             this.Camera1Panel.TabIndex = 23;
             // 
             // tabControl1
@@ -1333,7 +1382,7 @@ namespace CognexVisionProForm
             this.plGlobalCamera.Controls.Add(this.label32);
             this.plGlobalCamera.Controls.Add(this.bttnGlobalAbort);
             this.plGlobalCamera.Controls.Add(this.bttnGlobalSnap);
-            this.plGlobalCamera.Location = new System.Drawing.Point(3, 3);
+            this.plGlobalCamera.Location = new System.Drawing.Point(8, 0);
             this.plGlobalCamera.Name = "plGlobalCamera";
             this.plGlobalCamera.Size = new System.Drawing.Size(223, 168);
             this.plGlobalCamera.TabIndex = 21;
@@ -1376,6 +1425,38 @@ namespace CognexVisionProForm
             this.bttnGlobalSnap.Text = "Single Image";
             this.bttnGlobalSnap.UseVisualStyleBackColor = true;
             this.bttnGlobalSnap.Click += new System.EventHandler(this.bttnGlobalSnap_Click);
+            // 
+            // label41
+            // 
+            this.label41.AutoSize = true;
+            this.label41.Location = new System.Drawing.Point(22, 110);
+            this.label41.Name = "label41";
+            this.label41.Size = new System.Drawing.Size(81, 13);
+            this.label41.TabIndex = 35;
+            this.label41.Text = "PC to PLC Tag:";
+            // 
+            // tbPcPlcTag
+            // 
+            this.tbPcPlcTag.Location = new System.Drawing.Point(138, 107);
+            this.tbPcPlcTag.Name = "tbPcPlcTag";
+            this.tbPcPlcTag.Size = new System.Drawing.Size(209, 20);
+            this.tbPcPlcTag.TabIndex = 34;
+            // 
+            // label42
+            // 
+            this.label42.AutoSize = true;
+            this.label42.Location = new System.Drawing.Point(22, 138);
+            this.label42.Name = "label42";
+            this.label42.Size = new System.Drawing.Size(81, 13);
+            this.label42.TabIndex = 37;
+            this.label42.Text = "PLC to PC Tag:";
+            // 
+            // tbPlcPcTag
+            // 
+            this.tbPlcPcTag.Location = new System.Drawing.Point(138, 135);
+            this.tbPlcPcTag.Name = "tbPlcPcTag";
+            this.tbPlcPcTag.Size = new System.Drawing.Size(209, 20);
+            this.tbPlcPcTag.TabIndex = 36;
             // 
             // Form1
             // 
@@ -1431,7 +1512,7 @@ namespace CognexVisionProForm
         private System.Windows.Forms.TabPage tabToolBlock;
         private Cognex.VisionPro.CogDisplayStatusBarV2 Camera1_DisplayStatusBar;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.ComboBox cbToolBlockSelected;
+        private System.Windows.Forms.ComboBox cbTBCameraSelected;
         private System.Windows.Forms.TabPage tabPartData;
         private System.Windows.Forms.TextBox VGR_DegOffset;
         private System.Windows.Forms.TextBox VGR_YOffset;
@@ -1526,19 +1607,27 @@ namespace CognexVisionProForm
         private System.Windows.Forms.TextBox tbToolBlockName;
         private System.Windows.Forms.ComboBox cbCameraIdSelected;
         private System.Windows.Forms.Label label38;
-        private System.Windows.Forms.Button bttnCameraNameUpdate;
         private System.Windows.Forms.TabPage tabGlobalControl;
-        private System.Windows.Forms.Panel plGlobalCamera;
-        private System.Windows.Forms.Button bttnLogImage;
-        private System.Windows.Forms.Label label32;
-        private System.Windows.Forms.Button bttnGlobalAbort;
-        private System.Windows.Forms.Button bttnGlobalSnap;
         private System.Windows.Forms.Panel Camera3Panel;
         private System.Windows.Forms.Panel Camera2Panel;
         private System.Windows.Forms.Panel Camera1Panel;
         private System.Windows.Forms.Panel Camera4Panel;
         private System.Windows.Forms.Label label39;
-        private System.Windows.Forms.TextBox tbCamersDesc;
+        private System.Windows.Forms.TextBox tbCameraDesc;
+        private System.Windows.Forms.Panel plGlobalCamera;
+        private System.Windows.Forms.Button bttnLogImage;
+        private System.Windows.Forms.Label label32;
+        private System.Windows.Forms.Button bttnGlobalAbort;
+        private System.Windows.Forms.Button bttnGlobalSnap;
+        private System.Windows.Forms.Label label40;
+        private System.Windows.Forms.ComboBox cbTBToolSelected;
+        private System.Windows.Forms.Button bttnToolBlockLoad;
+        private System.Windows.Forms.Panel Camera6Panel;
+        private System.Windows.Forms.Panel Camera5Panel;
+        private System.Windows.Forms.Label label41;
+        private System.Windows.Forms.TextBox tbPcPlcTag;
+        private System.Windows.Forms.Label label42;
+        private System.Windows.Forms.TextBox tbPlcPcTag;
     }
 }
 

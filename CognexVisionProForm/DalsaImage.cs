@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using Cognex.VisionPro;
 using Microsoft.Win32;
 using System.Drawing;
+using System.Threading.Tasks;
 
 public class DalsaImage
 {
@@ -20,43 +21,30 @@ public class DalsaImage
     SapBuffer archiveBuffers;
     SapAcqDeviceToBuf acqDeviceXfer;
     SapAcqToBuf acqXfer;
-    ServerCategory serverCategory = ServerCategory.ServerAll;
 
-    bool saveImageSelected;
-
-    int id;
-
-    ICogImage image;
     SapFormat imageFormat;
-    bool imageReady;
     int imageWidth;
     int imageHeight;
     string imageFilePath;
 
     Stopwatch acqTimeWatch;
-    double acqTime;
-    double snapTime;
 
-    string configFile;
     string configFileLocation;
     string configFileType = "ConfigFile";
     string configFileExtension = ".cff";
-    bool configFilePresent;
 
-    bool archiveImageActive;
+
     FileInfo[] archiveImageArray;
     int archiveImageCount;
-    int archiveImageIndex;
     
     bool trigger;
     bool triggerMem = false;
+
+    bool abort;
+    bool abortMem = false;
     
     string cameraName;
     
-    string loadServerSelect;
-    string loadResourceName;
-    int loadResourceIndex;
-
 
     Form1 form = new Form1();
     public DalsaImage(Form1 Form)
@@ -67,11 +55,11 @@ public class DalsaImage
     }
     public double AcqTime
     {
-        get { return acqTime; }
+        get;set;
     }
     public double SnapTime
     {
-        get { return snapTime; }
+        get;set;
     }
     public int BufferIndex
     {
@@ -79,8 +67,7 @@ public class DalsaImage
     }
     public string CongfigFile
     {
-        get { return configFile; }
-        set { configFile = value; }
+        get; set;
     }
     public string Name
     {
@@ -88,17 +75,17 @@ public class DalsaImage
         set 
         { 
             cameraName = value;
-            imageFilePath = Utilities.ExeFilePath + "\\Camera" + id.ToString("00")+ "\\Images\\";
-            configFileLocation = Utilities.ExeFilePath + "\\Camera" + id.ToString("00") + "\\" + configFileType + configFileExtension;
+            imageFilePath = Utilities.ExeFilePath + "\\Camera" + Id.ToString("00")+ "\\Images\\";
+            configFileLocation = Utilities.ExeFilePath + "\\Camera" + Id.ToString("00") + "\\" + configFileType + configFileExtension;
             if (File.Exists(configFileLocation))
             {
-                configFilePresent = true;
-                configFile = configFileLocation;
+                ConfigFilePresent = true;
+                CongfigFile = configFileLocation;
             }
             else
             {
-                configFilePresent = false;
-                configFile = "";
+                ConfigFilePresent = false;
+                CongfigFile = "";
             }
         }
     }
@@ -106,8 +93,7 @@ public class DalsaImage
     { get; set; }
     public int Id
     {
-        get => id;
-        set => id = value;
+        get; set;
     }
     public bool Connected
     {
@@ -127,13 +113,38 @@ public class DalsaImage
         set
         {
             trigger = value;
-            if (trigger && !triggerMem) { SnapPicture(); }
+            if (trigger && !triggerMem) 
+            { 
+                if(Connected)
+                {
+                    SnapPicture();
+                }
+                else if(ArchiveImageActive)
+                {
+                    CreateBufferFromFile();
+                    ArchiveImageIndex++;
+                }
+                 
+            }
             triggerMem = trigger;
+        }
+    }
+    public bool AbortTrigger
+    {
+        get { return abort; }
+        set
+        {
+            abort = value;
+            if (abort && !abortMem)
+            {
+                Abort();
+            }
+            abortMem = abort;
         }
     }
     public bool ConfigFilePresent
     {
-        get => configFilePresent;
+        get; set;
     }
     public enum ServerCategory
     {
@@ -144,32 +155,27 @@ public class DalsaImage
     };
     public ServerCategory ServerType
     {
-        get => serverCategory;
+        get; set;
     }
     public string LoadServerSelect
     {
-        get => loadServerSelect;
-        set => loadServerSelect = value;
+        get; set;
     }
     public string LoadResourceName
     {
-        get => loadResourceName;
-        set => loadResourceName = value;
+        get; set;
     }
     public int LoadResourceIndex
     {
-        get => loadResourceIndex;
-        set => loadResourceIndex = value;
+        get; set;
     }
     public bool SaveImageSelected
     {
-        get => saveImageSelected;
-        set => saveImageSelected = value;
+        get;set;
     }
     public bool ArchiveImageActive
-    { 
-        get => archiveImageActive; 
-        set => archiveImageActive = value;
+    {
+        get; set;
     }
     public int ArchiveImageCount
     {
@@ -180,17 +186,16 @@ public class DalsaImage
         }
     }
     public int ArchiveImageIndex
-    { 
-        get { return archiveImageIndex; }
-        set {  archiveImageIndex = value; }
+    {
+        get; set;
     }
     public bool ImageReady
     {
-        get => imageReady;
+        get; set;
     }
     public ICogImage Image
     {
-        get => image;
+        get;set;
     }
     public void FindArchivedImages()
     {
@@ -214,15 +219,16 @@ public class DalsaImage
         else { archiveImageCount = -1; }
 
     }
-    public void CreateBufferFromFile()
+    public async void CreateBufferFromFile()
     {
         acqTimeWatch.Start();
+        ImageReady = false;
 
         if (archiveImageCount == -1) {return; }
-        if (archiveImageIndex > archiveImageCount - 1) { archiveImageIndex = 0; }
-        if (archiveImageIndex < 0 ) { archiveImageIndex = archiveImageCount - 1; }
+        if (ArchiveImageIndex > archiveImageCount - 1) { ArchiveImageIndex = 0; }
+        if (ArchiveImageIndex < 0 ) { ArchiveImageIndex = archiveImageCount - 1; }
 
-        string filename = imageFilePath + archiveImageArray[archiveImageIndex].Name;
+        string filename = imageFilePath + archiveImageArray[ArchiveImageIndex].Name;
 
         // Allocate buffer with parameters compatible to file (does not load it)
         archiveBuffers = new SapBuffer(filename, SapBuffer.MemoryType.Default);
@@ -238,33 +244,35 @@ public class DalsaImage
             Cleaning();
             return;
         }
+        await Task.Delay(1000);
+        //System.Threading.Thread.Sleep(1000);
 
         UpdateImageData();
 
     }
     public void LoadConfigFile()
     {
-        string filePath = Utilities.ExeFilePath + "\\Camera" + id.ToString("00");
+        string filePath = Utilities.ExeFilePath + "\\Camera" + Id.ToString("00");
         Utilities.Import(filePath,cameraName, "ConfigFile", ".cff");
-        configFile = configFileLocation;
-        configFilePresent = true;
+        CongfigFile = configFileLocation;
+        ConfigFilePresent = true;
 
-        Utilities.LoggingStatment(cameraName + ": new log file from: " + configFile);
+        Utilities.LoggingStatment(cameraName + ": new log file from: " + CongfigFile);
 
     }
     public void CreateCamera()
     {
-        Utilities.LoggingStatment($"{cameraName}: CreateCamera from {loadServerSelect}  {loadResourceIndex} ");
+        Utilities.LoggingStatment($"{cameraName}: CreateCamera from {LoadServerSelect}  {LoadResourceIndex} ");
         Cleaning();
 
-        serverLocation = new SapLocation(loadServerSelect, loadResourceIndex);
+        serverLocation = new SapLocation(LoadServerSelect, LoadResourceIndex);
 
 
         if (SapManager.GetResourceCount(serverLocation, SapManager.ResourceType.Acq) > 0)
         {
-            serverCategory = ServerCategory.ServerAcq;
+            ServerType = ServerCategory.ServerAcq;
 
-            acquisition = new SapAcquisition(serverLocation, configFile);
+            acquisition = new SapAcquisition(serverLocation, CongfigFile);
             buffers = new SapBufferWithTrash(2, acquisition, SapBuffer.MemoryType.ScatterGather);
             acqXfer = new SapAcqToBuf(acquisition, buffers);
             
@@ -280,8 +288,8 @@ public class DalsaImage
         }      
         else if (SapManager.GetResourceCount(serverLocation, SapManager.ResourceType.AcqDevice) > 0)
         {
-            serverCategory = ServerCategory.ServerAcqDevice;
-            acqDevice = new SapAcqDevice(serverLocation, configFile);
+            ServerType = ServerCategory.ServerAcqDevice;
+            acqDevice = new SapAcqDevice(serverLocation, CongfigFile);
             buffers = new SapBufferWithTrash(4, acqDevice, SapBuffer.MemoryType.ScatterGather);
             acqDeviceXfer = new SapAcqDeviceToBuf(acqDevice, buffers);
 
@@ -303,7 +311,7 @@ public class DalsaImage
         }
         if (buffers != null && !buffers.Initialized)
         {
-            archiveImageActive = false;
+            ArchiveImageActive = false;
             buffers.Create();
         }
         if (acqDeviceXfer != null && !acqDeviceXfer.Initialized)
@@ -313,7 +321,7 @@ public class DalsaImage
     }
     public void SnapPicture()
     {
-        imageReady = false;
+        ImageReady = false;
 
         acqTimeWatch.Start();
         if(acqDeviceXfer.Connected)
@@ -321,7 +329,7 @@ public class DalsaImage
             if (acqDeviceXfer.Snap())
             {
                 
-                snapTime = acqTimeWatch.ElapsedMilliseconds;
+                SnapTime = acqTimeWatch.ElapsedMilliseconds;
                 acqDeviceXfer.Wait(5000);
             }
         }
@@ -330,7 +338,7 @@ public class DalsaImage
             if (acqXfer.Snap())
             {
                 acqXfer.Wait(5000);
-                snapTime = acqTimeWatch.ElapsedMilliseconds;
+                SnapTime = acqTimeWatch.ElapsedMilliseconds;
             }
         }
     }
@@ -344,7 +352,7 @@ public class DalsaImage
         {
             acqXfer.Abort();
         }
-        imageReady = true;
+        ImageReady = true;
     }
     public void SaveImageBMP()
     {
@@ -403,7 +411,7 @@ public class DalsaImage
     }
     public void UpdateImageData()
     {
-        acqTime = acqTimeWatch.ElapsedMilliseconds;
+        AcqTime = acqTimeWatch.ElapsedMilliseconds;
 
         // logic for using Camera
         if (buffers != null) 
@@ -423,12 +431,12 @@ public class DalsaImage
         }
 
         //Save Dalsa Image to Cog Image
-        image = MarshalToCogImage();
+        Image = MarshalToCogImage();
 
         // Save Image as BMP to pre-defined location
-        if (buffers != null && saveImageSelected) { SaveImageBMP(); }
+        if (buffers != null && SaveImageSelected) { SaveImageBMP(); }
 
-        imageReady = true;
+        ImageReady = true;
         form.CameraSnapComplete = true;
 
         acqTimeWatch.Stop();

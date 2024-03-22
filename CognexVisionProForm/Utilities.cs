@@ -126,12 +126,15 @@ namespace CognexVisionProForm
             string fullFilePath = NewPath + "\\" + DeviceID + "_" + FileType + Extension;
             System.IO.Directory.CreateDirectory(NewPath);
 
-            if (File.Exists(fullFilePath))
+            if (File.Exists(fullFilePath) && newfigFile != fullFilePath)
             {
                 Archive(fullFilePath);
             }
-
-            File.Copy(newfigFile, fullFilePath);
+            if(newfigFile != fullFilePath)
+            {
+                File.Copy(newfigFile, fullFilePath);
+            }
+            
         }
         public static double DirSize(DirectoryInfo Folder)
         {

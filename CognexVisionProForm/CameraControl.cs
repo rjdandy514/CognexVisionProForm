@@ -17,6 +17,8 @@ namespace CognexVisionProForm
         DalsaImage camera;
         ICogImage image;
         public ToolBlock[] cogTool;
+        double acqTime;
+        private Timer pollingTimer;
         public ICogImage Image
         {
             get
@@ -31,9 +33,11 @@ namespace CognexVisionProForm
         }
         public double AcqTime
         {
+            get { return acqTime; }
             set
             {
-                lbAcqTime.Text = $"Aquisition: {value}ms";
+                acqTime = value;
+                AcqTimeUpdate();
             }
         }
         public CameraControl(Form1 Sender, DalsaImage Camera)
@@ -44,8 +48,23 @@ namespace CognexVisionProForm
 
             InitializeComponent();
         }
+        private void pollingTimer_Tick(object sender, EventArgs e)
+        {
+            pollingTimer.Stop();
+
+            cbCameraConnected.Checked = camera.Connected;
+            cbArchiveImageActive.Checked = camera.ArchiveImageActive;
+            cbImageReady.Checked = camera.ImageReady;
+
+            pollingTimer.Start();
+        }
         private void CameraControl_Load(object sender, EventArgs e)
         {
+            pollingTimer = new Timer();
+            pollingTimer.Tick += new EventHandler(pollingTimer_Tick);
+            pollingTimer.Interval = 200; // in miliseconds
+            pollingTimer.Start();
+
             lbCameraName.Text = camera.Name;
             lbCameraDescription.Text = camera.Description;
 
@@ -53,17 +72,24 @@ namespace CognexVisionProForm
             bttnCameraLog.Visible = !camera.ArchiveImageActive;
 
         }
-
         private void bttnCameraSnap_Click(object sender, EventArgs e)
         {
-            _form.CameraTrigger(camera.Id);
-        }
+            //_form.CameraTrigger(camera.Id);
 
+            if ( camera.Connected)
+            {
+                camera.SnapPicture();
+            }
+            else if (camera.ArchiveImageActive)
+            {
+                camera.CreateBufferFromFile();
+                camera.ArchiveImageIndex++;
+            }
+        }
         private void bttnCameraAbort_Click(object sender, EventArgs e)
         {
-            _form.CameraAbort(camera.Id);
+            camera.Abort();
         }
-
         private void bttnCameraLog_Click(object sender, EventArgs e)
         {
             if (camera.SaveImageSelected)
@@ -77,7 +103,6 @@ namespace CognexVisionProForm
                 bttnCameraLog.Text = "Log Images - Active";
             }
         }
-        
         private delegate void Set_ResizeWindow();
         public void ResizeWindow()
         {
@@ -112,10 +137,16 @@ namespace CognexVisionProForm
 
             
         }
-
-        private void label1_Click(object sender, EventArgs e)
+        private delegate void Set_AcqTimeUpdate();
+        public void AcqTimeUpdate()
         {
-
+            if (this.InvokeRequired)
+            {
+                BeginInvoke(new Set_AcqTimeUpdate(AcqTimeUpdate));
+                return;
+            }
+            lbAcqTime.Text = $"Aquisition: {AcqTime}ms";
         }
+
     }
 }

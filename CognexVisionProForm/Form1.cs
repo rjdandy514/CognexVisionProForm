@@ -1,22 +1,11 @@
 ﻿using Cognex.VisionPro;
-using Cognex.VisionPro.Exceptions;
-using Cognex.VisionPro.ImageFile;
-using DALSA.SaperaProcessing.CPro;
-using DALSA.SaperaLT.SapClassBasic;
 using System;
+using System.Collections;
 using System.Diagnostics;
+using System.Drawing;
+using System.Net.NetworkInformation;
 using System.Windows.Forms;
 using EventArgs = System.EventArgs;
-using static System.Net.Mime.MediaTypeNames;
-using Cognex.VisionPro.ToolBlock;
-using LibplctagWrapper;
-using System.Net.NetworkInformation;
-using System.Collections;
-using static DalsaImage;
-using System.IO;
-using System.Linq;
-using System.Net.Http.Headers;
-using System.Drawing;
 
 namespace CognexVisionProForm
 {
@@ -40,6 +29,7 @@ namespace CognexVisionProForm
         private bool cogLicenseOk;
 
         int selectedCameraId;
+        int cameraConnectCount;
         public DalsaImage[] CameraAcqArray;
         ICogImage CameraImage;
         bool cameraSnapComplete;
@@ -97,7 +87,7 @@ namespace CognexVisionProForm
 
             PlcRead();
 
-            CameraAcqArray[selectedCameraId].Trigger = CameraControl[0];
+            
 
             PlcWrite();
 
@@ -120,7 +110,7 @@ namespace CognexVisionProForm
             string ArchiveLogDir = LogDir + "Archive\\";
             Utilities.InitializeLog(LogDir, ArchiveLogDir);
 
-            cameraCount = 3;
+            cameraCount = 6;
             toolCount = 4;
             CameraAcqArray = new DalsaImage[cameraCount];
             toolblockArray = new ToolBlock[cameraCount, toolCount];
@@ -307,30 +297,18 @@ namespace CognexVisionProForm
         }
         private void cbCameraSelected_DropDown(object sender, EventArgs e)
         {
-            cbToolBlockSelected.Items.Clear();
+            cbToolBlock.Items.Clear();
             for (int i = 0; i < toolblockArray.GetLength(1); i++)
             {
-                cbToolBlockSelected.Items.Add(toolblockArray[0,i].Name);
+                cbToolBlock.Items.Add(toolblockArray[0,i].Name);
             }
         }
-        private void cbCameraSelected_SelectedIndexChanged(object sender, EventArgs e)
-        {
 
-            if(toolblockArray[0,cbToolBlockSelected.SelectedIndex].ToolReady)
-            {
-                cogToolBlockEditV21.Subject = toolblockArray[0, cbToolBlockSelected.SelectedIndex].cogToolBlock;
-            }
-            
-
-           
-            if(cogToolBlockEditV21.Subject != null)
-            {
-                cogToolBlockEditV21.Subject.Run();
-            }
-        }
         private void bttnPLC_Click(object sender, EventArgs e)
         {
-            
+            MainPLC.ReadTag = tbPcPlcTag.Text;
+            MainPLC.WriteTag = tbPlcPcTag.Text;
+
             MainPLC.InitializePlcComms(numIP1.Value.ToString(), numIP2.Value.ToString(), numIP3.Value.ToString(), numIP4.Value.ToString());
             
             if(MainPLC.InitialCheck.Status == IPStatus.Success)
@@ -377,33 +355,39 @@ namespace CognexVisionProForm
         }
         private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if(tabControl1.SelectedIndex == 0)
+            
+            if (tabControl1.SelectedIndex == 0)
             {
-                if (CameraAcqArray[0].Connected || CameraAcqArray[0].ArchiveImageActive)
+                Panel[] allPanels = new Panel[] { Camera1Panel, Camera2Panel, Camera3Panel, Camera4Panel, Camera5Panel, Camera6Panel };
+                cameraConnectCount = 0;
+                for(int i = 0;i < cameraCount;i++)
                 {
-                    LoadForm(this.Camera1Panel, cameraControl[0]);
-
+                    if (CameraAcqArray[i].Connected || CameraAcqArray[i].ArchiveImageActive)
+                    {
+                        LoadForm(allPanels[cameraConnectCount], cameraControl[i]);
+                        cameraConnectCount++;
+                    }
                 }
-                if (CameraAcqArray[1].Connected || CameraAcqArray[1].ArchiveImageActive)
-                {
-                    LoadForm(this.Camera2Panel, cameraControl[1]);
-
-                }
-                if (CameraAcqArray[2].Connected || CameraAcqArray[2].ArchiveImageActive)
-                {
-                    LoadForm(this.Camera3Panel, cameraControl[2]);
-                }
+                resize_Tab00();
             }
             else if (tabControl1.SelectedIndex == 1)
             {
                 UpdateFrameGrabberTab();
             }
-            else if(tabControl1.SelectedIndex == 2)
+            else if(tabControl1.SelectedIndex == 5)
             {
+                cbTBCameraSelected.Items.Clear();
+
+                foreach(DalsaImage camera in CameraAcqArray)
+                {
+                    cbTBCameraSelected.Items.Add(camera.Name);
+                }
 
             }
-            else if(tabControl1.SelectedIndex == 7)
+            else if(tabControl1.SelectedIndex == 6)
             {
+                tbPcPlcTag.Text = MainPLC.ReadTag;
+                tbPlcPcTag.Text = MainPLC.WriteTag;
             }
         }
 
@@ -414,7 +398,8 @@ namespace CognexVisionProForm
             cbConfigFileFound.Checked = CameraAcqArray[selectedCameraId].ConfigFilePresent;
             cbCameraConnected.Checked = CameraAcqArray[selectedCameraId].Connected;
             tbCameraName.Text = CameraAcqArray[selectedCameraId].Name;
-            
+            tbCameraDesc.Text = CameraAcqArray[selectedCameraId].Description;
+
             tbArchiveCount.Text = CameraAcqArray[selectedCameraId].ArchiveImageCount.ToString();
             tbArchiveIndex.Text = CameraAcqArray[selectedCameraId].ArchiveImageIndex.ToString();
             cbArchiveActive.Checked = CameraAcqArray[selectedCameraId].ArchiveImageActive;
@@ -431,11 +416,6 @@ namespace CognexVisionProForm
             cbToolBlock.SelectedIndex = 0;
         }
 
-        private void bttnCameraNameUpdate_Click(object sender, EventArgs e)
-        {
-            CameraAcqArray[cbCameraIdSelected.SelectedIndex].Name = tbCameraName.Text;
-        }
-
         private void bttnGlobalSnap_Click(object sender, EventArgs e)
         {
             for(int i = 0; i < cameraCount;i++)
@@ -449,31 +429,46 @@ namespace CognexVisionProForm
 
         private void tbCamersDesc_Leave(object sender, EventArgs e)
         {
-            CameraAcqArray[selectedCameraId].Description = tbCamersDesc.Text;
+            CameraAcqArray[selectedCameraId].Description = tbCameraDesc.Text;
         }
 
         private void Form1_Resize(object sender, EventArgs e)
         {
+            resize_Tab00();
+            resize_tabToolBlock();
 
-            
-            Camera1Panel.Height = this.tabControl1.Height / 2 - 2;
-            Camera1Panel.Width = this.tabControl1.Width / 2 - 2;
-            Camera1Panel.Location = new Point(0, 0);
+        }
 
-            Camera2Panel.Height = this.tabControl1.Height / 2 - 2;
-            Camera2Panel.Width = this.tabControl1.Width / 2 - 2;
-            Camera2Panel.Location = new Point(tabControl1.Width - Camera2Panel.Width, 0);
+        private void bttnToolBlockLoad_Click(object sender, EventArgs e)
+        {
 
-            Camera3Panel.Height = this.tabControl1.Height / 2 - 2;
-            Camera3Panel.Width = this.tabControl1.Width / 2 - 2;
-            Camera3Panel.Location = new Point(0, tabControl1.Height - Camera2Panel.Height);
+            int cameraSelected = cbTBCameraSelected.SelectedIndex;
+            int toolSelected = cbTBToolSelected.SelectedIndex;
 
-            Camera4Panel.Height = this.tabControl1.Height / 2 - 2;
-            Camera4Panel.Width = this.tabControl1.Width / 2 - 2;
-            Camera4Panel.Location = new Point(tabControl1.Width - Camera2Panel.Width, tabControl1.Height - Camera2Panel.Height);
+            //make sure that there are no selection out of range of arrays
+            if (cameraSelected < 0 || cameraSelected >= cameraCount) { return; }
+            if (toolSelected < 0 || toolSelected >= toolCount) { return; }
 
 
+            if (toolblockArray[cameraSelected, toolSelected].ToolReady)
+            {
+                cogToolBlockEditV21.Subject = toolblockArray[cameraSelected, toolSelected].cogToolBlock;
+            }
 
+            if (cogToolBlockEditV21.Subject != null)
+            {
+                cogToolBlockEditV21.Subject.Run();
+            }
+        }
+
+        private void cbTBCameraSelected_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            cbTBToolSelected.Items.Clear();
+            for (int i = 0; i < toolCount; i++)
+            {
+
+                cbTBToolSelected.Items.Add(toolblockArray[cbTBCameraSelected.SelectedIndex, i].Name);
+            }
         }
     }
 

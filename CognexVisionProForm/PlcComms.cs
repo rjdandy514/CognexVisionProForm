@@ -24,8 +24,8 @@ namespace CognexVisionProForm
         Libplctag client;
         bool pinged;
         int DataTimeout = 2000;
-        public int[] PlcToPC_Data = new int[32];
-        public int[]PCtoPLC_Data = new int[32];
+        public int[] PlcToPC_Data = new int[64];
+        public int[]PCtoPLC_Data = new int[64];
         string IP_Address;
         Ping pinger;
         
@@ -39,6 +39,14 @@ namespace CognexVisionProForm
         public string IPAddress
         {
             get { return InitialCheck.Address.ToString(); }
+        }
+        public string ReadTag
+        {
+            get;set;
+        }
+        public string WriteTag
+        {
+            get;set;
         }
         public string DecodeError(int result)
         {
@@ -67,19 +75,18 @@ namespace CognexVisionProForm
                 client = new Libplctag();
 
                 // create the tag for PLC to PC communication
-                tagPlcToPC = new Tag(IP_Address, "1,0", CpuType.LGX, "CameraOutput[0]", DataType.DINT, 32);
-                CreatePlcTag(tagPlcToPC, "CameraOutput[0]");
+                tagPlcToPC = new Tag(IP_Address, "1,0", CpuType.LGX, $"{ReadTag}[0]", DataType.DINT, 32);
+                CreatePlcTag(tagPlcToPC, $"{ReadTag}[0]");
 
                 // create the tag for PC to PLC communication
-                tagPcToPlc = new Tag(IP_Address, "1,0", CpuType.LGX, "CameraInput[0]", DataType.DINT, 32);
-                CreatePlcTag(tagPcToPlc, "CameraInput[0]");
+                tagPcToPlc = new Tag(IP_Address, "1,0", CpuType.LGX, $"{WriteTag}[0]", DataType.DINT, 32);
+                CreatePlcTag(tagPcToPlc, $"{WriteTag}[0]");
 
                 /*
                 Sample code for creating String Tag
                 // create the tag for PC to PLC communication
                 tagPcToPlcString = new Tag(IP_Address, "1,0", CpuType.LGX, "CameraInputString[0]", DataType.String, 10);
                 CreatePlcTag(tagPcToPlcString, "CameraInputString[0]");
-
                 */
 
             }
