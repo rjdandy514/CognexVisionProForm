@@ -122,10 +122,16 @@
     <Compile Include="CameraControl.Designer.cs">
       <DependentUpon>CameraControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="SplashScreen.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SplashScreen.Designer.cs">
+      <DependentUpon>SplashScreen.cs</DependentUpon>
+    </Compile>
     <Compile Include="Utilities.cs" />
     <Compile Include="Calculations.cs" />
     <Compile Include="CameraAcq.cs" />
-    <Compile Include="Code.cs">
+    <Compile Include="Code01.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="DalsaImage.cs" />
@@ -155,6 +161,9 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="SplashScreen.resx">
+      <DependentUpon>SplashScreen.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

@@ -127,6 +127,7 @@ public class DalsaImage
                  
             }
             triggerMem = trigger;
+
         }
     }
     public bool AbortTrigger

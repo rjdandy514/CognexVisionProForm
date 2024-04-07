@@ -26,7 +26,6 @@ namespace CognexVisionProForm
         int DataTimeout = 2000;
         public int[] PlcToPC_Data = new int[64];
         public int[]PCtoPLC_Data = new int[64];
-        string IP_Address;
         Ping pinger;
         
         public PlcComms(Form1 Sender)

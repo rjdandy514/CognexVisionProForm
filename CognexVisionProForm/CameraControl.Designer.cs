@@ -35,12 +35,12 @@
             this.bttnCameraAbort = new System.Windows.Forms.Button();
             this.bttnCameraSnap = new System.Windows.Forms.Button();
             this.lbCameraName = new System.Windows.Forms.Label();
-            this.plControl = new System.Windows.Forms.Panel();
-            this.lbCameraDescription = new System.Windows.Forms.Label();
             this.lbAcqTime = new System.Windows.Forms.Label();
+            this.lbCameraDescription = new System.Windows.Forms.Label();
             this.cbCameraConnected = new System.Windows.Forms.CheckBox();
             this.cbImageReady = new System.Windows.Forms.CheckBox();
             this.cbArchiveImageActive = new System.Windows.Forms.CheckBox();
+            this.plControl = new System.Windows.Forms.Panel();
             ((System.ComponentModel.ISupportInitialize)(this.cogImageDisplay)).BeginInit();
             this.plControl.SuspendLayout();
             this.SuspendLayout();
@@ -64,6 +64,7 @@
             // 
             // bttnCameraLog
             // 
+            this.bttnCameraLog.BackColor = System.Drawing.SystemColors.ButtonFace;
             this.bttnCameraLog.FlatAppearance.BorderColor = System.Drawing.Color.Red;
             this.bttnCameraLog.FlatAppearance.BorderSize = 2;
             this.bttnCameraLog.Location = new System.Drawing.Point(3, 201);
@@ -71,11 +72,12 @@
             this.bttnCameraLog.Size = new System.Drawing.Size(152, 43);
             this.bttnCameraLog.TabIndex = 2;
             this.bttnCameraLog.Text = "Log Images";
-            this.bttnCameraLog.UseVisualStyleBackColor = true;
+            this.bttnCameraLog.UseVisualStyleBackColor = false;
             this.bttnCameraLog.Click += new System.EventHandler(this.bttnCameraLog_Click);
             // 
             // bttnCameraAbort
             // 
+            this.bttnCameraAbort.BackColor = System.Drawing.SystemColors.ButtonFace;
             this.bttnCameraAbort.FlatAppearance.BorderColor = System.Drawing.Color.Red;
             this.bttnCameraAbort.FlatAppearance.BorderSize = 2;
             this.bttnCameraAbort.Location = new System.Drawing.Point(3, 156);
@@ -83,11 +85,12 @@
             this.bttnCameraAbort.Size = new System.Drawing.Size(152, 43);
             this.bttnCameraAbort.TabIndex = 1;
             this.bttnCameraAbort.Text = "Abort";
-            this.bttnCameraAbort.UseVisualStyleBackColor = true;
+            this.bttnCameraAbort.UseVisualStyleBackColor = false;
             this.bttnCameraAbort.Click += new System.EventHandler(this.bttnCameraAbort_Click);
             // 
             // bttnCameraSnap
             // 
+            this.bttnCameraSnap.BackColor = System.Drawing.SystemColors.ButtonFace;
             this.bttnCameraSnap.FlatAppearance.BorderColor = System.Drawing.Color.Red;
             this.bttnCameraSnap.FlatAppearance.BorderSize = 2;
             this.bttnCameraSnap.Location = new System.Drawing.Point(3, 111);
@@ -95,7 +98,7 @@
             this.bttnCameraSnap.Size = new System.Drawing.Size(152, 43);
             this.bttnCameraSnap.TabIndex = 0;
             this.bttnCameraSnap.Text = "Single Snap";
-            this.bttnCameraSnap.UseVisualStyleBackColor = true;
+            this.bttnCameraSnap.UseVisualStyleBackColor = false;
             this.bttnCameraSnap.Click += new System.EventHandler(this.bttnCameraSnap_Click);
             // 
             // lbCameraName
@@ -107,22 +110,14 @@
             this.lbCameraName.TabIndex = 17;
             this.lbCameraName.Text = "Camera Name";
             // 
-            // plControl
+            // lbAcqTime
             // 
-            this.plControl.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.plControl.Controls.Add(this.cbArchiveImageActive);
-            this.plControl.Controls.Add(this.cbImageReady);
-            this.plControl.Controls.Add(this.cbCameraConnected);
-            this.plControl.Controls.Add(this.lbCameraDescription);
-            this.plControl.Controls.Add(this.lbAcqTime);
-            this.plControl.Controls.Add(this.lbCameraName);
-            this.plControl.Controls.Add(this.bttnCameraSnap);
-            this.plControl.Controls.Add(this.bttnCameraAbort);
-            this.plControl.Controls.Add(this.bttnCameraLog);
-            this.plControl.Location = new System.Drawing.Point(459, 5);
-            this.plControl.Name = "plControl";
-            this.plControl.Size = new System.Drawing.Size(158, 339);
-            this.plControl.TabIndex = 18;
+            this.lbAcqTime.AutoSize = true;
+            this.lbAcqTime.Location = new System.Drawing.Point(3, 39);
+            this.lbAcqTime.Name = "lbAcqTime";
+            this.lbAcqTime.Size = new System.Drawing.Size(58, 13);
+            this.lbAcqTime.TabIndex = 18;
+            this.lbAcqTime.Text = "Acquisition";
             // 
             // lbCameraDescription
             // 
@@ -132,15 +127,6 @@
             this.lbCameraDescription.Size = new System.Drawing.Size(99, 13);
             this.lbCameraDescription.TabIndex = 19;
             this.lbCameraDescription.Text = "Camera Description";
-            // 
-            // lbAcqTime
-            // 
-            this.lbAcqTime.AutoSize = true;
-            this.lbAcqTime.Location = new System.Drawing.Point(3, 39);
-            this.lbAcqTime.Name = "lbAcqTime";
-            this.lbAcqTime.Size = new System.Drawing.Size(58, 13);
-            this.lbAcqTime.TabIndex = 18;
-            this.lbAcqTime.Text = "Acquisition";
             // 
             // cbCameraConnected
             // 
@@ -172,17 +158,38 @@
             this.cbArchiveImageActive.Text = "Using Archived Images";
             this.cbArchiveImageActive.UseVisualStyleBackColor = true;
             // 
+            // plControl
+            // 
+            this.plControl.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.plControl.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.plControl.Controls.Add(this.cbArchiveImageActive);
+            this.plControl.Controls.Add(this.cbImageReady);
+            this.plControl.Controls.Add(this.cbCameraConnected);
+            this.plControl.Controls.Add(this.lbCameraDescription);
+            this.plControl.Controls.Add(this.lbAcqTime);
+            this.plControl.Controls.Add(this.lbCameraName);
+            this.plControl.Controls.Add(this.bttnCameraSnap);
+            this.plControl.Controls.Add(this.bttnCameraAbort);
+            this.plControl.Controls.Add(this.bttnCameraLog);
+            this.plControl.Location = new System.Drawing.Point(456, 5);
+            this.plControl.Margin = new System.Windows.Forms.Padding(20);
+            this.plControl.Name = "plControl";
+            this.plControl.Size = new System.Drawing.Size(158, 350);
+            this.plControl.TabIndex = 18;
+            // 
             // CameraControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.SystemColors.ControlDark;
-            this.ClientSize = new System.Drawing.Size(618, 356);
+            this.BackColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.ClientSize = new System.Drawing.Size(620, 360);
             this.ControlBox = false;
             this.Controls.Add(this.plControl);
             this.Controls.Add(this.cogImageDisplay);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "CameraControl";
+            this.Padding = new System.Windows.Forms.Padding(5);
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "CameraControl";
             this.Load += new System.EventHandler(this.CameraControl_Load);
@@ -199,11 +206,11 @@
         private System.Windows.Forms.Button bttnCameraAbort;
         private System.Windows.Forms.Button bttnCameraSnap;
         private System.Windows.Forms.Label lbCameraName;
-        private System.Windows.Forms.Panel plControl;
         private System.Windows.Forms.Label lbAcqTime;
         private System.Windows.Forms.Label lbCameraDescription;
         private System.Windows.Forms.CheckBox cbCameraConnected;
         private System.Windows.Forms.CheckBox cbImageReady;
         private System.Windows.Forms.CheckBox cbArchiveImageActive;
+        private System.Windows.Forms.Panel plControl;
     }
 }

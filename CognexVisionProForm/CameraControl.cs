@@ -74,8 +74,6 @@ namespace CognexVisionProForm
         }
         private void bttnCameraSnap_Click(object sender, EventArgs e)
         {
-            //_form.CameraTrigger(camera.Id);
-
             if ( camera.Connected)
             {
                 camera.SnapPicture();
@@ -110,7 +108,7 @@ namespace CognexVisionProForm
             //determine the zoom factor to use full window
             //update cogdisplay
             //*********************************************
-            int cogWidth = plControl.Location.X - 5;
+            int cogWidth = plControl.Location.X - cogImageDisplay.Location.X - 5;
             int cogHeight = this.Size.Height - 5;
 
             double zoomWidth = Convert.ToDouble(cogWidth) / Convert.ToDouble(image.Width);
@@ -135,7 +133,9 @@ namespace CognexVisionProForm
             cogImageDisplay.Height = Convert.ToInt16(Convert.ToDouble(image.Height) * cogImageDisplay.Zoom);
             cogImageDisplay.Image = image;
 
-            
+            //plControl.Height = this.Size.Height - 5;
+
+
         }
         private delegate void Set_AcqTimeUpdate();
         public void AcqTimeUpdate()
