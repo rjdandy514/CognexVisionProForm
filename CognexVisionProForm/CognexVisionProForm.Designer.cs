@@ -2,7 +2,7 @@
 
 namespace CognexVisionProForm
 {
-    partial class Form1
+    partial class CognexVisionProForm
     {
         /// <summary>
         /// Required designer variable.

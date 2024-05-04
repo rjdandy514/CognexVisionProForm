@@ -16,7 +16,7 @@ namespace CognexVisionProForm
 
     class PlcComms
     {
-        Form1 _form;
+        CognexVisionProForm _form;
         public PingReply InitialCheck;
         Tag tagPlcToPC;
         Tag tagPcToPlc;
@@ -24,13 +24,14 @@ namespace CognexVisionProForm
         Libplctag client;
         bool pinged;
         int DataTimeout = 2000;
-        public int[] PlcToPC_Data = new int[64];
-        public int[]PCtoPLC_Data = new int[64];
+        public short[] PlcToPcData = new short[8];
+        public short[] PcToPlcData = new short[8];
+        public string[] PcToPlcString = new string[24];
         Ping pinger;
         
-        public PlcComms(Form1 Sender)
+        public PlcComms(CognexVisionProForm Sender)
         {
-            _form = new Form1();
+            _form = new CognexVisionProForm();
             pinger = new Ping();
 
             _form = Sender;
@@ -74,19 +75,19 @@ namespace CognexVisionProForm
                 client = new Libplctag();
 
                 // create the tag for PLC to PC communication
-                tagPlcToPC = new Tag(IP_Address, "1,0", CpuType.LGX, $"{ReadTag}[0]", DataType.DINT, 32);
+                tagPlcToPC = new Tag(IP_Address, "1,0", CpuType.LGX, $"{ReadTag}[0]", DataType.Int16, 8);
                 CreatePlcTag(tagPlcToPC, $"{ReadTag}[0]");
 
                 // create the tag for PC to PLC communication
-                tagPcToPlc = new Tag(IP_Address, "1,0", CpuType.LGX, $"{WriteTag}[0]", DataType.DINT, 32);
+                tagPcToPlc = new Tag(IP_Address, "1,0", CpuType.LGX, $"{WriteTag}[0]", DataType.Int16, 8);
                 CreatePlcTag(tagPcToPlc, $"{WriteTag}[0]");
 
-                /*
-                Sample code for creating String Tag
+
                 // create the tag for PC to PLC communication
-                tagPcToPlcString = new Tag(IP_Address, "1,0", CpuType.LGX, "CameraInputString[0]", DataType.String, 10);
-                CreatePlcTag(tagPcToPlcString, "CameraInputString[0]");
-                */
+                string strPcToPlc = "CameraString[0]";
+                tagPcToPlcString = new Tag(IP_Address, "1,0", CpuType.LGX, strPcToPlc, DataType.String, 24);
+                CreatePlcTag(tagPcToPlcString, strPcToPlc);
+
 
             }
             else
@@ -121,10 +122,23 @@ namespace CognexVisionProForm
             // set values on the tag buffer
             for (int i = 0; i < tagPcToPlc.ElementCount; i++)
             {
-                client.SetInt32Value(tagPcToPlc, i * tagPcToPlc.ElementSize, PCtoPLC_Data[i]);
+                client.SetInt32Value(tagPcToPlc, i * tagPcToPlc.ElementSize, PcToPlcData[i]);
             }
             // write the values
             result = client.WriteTag(tagPcToPlc, DataTimeout);
+            return result;
+
+        }
+        public int WritePlcDataTag()
+        {
+            int result = 0;
+            // set values on the tag buffer
+            for (int i = 0; i < tagPcToPlcString.ElementCount; i++)
+            {
+                client.SetStringValue(tagPcToPlcString, i * tagPcToPlcString.ElementSize, PcToPlcString[i]);
+            }
+            // write the values
+            result = client.WriteTag(tagPcToPlcString, DataTimeout);
             return result;
 
         }
@@ -137,7 +151,7 @@ namespace CognexVisionProForm
             {
                 for (int i = 0; i < tagPlcToPC.ElementCount; i++)
                 {
-                    PlcToPC_Data[i] = client.GetInt32Value(tagPlcToPC, i * tagPlcToPC.ElementSize);
+                    PlcToPcData[i] = client.GetInt16Value(tagPlcToPC, i * tagPlcToPC.ElementSize);
                 }
             }
             return result;

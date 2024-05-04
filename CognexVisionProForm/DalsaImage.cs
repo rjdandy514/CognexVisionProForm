@@ -44,10 +44,10 @@ public class DalsaImage
     bool abortMem = false;
     
     string cameraName;
-    
 
-    Form1 form = new Form1();
-    public DalsaImage(Form1 Form)
+
+    CognexVisionProForm.CognexVisionProForm form = new CognexVisionProForm.CognexVisionProForm();
+    public DalsaImage(CognexVisionProForm.CognexVisionProForm Form)
     {
         acqTimeWatch = new Stopwatch();
         form = Form;
@@ -113,6 +113,7 @@ public class DalsaImage
         set
         {
             trigger = value;
+            TriggerAck = trigger;
             if (trigger && !triggerMem) 
             { 
                 if(Connected)
@@ -130,18 +131,27 @@ public class DalsaImage
 
         }
     }
+    public bool TriggerAck
+    {
+        get; set;
+    }
     public bool AbortTrigger
     {
         get { return abort; }
         set
         {
             abort = value;
+            AbortTriggerAck = abort;
             if (abort && !abortMem)
             {
                 Abort();
             }
             abortMem = abort;
         }
+    }
+    public bool AbortTriggerAck
+    {
+        get; set;
     }
     public bool ConfigFilePresent
     {
@@ -267,7 +277,7 @@ public class DalsaImage
         Cleaning();
 
         serverLocation = new SapLocation(LoadServerSelect, LoadResourceIndex);
-
+        
 
         if (SapManager.GetResourceCount(serverLocation, SapManager.ResourceType.Acq) > 0)
         {
@@ -291,6 +301,7 @@ public class DalsaImage
         {
             ServerType = ServerCategory.ServerAcqDevice;
             acqDevice = new SapAcqDevice(serverLocation, CongfigFile);
+            
             buffers = new SapBufferWithTrash(4, acqDevice, SapBuffer.MemoryType.ScatterGather);
             acqDeviceXfer = new SapAcqDeviceToBuf(acqDevice, buffers);
 

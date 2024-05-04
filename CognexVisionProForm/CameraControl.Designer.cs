@@ -41,6 +41,9 @@
             this.cbImageReady = new System.Windows.Forms.CheckBox();
             this.cbArchiveImageActive = new System.Windows.Forms.CheckBox();
             this.plControl = new System.Windows.Forms.Panel();
+            this.lbToolData = new System.Windows.Forms.ListBox();
+            this.cbAbortTriggeAck = new System.Windows.Forms.CheckBox();
+            this.cbTriggerAck = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.cogImageDisplay)).BeginInit();
             this.plControl.SuspendLayout();
             this.SuspendLayout();
@@ -64,10 +67,11 @@
             // 
             // bttnCameraLog
             // 
+            this.bttnCameraLog.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.bttnCameraLog.BackColor = System.Drawing.SystemColors.ButtonFace;
             this.bttnCameraLog.FlatAppearance.BorderColor = System.Drawing.Color.Red;
             this.bttnCameraLog.FlatAppearance.BorderSize = 2;
-            this.bttnCameraLog.Location = new System.Drawing.Point(3, 201);
+            this.bttnCameraLog.Location = new System.Drawing.Point(3, 622);
             this.bttnCameraLog.Name = "bttnCameraLog";
             this.bttnCameraLog.Size = new System.Drawing.Size(152, 43);
             this.bttnCameraLog.TabIndex = 2;
@@ -77,10 +81,11 @@
             // 
             // bttnCameraAbort
             // 
+            this.bttnCameraAbort.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.bttnCameraAbort.BackColor = System.Drawing.SystemColors.ButtonFace;
             this.bttnCameraAbort.FlatAppearance.BorderColor = System.Drawing.Color.Red;
             this.bttnCameraAbort.FlatAppearance.BorderSize = 2;
-            this.bttnCameraAbort.Location = new System.Drawing.Point(3, 156);
+            this.bttnCameraAbort.Location = new System.Drawing.Point(3, 577);
             this.bttnCameraAbort.Name = "bttnCameraAbort";
             this.bttnCameraAbort.Size = new System.Drawing.Size(152, 43);
             this.bttnCameraAbort.TabIndex = 1;
@@ -90,10 +95,11 @@
             // 
             // bttnCameraSnap
             // 
+            this.bttnCameraSnap.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.bttnCameraSnap.BackColor = System.Drawing.SystemColors.ButtonFace;
             this.bttnCameraSnap.FlatAppearance.BorderColor = System.Drawing.Color.Red;
             this.bttnCameraSnap.FlatAppearance.BorderSize = 2;
-            this.bttnCameraSnap.Location = new System.Drawing.Point(3, 111);
+            this.bttnCameraSnap.Location = new System.Drawing.Point(3, 532);
             this.bttnCameraSnap.Name = "bttnCameraSnap";
             this.bttnCameraSnap.Size = new System.Drawing.Size(152, 43);
             this.bttnCameraSnap.TabIndex = 0;
@@ -141,7 +147,7 @@
             // cbImageReady
             // 
             this.cbImageReady.AutoSize = true;
-            this.cbImageReady.Location = new System.Drawing.Point(3, 92);
+            this.cbImageReady.Location = new System.Drawing.Point(3, 139);
             this.cbImageReady.Name = "cbImageReady";
             this.cbImageReady.Size = new System.Drawing.Size(89, 17);
             this.cbImageReady.TabIndex = 22;
@@ -151,7 +157,7 @@
             // cbArchiveImageActive
             // 
             this.cbArchiveImageActive.AutoSize = true;
-            this.cbArchiveImageActive.Location = new System.Drawing.Point(3, 73);
+            this.cbArchiveImageActive.Location = new System.Drawing.Point(3, 120);
             this.cbArchiveImageActive.Name = "cbArchiveImageActive";
             this.cbArchiveImageActive.Size = new System.Drawing.Size(135, 17);
             this.cbArchiveImageActive.TabIndex = 23;
@@ -163,6 +169,9 @@
             this.plControl.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.plControl.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.plControl.Controls.Add(this.lbToolData);
+            this.plControl.Controls.Add(this.cbAbortTriggeAck);
+            this.plControl.Controls.Add(this.cbTriggerAck);
             this.plControl.Controls.Add(this.cbArchiveImageActive);
             this.plControl.Controls.Add(this.cbImageReady);
             this.plControl.Controls.Add(this.cbCameraConnected);
@@ -172,18 +181,47 @@
             this.plControl.Controls.Add(this.bttnCameraSnap);
             this.plControl.Controls.Add(this.bttnCameraAbort);
             this.plControl.Controls.Add(this.bttnCameraLog);
-            this.plControl.Location = new System.Drawing.Point(456, 5);
+            this.plControl.Location = new System.Drawing.Point(557, 5);
             this.plControl.Margin = new System.Windows.Forms.Padding(20);
             this.plControl.Name = "plControl";
-            this.plControl.Size = new System.Drawing.Size(158, 350);
+            this.plControl.Size = new System.Drawing.Size(158, 669);
             this.plControl.TabIndex = 18;
+            // 
+            // lbToolData
+            // 
+            this.lbToolData.FormattingEnabled = true;
+            this.lbToolData.Location = new System.Drawing.Point(6, 162);
+            this.lbToolData.Name = "lbToolData";
+            this.lbToolData.Size = new System.Drawing.Size(149, 199);
+            this.lbToolData.TabIndex = 26;
+            this.lbToolData.SelectedIndexChanged += new System.EventHandler(this.listBox1_SelectedIndexChanged);
+            // 
+            // cbAbortTriggeAck
+            // 
+            this.cbAbortTriggeAck.AutoSize = true;
+            this.cbAbortTriggeAck.Location = new System.Drawing.Point(3, 100);
+            this.cbAbortTriggeAck.Name = "cbAbortTriggeAck";
+            this.cbAbortTriggeAck.Size = new System.Drawing.Size(117, 17);
+            this.cbAbortTriggeAck.TabIndex = 25;
+            this.cbAbortTriggeAck.Text = "Camera Connected";
+            this.cbAbortTriggeAck.UseVisualStyleBackColor = true;
+            // 
+            // cbTriggerAck
+            // 
+            this.cbTriggerAck.AutoSize = true;
+            this.cbTriggerAck.Location = new System.Drawing.Point(3, 77);
+            this.cbTriggerAck.Name = "cbTriggerAck";
+            this.cbTriggerAck.Size = new System.Drawing.Size(127, 17);
+            this.cbTriggerAck.TabIndex = 24;
+            this.cbTriggerAck.Text = "Trigger Acknowledge";
+            this.cbTriggerAck.UseVisualStyleBackColor = true;
             // 
             // CameraControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ControlDarkDark;
-            this.ClientSize = new System.Drawing.Size(620, 360);
+            this.ClientSize = new System.Drawing.Size(721, 679);
             this.ControlBox = false;
             this.Controls.Add(this.plControl);
             this.Controls.Add(this.cogImageDisplay);
@@ -212,5 +250,8 @@
         private System.Windows.Forms.CheckBox cbImageReady;
         private System.Windows.Forms.CheckBox cbArchiveImageActive;
         private System.Windows.Forms.Panel plControl;
+        private System.Windows.Forms.CheckBox cbAbortTriggeAck;
+        private System.Windows.Forms.CheckBox cbTriggerAck;
+        private System.Windows.Forms.ListBox lbToolData;
     }
 }

@@ -1,11 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace CognexVisionProForm
@@ -26,7 +19,8 @@ namespace CognexVisionProForm
 
             if (loadAppValue <= 100) { pbLoadApp.Value = loadAppValue; }
             else { pbLoadApp.Value = 100; }
-            
+            this.Refresh();
+
         }
 
         private void lbLoadProgress_Click(object sender, EventArgs e)

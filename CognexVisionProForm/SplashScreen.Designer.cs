@@ -73,7 +73,9 @@
             this.Controls.Add(this.txtArchive);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.MaximizeBox = false;
+            this.MaximumSize = new System.Drawing.Size(800, 450);
             this.MinimizeBox = false;
+            this.MinimumSize = new System.Drawing.Size(800, 450);
             this.Name = "SplashScreen";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;

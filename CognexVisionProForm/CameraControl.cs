@@ -8,16 +8,16 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Cognex.VisionPro;
+using Cognex.VisionPro.ToolBlock;
 
 namespace CognexVisionProForm
 {
     public partial class CameraControl : Form
     {
-        Form1 _form;
+        CognexVisionProForm _form;
         DalsaImage camera;
-        ICogImage image;
-        public ToolBlock[] cogTool;
         double acqTime;
+        public ICogImage image;
         private Timer pollingTimer;
         public ICogImage Image
         {
@@ -40,9 +40,24 @@ namespace CognexVisionProForm
                 AcqTimeUpdate();
             }
         }
-        public CameraControl(Form1 Sender, DalsaImage Camera)
+        public CogToolBlockTerminal[] ToolData
         {
-            _form = new Form1();
+            set
+            {
+                lbToolData.Items.Clear();
+                lbToolData.BeginUpdate();
+                for (int i = 0; i < value.Length; i++)
+                {
+                    lbToolData.Items.Add(value[i].Value.ToString());
+
+                }
+                lbToolData.EndUpdate();
+                lbToolData.Height = lbToolData.PreferredHeight;
+            }
+        }
+        public CameraControl(CognexVisionProForm Sender, DalsaImage Camera)
+        {
+            _form = new CognexVisionProForm();
             _form = Sender;
             camera = Camera;
 
@@ -53,9 +68,17 @@ namespace CognexVisionProForm
             pollingTimer.Stop();
 
             cbCameraConnected.Checked = camera.Connected;
+            cbTriggerAck.Checked = camera.TriggerAck;
+            cbAbortTriggeAck.Checked = camera.AbortTriggerAck;
             cbArchiveImageActive.Checked = camera.ArchiveImageActive;
             cbImageReady.Checked = camera.ImageReady;
 
+            if(camera.TriggerAck)
+            {
+                camera.Trigger = false;
+                bttnCameraSnap.Text = "Single Snap";
+            }
+            
             pollingTimer.Start();
         }
         private void CameraControl_Load(object sender, EventArgs e)
@@ -68,20 +91,22 @@ namespace CognexVisionProForm
             lbCameraName.Text = camera.Name;
             lbCameraDescription.Text = camera.Description;
 
-            bttnCameraAbort.Visible = !camera.ArchiveImageActive;
-            bttnCameraLog.Visible = !camera.ArchiveImageActive;
+            bttnCameraAbort.Enabled = !camera.ArchiveImageActive;
+            bttnCameraLog.Enabled = !camera.ArchiveImageActive;
 
         }
         private void bttnCameraSnap_Click(object sender, EventArgs e)
         {
-            if ( camera.Connected)
+
+            if(camera.Trigger == true)
             {
-                camera.SnapPicture();
+                camera.Trigger = false;
+                bttnCameraSnap.Text = "Single Snap";
             }
-            else if (camera.ArchiveImageActive)
+            else
             {
-                camera.CreateBufferFromFile();
-                camera.ArchiveImageIndex++;
+                camera.Trigger = true;
+                bttnCameraSnap.Text = "Triggering";
             }
         }
         private void bttnCameraAbort_Click(object sender, EventArgs e)
@@ -148,5 +173,9 @@ namespace CognexVisionProForm
             lbAcqTime.Text = $"Aquisition: {AcqTime}ms";
         }
 
+        private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }

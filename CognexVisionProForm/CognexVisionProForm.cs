@@ -2,23 +2,26 @@
 using System;
 using System.Collections;
 using System.Diagnostics;
-using System.Drawing;
 using System.Net.NetworkInformation;
 using System.Windows.Forms;
 using EventArgs = System.EventArgs;
 
+
 namespace CognexVisionProForm
 {
-    public partial class Form1 : Form
+    public partial class CognexVisionProForm : Form
     {
         private bool heartBeat = false;
         private bool CommsUp = false;
+        private bool PlcAutoMode;
+
+        private BitArray generalControl;
 
         private BitArray CameraControl;
-        private BitArray CameraStatus;
+        private BitArray generalStatus;
 
         private BitArray toolControl;
-        private BitArray toolStatus;
+        private BitArray cameraStatus;
         private bool toolRunComplete;
         private int toolRunCount;
         private int toolCompleteCount;
@@ -73,11 +76,13 @@ namespace CognexVisionProForm
 
         private Timer pollingTimer;
 
-        public Form1()
+
+        public CognexVisionProForm()
         {
             InitializeComponent();
+
         }
-        
+
         private void pollingTimer_Tick(object sender, EventArgs e)
         {
             pollingTimer.Stop();
@@ -91,10 +96,11 @@ namespace CognexVisionProForm
                 //Get all data from PLC
                 MainPLC.ReadPlcTag();
                 PlcRead();
-                
+
                 //Send Data to PLC
                 PlcWrite();
                 MainPLC.WritePlcTag();
+                MainPLC.WritePlcDataTag();
             }
             pollingTimer.Start();
         }
@@ -124,22 +130,22 @@ namespace CognexVisionProForm
 
             splashScreen.UpdateProgress("Initialize Classes", 10);
             InitializeClasses();
-            
+
             splashScreen.UpdateProgress("Load Settings", 10);
             LoadSettings();
-            
+
             splashScreen.UpdateProgress("Initialize Server List", 10);
             InitializeServerList(0);
-            
+
             splashScreen.UpdateProgress("Initialize Resource List", 10);
             InitializeResourceList(0);
-            
+
             splashScreen.UpdateProgress("Initialize Job Manager", 10);
             InitializeJobManager();
 
             splashScreen.UpdateProgress("Check License", 10);
             CheckLicense();
-            if(!cogLicenseOk)
+            if (!cogLicenseOk)
             {
                 MessageBox.Show("Cognex VisionPro License did not load properly");
                 tabControl1.SelectedIndex = 2;
@@ -350,7 +356,7 @@ namespace CognexVisionProForm
         //*********************************************************************
         private void bttnToolBockFileSelect_Click(object sender, EventArgs e)
         {
-            
+
             string toolNameUpdated = tbC1TB1Name.Text.ToString();
             int toolSelected = cbToolBlock.SelectedIndex;
 
@@ -364,7 +370,7 @@ namespace CognexVisionProForm
                 cbToolBlock.Items[toolSelected] = toolNameUpdated;
             }
 
-            
+
         }
         private void cogToolBlockEditV21_Load(object sender, EventArgs e)
         {
@@ -431,11 +437,11 @@ namespace CognexVisionProForm
             double FF_X = Convert.ToDouble(FF_XDistance.Text);
             double FF_Y = Convert.ToDouble(FF_YDistance.Text);
 
-            FC_Radians = Math.Atan2(FC_Y,FC_X);
+            FC_Radians = Math.Atan2(FC_Y, FC_X);
             FF_Radians = Math.Atan2(FF_Y, FF_X);
 
             FC_L = Camera01Calc.DistanceBetweenPoints(0, 0, FC_X, FC_Y);
-            FF_L = Camera01Calc.DistanceBetweenPoints(0,0,FF_X,FF_Y);
+            FF_L = Camera01Calc.DistanceBetweenPoints(0, 0, FF_X, FF_Y);
 
             FC_Angle.Text = FC_Radians.ToString();
             FF_Angle.Text = FF_Radians.ToString();
@@ -446,7 +452,7 @@ namespace CognexVisionProForm
         }
         private void btnPartLocCalc_Click(object sender, EventArgs e)
         {
-            
+
             double temp_PartData_XNom = 214.5;
             double temp_PartData_YNom = 20;
 
@@ -458,9 +464,9 @@ namespace CognexVisionProForm
             double F2_X = Convert.ToDouble(F2_XPosition.Text);
             double F2_Y = Convert.ToDouble(F2_YPosition.Text);
 
-            Part_Radians = Math.Atan2(F2_Y - F1_Y, F2_X - F1_X)-FF_Radians;
+            Part_Radians = Math.Atan2(F2_Y - F1_Y, F2_X - F1_X) - FF_Radians;
 
-            Part_X = FC_L * Math.Cos(FC_Radians+ Part_Radians) + F1_X;
+            Part_X = FC_L * Math.Cos(FC_Radians + Part_Radians) + F1_X;
             Part_Y = FC_L * Math.Sin(FC_Radians + Part_Radians) + F1_Y;
 
 
@@ -476,8 +482,8 @@ namespace CognexVisionProForm
             Part_XNom = Convert.ToDouble(PartData_XNom.Text);
             Part_YNom = Convert.ToDouble(PartData_YNom.Text);
 
-            Robot_XNeg = -1*(Part_X - Part_XNom);
-            Robot_YNeg = -1*(Part_Y - Part_YNom);
+            Robot_XNeg = -1 * (Part_X - Part_XNom);
+            Robot_YNeg = -1 * (Part_Y - Part_YNom);
 
             Robot_X = Robot_XNeg * Math.Cos(-Part_Radians) - Robot_YNeg * Math.Sin(-Part_Radians);
             Robot_Y = Robot_XNeg * Math.Sin(-Part_Radians) + Robot_YNeg * Math.Cos(-Part_Radians);
@@ -498,8 +504,8 @@ namespace CognexVisionProForm
             MainPLC.WriteTag = tbPlcPcTag.Text;
 
             MainPLC.InitializePlcComms(numIP1.Value.ToString(), numIP2.Value.ToString(), numIP3.Value.ToString(), numIP4.Value.ToString());
-            
-            if(MainPLC.InitialCheck.Status == IPStatus.Success)
+
+            if (MainPLC.InitialCheck.Status == IPStatus.Success)
             {
                 pollingTimer.Start();
             }

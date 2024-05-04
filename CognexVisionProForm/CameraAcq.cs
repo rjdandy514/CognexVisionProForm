@@ -15,9 +15,9 @@ namespace CognexVisionProForm
         int numAcqs;
         string CameraName = null;
         string ImageSaveLocation;
-        Form1 _form = new Form1();
+        CognexVisionProForm _form = new CognexVisionProForm();
 
-        public CameraAcq(String UniqueName, Form1 Sender)
+        public CameraAcq(String UniqueName, CognexVisionProForm Sender)
         {
             CameraName = UniqueName;
             

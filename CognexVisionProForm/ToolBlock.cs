@@ -16,13 +16,13 @@ namespace CognexVisionProForm
         string toolFileLocation;
         string toolFileType = "ToolBlock";
         string toolFileExtension = ".vpp";
-
+        string Previous = "";
 
         CogToolBlockTerminal[] toolOutput;
 
         public CogToolBlock cogToolBlock;
-        Form1 form = new Form1();
-        public ToolBlock(Form1 Form)
+        CognexVisionProForm form = new CognexVisionProForm();
+        public ToolBlock(CognexVisionProForm Form)
         {
             // Update internal variables
             form = Form;
@@ -35,10 +35,6 @@ namespace CognexVisionProForm
         public int CameraId
         {
             get;set;
-        }
-        public bool Enabled
-        {
-            get; set;
         }
         public string Name
         {
@@ -174,19 +170,22 @@ namespace CognexVisionProForm
         }
         public void ToolRun(CogImage8Grey InputImage)
         {
-            if (!Enabled || cogToolBlock == null) { return; }
 
             ResultUpdated = false;
             ToolReady = false;
 
             try
             {
-                cogToolBlock.Inputs["Image"].Value = InputImage;
+                cogToolBlock.Inputs[0].Value = InputImage;
                 cogToolBlock.Run();
                 
                 Utilities.LoggingStatment($"{toolName}: JOB TRIGGERED");
             }
-            catch (Exception ex) { Utilities.LoggingStatment(ex.Message); }
+            catch (Exception ex) 
+            {
+                ToolReady = true;
+                Utilities.LoggingStatment(ex.Message); 
+            }
 
         }
         void Subject_Ran(object sender, EventArgs e)
@@ -196,6 +195,7 @@ namespace CognexVisionProForm
         }
         private void GetInfoFromTool()
         {
+            
 
             int toolOutputCount = cogToolBlock.Outputs.Count;
 
@@ -204,6 +204,12 @@ namespace CognexVisionProForm
             {
                 toolOutput[i] = cogToolBlock.Outputs[i];
             }
+
+            if(Previous == toolOutput[0].ID.ToString())
+            {
+                int x = 1;
+            }
+            Previous = toolOutput[0].ID.ToString();
 
             ToolReady = true;
             ResultUpdated = true;
