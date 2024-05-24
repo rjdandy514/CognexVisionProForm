@@ -466,10 +466,11 @@ namespace CognexVisionProForm
                 tempTag |= ((CameraAcqArray[cam].Connected ? 0 : 1) << 0);
                 tempTag |= ((CameraAcqArray[cam].TriggerAck ? 0 : 1) << 1);
                 tempTag |= ((CameraAcqArray[cam].AbortTriggerAck ? 0 : 1) << 2);
-                tempTag |= ((toolblockArray[cam, desiredTool[cam]].ToolReady ? 0 : 1) << 3);
-                tempTag |= ((toolblockArray[cam, desiredTool[cam]].ResultUpdated ? 0 : 1) << 4);
-                tempTag |= ((toolblockArray[cam, desiredTool[cam]].Result ? 0 : 1) << 5);
-                tempTag |= ((toolblockArray[cam, desiredTool[cam]].FilePresent ? 0 : 1) << 6);
+                tempTag |= ((CameraAcqArray[cam].ImageReady ? 0 : 1) << 3);
+                tempTag |= ((toolblockArray[cam, desiredTool[cam]].ToolReady ? 0 : 1) << 4);
+                tempTag |= ((toolblockArray[cam, desiredTool[cam]].ResultUpdated ? 0 : 1) << 5);
+                tempTag |= ((toolblockArray[cam, desiredTool[cam]].Result ? 0 : 1) << 6);
+                tempTag |= ((toolblockArray[cam, desiredTool[cam]].FilePresent ? 0 : 1) << 7);
 
                 tempTag |= desiredTool[cam] << 11;
 

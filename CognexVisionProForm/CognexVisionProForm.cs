@@ -250,7 +250,6 @@ namespace CognexVisionProForm
             }
             cbToolBlock.SelectedIndex = 0;
         }
-
         private void tbCamersDesc_Leave(object sender, EventArgs e)
         {
             CameraAcqArray[selectedCameraId].Description = tbCameraDesc.Text;
@@ -294,7 +293,6 @@ namespace CognexVisionProForm
                 cbToolBlock.Items.Add(toolblockArray[0, i].Name);
             }
         }
-
         private void bttnC1Config_Click(object sender, EventArgs e)
         {
             CameraAcqArray[selectedCameraId].LoadConfigFile();
@@ -332,7 +330,6 @@ namespace CognexVisionProForm
                 desiredTool[cbCameraIdSelected.SelectedIndex] = cbToolBlock.SelectedIndex;
             }
         }
-
         //*********************************************************************
         //lICENSE CHECK
         //*********************************************************************
@@ -405,7 +402,6 @@ namespace CognexVisionProForm
                 cogToolBlockEditV21.Subject.Run();
             }
         }
-
         //*********************************************************************
         //PART DATA
         //*********************************************************************
@@ -497,7 +493,6 @@ namespace CognexVisionProForm
         //*********************************************************************
         //PLC CONNECTION
         //*********************************************************************
-
         private void bttnPLC_Click(object sender, EventArgs e)
         {
             MainPLC.ReadTag = tbPcPlcTag.Text;

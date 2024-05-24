@@ -51,7 +51,7 @@ public class DalsaImage
     {
         acqTimeWatch = new Stopwatch();
         form = Form;
-        Utilities.LoggingStatment(cameraName + ": DalsaImage Class created");
+        Utilities.LoggingStatment(Name + ": Dalsa Image Class created");
     }
     public double AcqTime
     {
@@ -273,7 +273,7 @@ public class DalsaImage
     }
     public void CreateCamera()
     {
-        Utilities.LoggingStatment($"{cameraName}: CreateCamera from {LoadServerSelect}  {LoadResourceIndex} ");
+        Utilities.LoggingStatment($"{cameraName}: Create Camera from {LoadServerSelect}  {LoadResourceIndex} ");
         Cleaning();
 
         serverLocation = new SapLocation(LoadServerSelect, LoadResourceIndex);
