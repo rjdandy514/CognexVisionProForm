@@ -490,10 +490,16 @@ namespace CognexVisionProForm
                 {
                     for(int j = 0;j < toolblockArray[i, desiredTool[i]].ToolOutput.Length;j++)
                     {
+                       
+                        if(toolblockArray[i, desiredTool[i]].ToolOutput[i] != null)
+                        {
+                            break;
+                        }
+
                         var data = toolblockArray[i, desiredTool[i]].ToolOutput[i].Value;
                         dataTypeName = data.GetType().Name.ToString();
 
-                        if (j > 4) { break; }
+                        if (j > 4) {  }
 
                         if (dataTypeName == "Double")
                         {
@@ -514,7 +520,6 @@ namespace CognexVisionProForm
                     }
                 }
             }
-
         }
         public void SaveSettings()
         {

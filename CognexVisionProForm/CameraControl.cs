@@ -48,8 +48,8 @@ namespace CognexVisionProForm
                 lbToolData.BeginUpdate();
                 for (int i = 0; i < value.Length; i++)
                 {
-                    lbToolData.Items.Add(value[i].Value.ToString());
-
+                    if (value[i] != null) { lbToolData.Items.Add(value[i].Value.ToString()); }
+                    
                 }
                 lbToolData.EndUpdate();
                 lbToolData.Height = lbToolData.PreferredHeight;

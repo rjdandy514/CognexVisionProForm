@@ -195,21 +195,24 @@ namespace CognexVisionProForm
         }
         private void GetInfoFromTool()
         {
-            
+            CogToolBlockTerminal nullTool =null;
+
+
 
             int toolOutputCount = cogToolBlock.Outputs.Count;
 
             toolOutput = new CogToolBlockTerminal[toolOutputCount];
             for(int i = 0; i < toolOutput.Length;i++)
             {
-                toolOutput[i] = cogToolBlock.Outputs[i];
+                if (cogToolBlock.RunStatus.Result == CogToolResultConstants.Accept)
+                {
+                    toolOutput[i] = cogToolBlock.Outputs[i];
+                }
+                else
+                {
+                    toolOutput[i] = nullTool;
+                }
             }
-
-            if(Previous == toolOutput[0].ID.ToString())
-            {
-                int x = 1;
-            }
-            Previous = toolOutput[0].ID.ToString();
 
             ToolReady = true;
             ResultUpdated = true;

@@ -252,6 +252,7 @@ namespace CognexVisionProForm
         }
         private void tbCamersDesc_Leave(object sender, EventArgs e)
         {
+            CameraAcqArray[selectedCameraId].Name = tbCameraName.Text;
             CameraAcqArray[selectedCameraId].Description = tbCameraDesc.Text;
         }
         private void cbServerList_SelectedIndexChanged(object sender, EventArgs e)
