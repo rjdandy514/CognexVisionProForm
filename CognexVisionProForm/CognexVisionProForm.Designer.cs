@@ -146,18 +146,18 @@ namespace CognexVisionProForm
             this.cogToolBlockEditV21 = new Cognex.VisionPro.ToolBlock.CogToolBlockEditV2();
             this.tabPlcConnection = new System.Windows.Forms.TabPage();
             this.panel8 = new System.Windows.Forms.Panel();
+            this.bttnPlcPing = new System.Windows.Forms.Button();
             this.label33 = new System.Windows.Forms.Label();
-            this.label42 = new System.Windows.Forms.Label();
             this.numIP1 = new System.Windows.Forms.NumericUpDown();
-            this.tbPlcPcTag = new System.Windows.Forms.TextBox();
             this.numIP2 = new System.Windows.Forms.NumericUpDown();
             this.label41 = new System.Windows.Forms.Label();
             this.numIP3 = new System.Windows.Forms.NumericUpDown();
-            this.tbPcPlcTag = new System.Windows.Forms.TextBox();
+            this.tbBaseTag = new System.Windows.Forms.TextBox();
             this.numIP4 = new System.Windows.Forms.NumericUpDown();
             this.cbHeartbeat = new System.Windows.Forms.CheckBox();
             this.bttnPLC = new System.Windows.Forms.Button();
             this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.tbPlcPingResponse = new System.Windows.Forms.TextBox();
             this.tabImage.SuspendLayout();
             this.tabFrameGrabber.SuspendLayout();
             this.panel3.SuspendLayout();
@@ -1306,22 +1306,32 @@ namespace CognexVisionProForm
             // panel8
             // 
             this.panel8.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.panel8.Controls.Add(this.tbPlcPingResponse);
+            this.panel8.Controls.Add(this.bttnPlcPing);
             this.panel8.Controls.Add(this.label33);
-            this.panel8.Controls.Add(this.label42);
             this.panel8.Controls.Add(this.numIP1);
-            this.panel8.Controls.Add(this.tbPlcPcTag);
             this.panel8.Controls.Add(this.numIP2);
             this.panel8.Controls.Add(this.label41);
             this.panel8.Controls.Add(this.numIP3);
-            this.panel8.Controls.Add(this.tbPcPlcTag);
+            this.panel8.Controls.Add(this.tbBaseTag);
             this.panel8.Controls.Add(this.numIP4);
             this.panel8.Controls.Add(this.cbHeartbeat);
             this.panel8.Controls.Add(this.bttnPLC);
             this.panel8.Location = new System.Drawing.Point(5, 5);
             this.panel8.Name = "panel8";
-            this.panel8.Size = new System.Drawing.Size(451, 165);
+            this.panel8.Size = new System.Drawing.Size(451, 210);
             this.panel8.TabIndex = 70;
             this.panel8.Tag = "pnCameraControl";
+            // 
+            // bttnPlcPing
+            // 
+            this.bttnPlcPing.Location = new System.Drawing.Point(8, 31);
+            this.bttnPlcPing.Name = "bttnPlcPing";
+            this.bttnPlcPing.Size = new System.Drawing.Size(182, 24);
+            this.bttnPlcPing.TabIndex = 38;
+            this.bttnPlcPing.Text = "PING TO PLC";
+            this.bttnPlcPing.UseVisualStyleBackColor = true;
+            this.bttnPlcPing.Click += new System.EventHandler(this.bttnPlcPing_Click);
             // 
             // label33
             // 
@@ -1331,15 +1341,6 @@ namespace CognexVisionProForm
             this.label33.Size = new System.Drawing.Size(75, 13);
             this.label33.TabIndex = 16;
             this.label33.Text = "PLC IP Adress";
-            // 
-            // label42
-            // 
-            this.label42.AutoSize = true;
-            this.label42.Location = new System.Drawing.Point(5, 96);
-            this.label42.Name = "label42";
-            this.label42.Size = new System.Drawing.Size(81, 13);
-            this.label42.TabIndex = 37;
-            this.label42.Text = "PLC to PC Tag:";
             // 
             // numIP1
             // 
@@ -1357,13 +1358,6 @@ namespace CognexVisionProForm
             0,
             0,
             0});
-            // 
-            // tbPlcPcTag
-            // 
-            this.tbPlcPcTag.Location = new System.Drawing.Point(121, 93);
-            this.tbPlcPcTag.Name = "tbPlcPcTag";
-            this.tbPlcPcTag.Size = new System.Drawing.Size(209, 20);
-            this.tbPlcPcTag.TabIndex = 36;
             // 
             // numIP2
             // 
@@ -1385,11 +1379,11 @@ namespace CognexVisionProForm
             // label41
             // 
             this.label41.AutoSize = true;
-            this.label41.Location = new System.Drawing.Point(5, 68);
+            this.label41.Location = new System.Drawing.Point(5, 94);
             this.label41.Name = "label41";
-            this.label41.Size = new System.Drawing.Size(81, 13);
+            this.label41.Size = new System.Drawing.Size(56, 13);
             this.label41.TabIndex = 35;
-            this.label41.Text = "PC to PLC Tag:";
+            this.label41.Text = "Base Tag:";
             // 
             // numIP3
             // 
@@ -1408,12 +1402,12 @@ namespace CognexVisionProForm
             0,
             0});
             // 
-            // tbPcPlcTag
+            // tbBaseTag
             // 
-            this.tbPcPlcTag.Location = new System.Drawing.Point(121, 65);
-            this.tbPcPlcTag.Name = "tbPcPlcTag";
-            this.tbPcPlcTag.Size = new System.Drawing.Size(209, 20);
-            this.tbPcPlcTag.TabIndex = 34;
+            this.tbBaseTag.Location = new System.Drawing.Point(121, 91);
+            this.tbBaseTag.Name = "tbBaseTag";
+            this.tbBaseTag.Size = new System.Drawing.Size(209, 20);
+            this.tbBaseTag.TabIndex = 34;
             // 
             // numIP4
             // 
@@ -1443,7 +1437,7 @@ namespace CognexVisionProForm
             // 
             // bttnPLC
             // 
-            this.bttnPLC.Location = new System.Drawing.Point(8, 31);
+            this.bttnPLC.Location = new System.Drawing.Point(8, 61);
             this.bttnPLC.Name = "bttnPLC";
             this.bttnPLC.Size = new System.Drawing.Size(182, 24);
             this.bttnPLC.TabIndex = 21;
@@ -1471,7 +1465,14 @@ namespace CognexVisionProForm
             this.tabControl1.TabIndex = 3;
             this.tabControl1.SelectedIndexChanged += new System.EventHandler(this.tabControl1_SelectedIndexChanged);
             // 
-            // Form1
+            // tbPlcPingResponse
+            // 
+            this.tbPlcPingResponse.Location = new System.Drawing.Point(196, 33);
+            this.tbPlcPingResponse.Name = "tbPlcPingResponse";
+            this.tbPlcPingResponse.Size = new System.Drawing.Size(209, 20);
+            this.tbPlcPingResponse.TabIndex = 39;
+            // 
+            // CognexVisionProForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -1479,7 +1480,7 @@ namespace CognexVisionProForm
             this.ClientSize = new System.Drawing.Size(1292, 749);
             this.Controls.Add(this.tabControl1);
             this.IsMdiContainer = true;
-            this.Name = "Form1";
+            this.Name = "CognexVisionProForm";
             this.Text = "Form1";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
@@ -1637,17 +1638,17 @@ namespace CognexVisionProForm
         private System.Windows.Forms.TabPage tabPlcConnection;
         private System.Windows.Forms.Panel panel8;
         private System.Windows.Forms.Label label33;
-        private System.Windows.Forms.Label label42;
         private System.Windows.Forms.NumericUpDown numIP1;
-        private System.Windows.Forms.TextBox tbPlcPcTag;
         private System.Windows.Forms.NumericUpDown numIP2;
         private System.Windows.Forms.Label label41;
         private System.Windows.Forms.NumericUpDown numIP3;
-        private System.Windows.Forms.TextBox tbPcPlcTag;
+        private System.Windows.Forms.TextBox tbBaseTag;
         private System.Windows.Forms.NumericUpDown numIP4;
         private System.Windows.Forms.CheckBox cbHeartbeat;
         private System.Windows.Forms.Button bttnPLC;
         private System.Windows.Forms.TabControl tabControl1;
+        private System.Windows.Forms.Button bttnPlcPing;
+        private System.Windows.Forms.TextBox tbPlcPingResponse;
     }
 }
 

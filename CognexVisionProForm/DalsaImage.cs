@@ -426,7 +426,7 @@ public class DalsaImage
         AcqTime = acqTimeWatch.ElapsedMilliseconds;
 
         // logic for using Camera
-        if (buffers != null) 
+        if (buffers != null && Connected) 
         { 
             buffers.GetAddress(buffers.Index, out imageAddress);
             imageWidth = buffers.Width;
@@ -434,7 +434,7 @@ public class DalsaImage
             imageFormat = buffers.XferParams.Format;
         }
         //logic for using saved images
-        else if(archiveBuffers != null)
+        else if(archiveBuffers != null && ArchiveImageActive)
         {
             archiveBuffers.GetAddress(archiveBuffers.Index, out imageAddress);
             imageWidth = archiveBuffers.Width;

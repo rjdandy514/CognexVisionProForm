@@ -95,6 +95,7 @@ namespace CognexVisionProForm
             {
                 //Get all data from PLC
                 MainPLC.ReadPlcTag();
+                MainPLC.ReadPlcDataTag();
                 PlcRead();
 
                 //Send Data to PLC
@@ -215,8 +216,7 @@ namespace CognexVisionProForm
             }
             else if (tabControl1.SelectedIndex == 6)
             {
-                tbPcPlcTag.Text = MainPLC.ReadTag;
-                tbPlcPcTag.Text = MainPLC.WriteTag;
+                tbBaseTag.Text = MainPLC.BaseTag;
             }
         }
         //*********************************************************************
@@ -496,16 +496,26 @@ namespace CognexVisionProForm
         //*********************************************************************
         private void bttnPLC_Click(object sender, EventArgs e)
         {
-            MainPLC.ReadTag = tbPcPlcTag.Text;
-            MainPLC.WriteTag = tbPlcPcTag.Text;
+            MainPLC.BaseTag = tbBaseTag.Text;
 
-            MainPLC.InitializePlcComms(numIP1.Value.ToString(), numIP2.Value.ToString(), numIP3.Value.ToString(), numIP4.Value.ToString());
+            MainPLC.IPAddress = $"{numIP1.Value.ToString()}.{numIP2.Value.ToString()}.{numIP3.Value.ToString()}.{numIP4.Value.ToString()}";
+
+            MainPLC.InitializePlcComms();
 
             if (MainPLC.InitialCheck.Status == IPStatus.Success)
             {
                 pollingTimer.Start();
             }
 
+        }
+
+        private void bttnPlcPing_Click(object sender, EventArgs e)
+        {
+            MainPLC.IPAddress = $"{numIP1.Value.ToString()}.{numIP2.Value.ToString()}.{numIP3.Value.ToString()}.{numIP4.Value.ToString()}";
+            tbPlcPingResponse.Text = "Pinging";
+            this.Refresh();
+            PingReply temp = MainPLC.PingPLC();
+            tbPlcPingResponse.Text = temp.Status.ToString();
         }
     }
 

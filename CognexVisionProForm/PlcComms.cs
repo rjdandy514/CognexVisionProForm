@@ -10,6 +10,7 @@ using System.Security.AccessControl;
 using System.Windows.Forms;
 using System.Threading;
 using System.Collections;
+using Cognex.VisionPro.Exceptions;
 
 namespace CognexVisionProForm
 {
@@ -18,15 +19,17 @@ namespace CognexVisionProForm
     {
         CognexVisionProForm _form;
         public PingReply InitialCheck;
-        Tag tagPlcToPC;
+        Tag tagPlcToPc;
+        Tag tagPlcToPcData;
         Tag tagPcToPlc;
-        Tag tagPcToPlcString;
+        Tag tagPcToPlcData;
         Libplctag client;
         bool pinged;
         int DataTimeout = 2000;
-        public short[] PlcToPcData = new short[8];
-        public short[] PcToPlcData = new short[8];
-        public string[] PcToPlcString = new string[24];
+        public int[] PlcToPcControl = new int[8];
+        public int[] PcToPlcStatus = new int[8];
+        public int[] PcToPlcStatusData = new int[24];
+        public int[] PlcToPcControlData = new int[24];
         Ping pinger;
         
         public PlcComms(CognexVisionProForm Sender)
@@ -38,9 +41,9 @@ namespace CognexVisionProForm
         }
         public string IPAddress
         {
-            get { return InitialCheck.Address.ToString(); }
+            get;set;
         }
-        public string ReadTag
+        public string BaseTag
         {
             get;set;
         }
@@ -52,13 +55,10 @@ namespace CognexVisionProForm
         {
                 return client.DecodeError(result);
         }
-        public void InitializePlcComms(string IP1, string IP2, string IP3, string IP4)
+        public void InitializePlcComms()
         {
-            //Get IP Address from HMI screen
-            string IP_Address = $"{IP1}.{IP2}.{IP3}.{IP4}";
-
             // Send Ping command to PLC
-            InitialCheck = PingPLC(IP_Address);
+            InitialCheck = PingPLC();
 
             if (InitialCheck == null) { return; }
 
@@ -74,20 +74,25 @@ namespace CognexVisionProForm
                 //create instance of PLC Client
                 client = new Libplctag();
 
+                string plcControl =     $"{BaseTag}.OUT.Control[0]";
+                string plcControlData = $"{BaseTag}.OUT.ControlData[0]";
+                string plcStatus =      $"{BaseTag}.IN.Status[0]";
+                string plcStatusData =  $"{BaseTag}.IN.StatusData[0]";
+
+
+
+
                 // create the tag for PLC to PC communication
-                tagPlcToPC = new Tag(IP_Address, "1,0", CpuType.LGX, $"{ReadTag}[0]", DataType.Int16, 8);
-                CreatePlcTag(tagPlcToPC, $"{ReadTag}[0]");
+                tagPlcToPc =        new Tag(IPAddress, "1,0", CpuType.LGX, plcControl, DataType.DINT, 8);
+                tagPlcToPcData =    new Tag(IPAddress, "1,0", CpuType.LGX, plcControlData, DataType.DINT, 24);
+                tagPcToPlc =        new Tag(IPAddress, "1,0", CpuType.LGX, plcStatus, DataType.DINT, 8);
+                tagPcToPlcData =    new Tag(IPAddress, "1,0", CpuType.LGX, plcStatusData, DataType.DINT, 24);
 
-                // create the tag for PC to PLC communication
-                tagPcToPlc = new Tag(IP_Address, "1,0", CpuType.LGX, $"{WriteTag}[0]", DataType.Int16, 8);
-                CreatePlcTag(tagPcToPlc, $"{WriteTag}[0]");
-
-
-                // create the tag for PC to PLC communication
-                string strPcToPlc = "CameraString[0]";
-                tagPcToPlcString = new Tag(IP_Address, "1,0", CpuType.LGX, strPcToPlc, DataType.String, 24);
-                CreatePlcTag(tagPcToPlcString, strPcToPlc);
-
+                //Add tags to Client
+                CreatePlcTag(tagPlcToPc, plcControl);
+                CreatePlcTag(tagPlcToPcData, plcControlData);
+                CreatePlcTag(tagPcToPlc, plcStatus);
+                CreatePlcTag(tagPcToPlcData, plcStatusData);
 
             }
             else
@@ -122,7 +127,7 @@ namespace CognexVisionProForm
             // set values on the tag buffer
             for (int i = 0; i < tagPcToPlc.ElementCount; i++)
             {
-                client.SetInt32Value(tagPcToPlc, i * tagPcToPlc.ElementSize, PcToPlcData[i]);
+                client.SetInt32Value(tagPcToPlc, i * tagPcToPlc.ElementSize, PcToPlcStatus[i]);
             }
             // write the values
             result = client.WriteTag(tagPcToPlc, DataTimeout);
@@ -133,36 +138,53 @@ namespace CognexVisionProForm
         {
             int result = 0;
             // set values on the tag buffer
-            for (int i = 0; i < tagPcToPlcString.ElementCount; i++)
+            for (int i = 0; i < tagPcToPlcData.ElementCount; i++)
             {
-                client.SetStringValue(tagPcToPlcString, i * tagPcToPlcString.ElementSize, PcToPlcString[i]);
+                client.SetInt32Value(tagPcToPlcData, i * tagPcToPlcData.ElementSize, PcToPlcStatusData[i]);
             }
             // write the values
-            result = client.WriteTag(tagPcToPlcString, DataTimeout);
+            result = client.WriteTag(tagPcToPlcData, DataTimeout);
             return result;
 
         }
         public int ReadPlcTag()
         {
 
-            var result = client.ReadTag(tagPlcToPC, DataTimeout);
+            var result = client.ReadTag(tagPlcToPc, DataTimeout);
 
             if (result == Libplctag.PLCTAG_STATUS_OK)
             {
-                for (int i = 0; i < tagPlcToPC.ElementCount; i++)
+                for (int i = 0; i < tagPlcToPc.ElementCount; i++)
                 {
-                    PlcToPcData[i] = client.GetInt16Value(tagPlcToPC, i * tagPlcToPC.ElementSize);
+                    PlcToPcControl[i] = client.GetInt32Value(tagPlcToPc, i * tagPlcToPc.ElementSize);
                 }
             }
             return result;
-            
+
         }
-        public PingReply PingPLC(string IP)
+        public int ReadPlcDataTag()
+        {
+
+            var result = client.ReadTag(tagPlcToPcData, DataTimeout);
+
+            if (result == Libplctag.PLCTAG_STATUS_OK)
+            {
+                for (int i = 0; i < tagPlcToPc.ElementCount; i++)
+                {
+                    PlcToPcControlData[i] = client.GetInt32Value(tagPlcToPcData, i * tagPlcToPcData.ElementSize);
+                }
+            }
+            return result;
+
+        }
+        public PingReply PingPLC()
         {         
             PingReply replay;
+
+            if (IPAddress == null) { return null; }
             try
             {
-                replay = pinger.Send(IP);
+                replay = pinger.Send(IPAddress);
                 return replay;
             }
             catch (Exception ex)

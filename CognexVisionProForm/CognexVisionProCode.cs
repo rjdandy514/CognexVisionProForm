@@ -12,6 +12,7 @@ using static DalsaImage;
 using System.Windows.Forms;
 using static System.Net.Mime.MediaTypeNames;
 using Cognex.VisionPro.QuickBuild.Implementation.Internal;
+using System.Xml.Linq;
 
 namespace CognexVisionProForm
 {
@@ -215,22 +216,17 @@ namespace CognexVisionProForm
             bool allCamerasComplete = true;
             for (int i = 0; i < cameraCount; i++)
             {
-                if (CameraAcqArray[i].ImageReady)
-                {
-                    cameraControl[i].Image = CameraAcqArray[i].Image;
-                    cameraControl[i].AcqTime = CameraAcqArray[i].AcqTime;
-
-                }
                 //if any camera that is connected is not ready exit method without 
                 if ((CameraAcqArray[i].Connected || CameraAcqArray[i].ArchiveImageActive) && !CameraAcqArray[i].ImageReady)
                 {
                     allCamerasComplete = false;
                 }
-
             }
 
             // Run ToolBlocks that are enabled
             if (allCamerasComplete) { ToolBlockTrigger(); }
+
+            
 
 
         }
@@ -262,7 +258,13 @@ namespace CognexVisionProForm
                 BeginInvoke(new Set_ToolBlockUpdate(ToolBlockUpdate));
                 return;
             }
+
+            
+            cameraControl[0].ToolName = toolblockArray[0, desiredTool[0]].Name;
             cameraControl[0].ToolData = toolblockArray[0, desiredTool[0]].ToolOutput;
+            cameraControl[0].record = toolblockArray[0, desiredTool[0]].cogToolBlock.CreateLastRunRecord();
+            cameraControl[0].Image = CameraAcqArray[0].Image;
+            cameraControl[0].AcqTime = CameraAcqArray[0].AcqTime;
 
         }
         private delegate void Set_UpdateImageTab();
@@ -419,10 +421,13 @@ namespace CognexVisionProForm
         }
         public void PlcRead()
         {
+
+
+
             int index = 0;
 
            //GENERAL COMMANDS
-           PlcAutoMode = (MainPLC.PlcToPcData[index] & (1 << 0)) != 0;
+           PlcAutoMode = (MainPLC.PlcToPcControl[index] & (1 << 0)) != 0;
 
             index++;
             
@@ -430,31 +435,42 @@ namespace CognexVisionProForm
             //CAMERA COMMANDS
             for (int cam = 0; cam < cameraCount; cam++)
             {
-                CameraAcqArray[cam].Trigger = (MainPLC.PlcToPcData[index + cam] & (1 << 0)) != 0;
-                CameraAcqArray[cam].AbortTrigger = (MainPLC.PlcToPcData[index + cam] & (1 << 1)) != 0;
+                CameraAcqArray[cam].Trigger = (MainPLC.PlcToPcControl[index + cam] & (1 << 0)) != 0;
+                CameraAcqArray[cam].AbortTrigger = (MainPLC.PlcToPcControl[index + cam] & (1 << 1)) != 0;
 
-                desiredTool[cam] = MainPLC.PlcToPcData[index + cam] >> 11;
+                desiredTool[cam] = MainPLC.PlcToPcControl[index + cam] >> 16;
             }
 
-            
 
-            
+            double[] temp = new double[4];
+            for (int cam = 0; cam < cameraCount; cam++)
+            {
+                if (CameraAcqArray[cam].Connected)
+                {
+                    for (int j = 0; j < temp.Length; j++)
+                    {
+                        temp[j] = MainPLC.PlcToPcControlData[j + cam * temp.Length];
+                    }
+                    toolblockArray[cam, desiredTool[cam]].ToolInput = temp;
+                }
+            }
+
+
         }
         public void PlcWrite()
         {
             
             string dataTypeName;
-            int stringIndex = 0;
             int index = 0;
             int tempTag;
 
             //Camera Status: info related to camera and general system
             tempTag = 0;
             
-            tempTag |= ((heartBeat ? 0 : 1) << 0);
-            tempTag |= ((cogLicenseOk ? 0 : 1) << 1);
+            tempTag |= ((heartBeat ? 1 : 0 )<< 0);
+            tempTag |= ((cogLicenseOk ? 1:0 ) << 1);
 
-            MainPLC.PcToPlcData[index] = (short)(tempTag);
+            MainPLC.PcToPlcStatus[index] = tempTag;
             index++;
 
 
@@ -463,18 +479,18 @@ namespace CognexVisionProForm
             {
                 tempTag = 0;
 
-                tempTag |= ((CameraAcqArray[cam].Connected ? 0 : 1) << 0);
-                tempTag |= ((CameraAcqArray[cam].TriggerAck ? 0 : 1) << 1);
-                tempTag |= ((CameraAcqArray[cam].AbortTriggerAck ? 0 : 1) << 2);
-                tempTag |= ((CameraAcqArray[cam].ImageReady ? 0 : 1) << 3);
-                tempTag |= ((toolblockArray[cam, desiredTool[cam]].ToolReady ? 0 : 1) << 4);
-                tempTag |= ((toolblockArray[cam, desiredTool[cam]].ResultUpdated ? 0 : 1) << 5);
-                tempTag |= ((toolblockArray[cam, desiredTool[cam]].Result ? 0 : 1) << 6);
-                tempTag |= ((toolblockArray[cam, desiredTool[cam]].FilePresent ? 0 : 1) << 7);
+                tempTag |= ((CameraAcqArray[cam].Connected ? 1 : 0) << 0);
+                tempTag |= ((CameraAcqArray[cam].TriggerAck ? 1 : 0) << 1);
+                tempTag |= ((CameraAcqArray[cam].AbortTriggerAck ? 1 : 0) << 2);
+                tempTag |= ((CameraAcqArray[cam].ImageReady ? 1 : 0) << 3);
+                tempTag |= ((toolblockArray[cam, desiredTool[cam]].ToolReady ? 1 : 0) << 4);
+                tempTag |= ((toolblockArray[cam, desiredTool[cam]].ResultUpdated ? 1 : 0) << 5);
+                tempTag |= ((toolblockArray[cam, desiredTool[cam]].Result ? 1 : 0) << 6);
+                tempTag |= ((toolblockArray[cam, desiredTool[cam]].FilePresent ? 1 : 0) << 7);
 
-                tempTag |= desiredTool[cam] << 11;
+                tempTag |= desiredTool[cam] << 16;
 
-                MainPLC.PcToPlcData[index] = (short)(tempTag);
+                MainPLC.PcToPlcStatus[index] = tempTag;
                 index++;
             }
 
@@ -484,37 +500,31 @@ namespace CognexVisionProForm
             //Limit Doubles to 2 decimal places
             for(int i = 0; i< cameraCount;i++)
             {
-                stringIndex = cameraCount * 4;
 
-                if (toolblockArray[i, desiredTool[i]].ResultUpdated)
+                ToolBlock tool = toolblockArray[i, desiredTool[i]];
+
+                if (tool.ResultUpdated)
                 {
-                    for(int j = 0;j < toolblockArray[i, desiredTool[i]].ToolOutput.Length;j++)
+                    for(int j = 0;j < Math.Min(tool.ToolOutput.Length,4);j++)
                     {
                        
-                        if(toolblockArray[i, desiredTool[i]].ToolOutput[i] != null)
+                        if(tool.ToolOutput[j] == null || tool.RunStatus.Result == CogToolResultConstants.Error)
                         {
                             break;
                         }
 
-                        var data = toolblockArray[i, desiredTool[i]].ToolOutput[i].Value;
-                        dataTypeName = data.GetType().Name.ToString();
-
-                        if (j > 4) {  }
+                        dataTypeName = tool.ToolOutput[j].Value.GetType().Name;
 
                         if (dataTypeName == "Double")
                         {
-                            double temp = Convert.ToDouble(data);
-                            Math.Round(temp, 2);
+                            double dData = Convert.ToDouble(tool.ToolOutput[j].Value);
+                            int iData = Convert.ToInt32(dData * 100);
 
-                            MainPLC.PcToPlcString[stringIndex+j] = temp.ToString();
+                            MainPLC.PcToPlcStatusData[j] = iData;
                         }
                         else if (dataTypeName == "Int32")
                         {
-                            MainPLC.PcToPlcString[stringIndex + j] = Convert.ToString(data);
-                        }
-                        else if (dataTypeName == "String")
-                        {
-                            MainPLC.PcToPlcString[stringIndex + j] = Convert.ToString(data);
+                            MainPLC.PcToPlcStatusData[j] = Convert.ToInt32(tool.ToolOutput[j].Value);
                         }
 
                     }
@@ -548,8 +558,7 @@ namespace CognexVisionProForm
             RegKey.SetValue("MainPLC_IP3", Convert.ToInt32(numIP3.Value));
             RegKey.SetValue("MainPLC_IP4", Convert.ToInt32(numIP4.Value));
 
-            RegKey.SetValue("MainPLC_READTAG", MainPLC.ReadTag);
-            RegKey.SetValue("MainPLC_WRITETAG", MainPLC.WriteTag);
+            RegKey.SetValue("MainPLC_BASETAG", MainPLC.BaseTag);
 
         }
         public void LoadSettings()
@@ -579,8 +588,7 @@ namespace CognexVisionProForm
                 numIP3.Value = (int)RegKey.GetValue("MainPLC_IP3", 0);
                 numIP4.Value = (int)RegKey.GetValue("MainPLC_IP4", 0);
 
-                MainPLC.ReadTag = RegKey.GetValue("MainPLC_READTAG", "").ToString();
-                MainPLC.WriteTag = RegKey.GetValue("MainPLC_WRITETAG", "").ToString();
+                MainPLC.BaseTag = RegKey.GetValue("MainPLC_BASETAG", "").ToString();
 
                 RegKey.Close();
 

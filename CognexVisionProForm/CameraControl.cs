@@ -18,6 +18,7 @@ namespace CognexVisionProForm
         DalsaImage camera;
         double acqTime;
         public ICogImage image;
+        public ICogRecord record;
         private Timer pollingTimer;
         public ICogImage Image
         {
@@ -55,6 +56,10 @@ namespace CognexVisionProForm
                 lbToolData.Height = lbToolData.PreferredHeight;
             }
         }
+        public string ToolName
+        {
+            get;set;
+        }
         public CameraControl(CognexVisionProForm Sender, DalsaImage Camera)
         {
             _form = new CognexVisionProForm();
@@ -67,6 +72,7 @@ namespace CognexVisionProForm
         {
             pollingTimer.Stop();
 
+            lbToolName.Text = ToolName;
             cbCameraConnected.Checked = camera.Connected;
             cbTriggerAck.Checked = camera.TriggerAck;
             cbAbortTriggeAck.Checked = camera.AbortTriggerAck;
@@ -75,7 +81,6 @@ namespace CognexVisionProForm
 
             if(camera.TriggerAck)
             {
-                camera.Trigger = false;
                 bttnCameraSnap.Text = "Single Snap";
             }
             
@@ -129,23 +134,32 @@ namespace CognexVisionProForm
         private delegate void Set_ResizeWindow();
         public void ResizeWindow()
         {
+            //Determine last record to display
+            if (record != null)
+            {
+                int lastRecordIndex = Math.Max(record.SubRecords.Count - 1, 0);
+                cogRecordDisplay1.Record = record.SubRecords[lastRecordIndex];
+            }
+
             //*********************************************
             //determine the zoom factor to use full window
             //update cogdisplay
             //*********************************************
-            int cogWidth = plControl.Location.X - cogImageDisplay.Location.X - 5;
+            int cogWidth = plControl.Location.X - cogRecordDisplay1.Location.X - 5;
             int cogHeight = this.Size.Height - 5;
 
             double zoomWidth = Convert.ToDouble(cogWidth) / Convert.ToDouble(image.Width);
             double zoomHeight = Convert.ToDouble(cogHeight) / Convert.ToDouble(image.Height);
+            
+            
 
             if (zoomWidth < zoomHeight)
             {
-                cogImageDisplay.Zoom = zoomWidth;
+                cogRecordDisplay1.Zoom = zoomWidth;
             }
             else if (zoomHeight < zoomWidth)
             {
-                cogImageDisplay.Zoom = zoomHeight;
+                cogRecordDisplay1.Zoom = zoomHeight;
             }
 
             if (this.InvokeRequired)
@@ -154,11 +168,14 @@ namespace CognexVisionProForm
                 return;
             }
 
-            cogImageDisplay.Width = Convert.ToInt16(Convert.ToDouble(image.Width) * cogImageDisplay.Zoom);
-            cogImageDisplay.Height = Convert.ToInt16(Convert.ToDouble(image.Height) * cogImageDisplay.Zoom);
-            cogImageDisplay.Image = image;
+            cogRecordDisplay1.Width = Convert.ToInt16(Convert.ToDouble(image.Width) * cogRecordDisplay1.Zoom);
+            cogRecordDisplay1.Height = Convert.ToInt16(Convert.ToDouble(image.Height) * cogRecordDisplay1.Zoom);
+            cogRecordDisplay1.Image = image;
 
-            //plControl.Height = this.Size.Height - 5;
+            
+            
+            
+
 
 
         }

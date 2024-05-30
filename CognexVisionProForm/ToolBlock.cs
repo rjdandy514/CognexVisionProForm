@@ -4,6 +4,7 @@ using System.IO;
 using Cognex.VisionPro;
 using System.Windows.Forms;
 using Cognex.VisionPro.ToolBlock;
+using Cognex.VisionPro.QuickBuild.Implementation.Internal;
 
 
 namespace CognexVisionProForm
@@ -19,6 +20,7 @@ namespace CognexVisionProForm
         string Previous = "";
 
         CogToolBlockTerminal[] toolOutput;
+        double[] toolInput;
 
         public CogToolBlock cogToolBlock;
         CognexVisionProForm form = new CognexVisionProForm();
@@ -121,6 +123,17 @@ namespace CognexVisionProForm
         {
             get { return toolOutput; }
         }
+        public double[] ToolInput
+        {
+            set
+            {
+                toolInput = value;
+            }
+            get
+            {
+                return toolInput;
+            }
+        }
         public void LoadvisionProject()
         {
             Utilities.LoggingStatment($"{toolName}: Load Vision Applicaiton");
@@ -177,9 +190,18 @@ namespace CognexVisionProForm
             try
             {
                 cogToolBlock.Inputs[0].Value = InputImage;
+
+                for(int i = 1; i < cogToolBlock.Inputs.Count; i++)
+                {
+                    if (toolInput != null && toolInput.Length > i)
+                    {
+                        cogToolBlock.Inputs[i].Value = toolInput[i - 1];
+                        Utilities.LoggingStatment($"{toolName}: input # {i} = {cogToolBlock.Inputs[i].Value}");
+                    }
+                }
+
                 cogToolBlock.Run();
-                
-                Utilities.LoggingStatment($"{toolName}: JOB TRIGGERED");
+                Utilities.LoggingStatment($"{toolName}: Job Triggered");
             }
             catch (Exception ex) 
             {
@@ -195,9 +217,7 @@ namespace CognexVisionProForm
         }
         private void GetInfoFromTool()
         {
-            CogToolBlockTerminal nullTool =null;
-
-
+            CogToolBlockTerminal failedTool = new CogToolBlockTerminal("ToolFailed",0);
 
             int toolOutputCount = cogToolBlock.Outputs.Count;
 
@@ -210,7 +230,7 @@ namespace CognexVisionProForm
                 }
                 else
                 {
-                    toolOutput[i] = nullTool;
+                    toolOutput[i] = failedTool;
                 }
             }
 
@@ -218,7 +238,7 @@ namespace CognexVisionProForm
             ResultUpdated = true;
             form.ToolBlockRunComplete = Id;
 
-            Utilities.LoggingStatment($"{toolName}: Numer of Ouptuss - {toolOutputCount}");
+            Utilities.LoggingStatment($"{toolName}: Number of Ouptuss - {toolOutputCount}");
         }
         public void Cleaning()
         {
