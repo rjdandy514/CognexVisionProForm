@@ -146,6 +146,7 @@ namespace CognexVisionProForm
             this.cogToolBlockEditV21 = new Cognex.VisionPro.ToolBlock.CogToolBlockEditV2();
             this.tabPlcConnection = new System.Windows.Forms.TabPage();
             this.panel8 = new System.Windows.Forms.Panel();
+            this.tbPlcPingResponse = new System.Windows.Forms.TextBox();
             this.bttnPlcPing = new System.Windows.Forms.Button();
             this.label33 = new System.Windows.Forms.Label();
             this.numIP1 = new System.Windows.Forms.NumericUpDown();
@@ -157,7 +158,6 @@ namespace CognexVisionProForm
             this.cbHeartbeat = new System.Windows.Forms.CheckBox();
             this.bttnPLC = new System.Windows.Forms.Button();
             this.tabControl1 = new System.Windows.Forms.TabControl();
-            this.tbPlcPingResponse = new System.Windows.Forms.TextBox();
             this.tabImage.SuspendLayout();
             this.tabFrameGrabber.SuspendLayout();
             this.panel3.SuspendLayout();
@@ -1323,6 +1323,13 @@ namespace CognexVisionProForm
             this.panel8.TabIndex = 70;
             this.panel8.Tag = "pnCameraControl";
             // 
+            // tbPlcPingResponse
+            // 
+            this.tbPlcPingResponse.Location = new System.Drawing.Point(196, 33);
+            this.tbPlcPingResponse.Name = "tbPlcPingResponse";
+            this.tbPlcPingResponse.Size = new System.Drawing.Size(209, 20);
+            this.tbPlcPingResponse.TabIndex = 39;
+            // 
             // bttnPlcPing
             // 
             this.bttnPlcPing.Location = new System.Drawing.Point(8, 31);
@@ -1434,6 +1441,7 @@ namespace CognexVisionProForm
             this.cbHeartbeat.Size = new System.Drawing.Size(118, 24);
             this.cbHeartbeat.TabIndex = 24;
             this.cbHeartbeat.Text = "Heartbeat";
+            this.cbHeartbeat.CheckedChanged += new System.EventHandler(this.cbHeartbeat_CheckedChanged);
             // 
             // bttnPLC
             // 
@@ -1464,13 +1472,6 @@ namespace CognexVisionProForm
             this.tabControl1.Size = new System.Drawing.Size(1292, 749);
             this.tabControl1.TabIndex = 3;
             this.tabControl1.SelectedIndexChanged += new System.EventHandler(this.tabControl1_SelectedIndexChanged);
-            // 
-            // tbPlcPingResponse
-            // 
-            this.tbPlcPingResponse.Location = new System.Drawing.Point(196, 33);
-            this.tbPlcPingResponse.Name = "tbPlcPingResponse";
-            this.tbPlcPingResponse.Size = new System.Drawing.Size(209, 20);
-            this.tbPlcPingResponse.TabIndex = 39;
             // 
             // CognexVisionProForm
             // 

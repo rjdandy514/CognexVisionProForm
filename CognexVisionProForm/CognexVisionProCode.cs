@@ -13,6 +13,7 @@ using System.Windows.Forms;
 using static System.Net.Mime.MediaTypeNames;
 using Cognex.VisionPro.QuickBuild.Implementation.Internal;
 using System.Xml.Linq;
+using System.Net.NetworkInformation;
 
 namespace CognexVisionProForm
 {
@@ -241,6 +242,29 @@ namespace CognexVisionProForm
 
             for (int j = 0; j < cameraCount; j++)
             {
+                if (MainPLC.InitialCheck != null && MainPLC.InitialCheck.Status == IPStatus.Success)
+                {
+                    if (Enumerable.Range(0, toolCount - 1).Contains(plcTool[j]))
+                    {
+                        desiredTool[j] = plcTool[j];
+                    }
+                    else { desiredTool[j] = 0; }
+                        
+                    
+                }
+                else
+                {
+                    if (Enumerable.Range(0, toolCount - 1).Contains(cameraControl[j].ToolSelect))
+                    {
+                        desiredTool[j] = cameraControl[j].ToolSelect;
+                    }
+                    else 
+                    {
+                        cameraControl[j].ToolSelect = 0;
+                        desiredTool[j] = 0; 
+                    }
+                }
+
                 if (CameraAcqArray[j].ImageReady && cameraSnapComplete[j] && toolblockArray[j, desiredTool[j]].ToolReady)
                 {
                         toolTrigger[j] = true;
@@ -463,9 +487,9 @@ namespace CognexVisionProForm
 
                 if (Enumerable.Range(0, toolCount - 1).Contains(toolCheck))
                 {
-                    desiredTool[cam] = toolCheck;
+                    plcTool[cam] = toolCheck;
                 }
-                else { desiredTool[cam] = 0; }
+                else { plcTool[cam] = 0; }
                 
 
             }

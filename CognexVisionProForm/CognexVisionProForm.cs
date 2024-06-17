@@ -48,6 +48,8 @@ namespace CognexVisionProForm
         private bool ExpireError = false;
 
         private int[] desiredTool;
+        private int[] plcTool;
+        private int[] hmiTool;
         private ToolBlock[,] toolblockArray;
 
         private Calculations Camera01Calc;
@@ -128,6 +130,7 @@ namespace CognexVisionProForm
             CameraAcqArray = new DalsaImage[cameraCount];
             toolblockArray = new ToolBlock[cameraCount, toolCount];
             desiredTool = new int[cameraCount];
+            plcTool = new int[cameraCount];
             cameraControl = new CameraControl[cameraCount];
             cameraSnap = new bool[cameraCount];
             cameraSnapComplete = new bool[cameraCount];
@@ -332,10 +335,6 @@ namespace CognexVisionProForm
             cbC1Tb1FileFound.Checked = toolblockArray[cbCameraIdSelected.SelectedIndex, cbToolBlock.SelectedIndex].FilePresent;
             tbToolBlockName.Text = toolblockArray[cbCameraIdSelected.SelectedIndex, cbToolBlock.SelectedIndex].Name;
 
-            if (toolblockArray[cbCameraIdSelected.SelectedIndex, cbToolBlock.SelectedIndex].FilePresent)
-            {
-                desiredTool[cbCameraIdSelected.SelectedIndex] = cbToolBlock.SelectedIndex;
-            }
         }
         private void bttnToolBockFileSelect_Click(object sender, EventArgs e)
         {
@@ -523,6 +522,11 @@ namespace CognexVisionProForm
             this.Refresh();
             PingReply temp = MainPLC.PingPLC();
             tbPlcPingResponse.Text = temp.Status.ToString();
+        }
+
+        private void cbHeartbeat_CheckedChanged(object sender, EventArgs e)
+        {
+
         }
     }
 

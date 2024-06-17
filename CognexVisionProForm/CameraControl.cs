@@ -19,6 +19,7 @@ namespace CognexVisionProForm
         double acqTime = 0;
         public ICogImage image;
         public ICogRecord record;
+        private int toolSelect = 0;
         private Timer pollingTimer;
         public ICogImage Image
         {
@@ -43,6 +44,19 @@ namespace CognexVisionProForm
         public ToolBlock Tool
         {
             get;set;
+        }
+        public int ToolSelect
+        {
+            get
+            {
+                return toolSelect;
+            }
+            set
+            {
+                
+                toolSelect = value;
+
+            }
         }
 
 
@@ -115,7 +129,7 @@ namespace CognexVisionProForm
         public void UpdateDisplay()
         {
             ResizeWindow();
-
+            numToolSelect.Value = toolSelect;
             lbAcqTime.Text = $"Aquisition: {AcqTime}ms";
             lbToolName.Text = Tool.Name;
             lbToolRunTime.Text = $"Tool Time: {Tool.TotalTime}ms";
@@ -184,6 +198,7 @@ namespace CognexVisionProForm
 
         private void bttnCameraSnap_MouseDown(object sender, MouseEventArgs e)
         {
+            toolSelect = Convert.ToInt32(numToolSelect.Value);
             camera.Trigger = true;
         }
     }

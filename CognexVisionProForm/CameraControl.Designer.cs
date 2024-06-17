@@ -47,8 +47,10 @@
             this.cbAbortTriggeAck = new System.Windows.Forms.CheckBox();
             this.cbTriggerAck = new System.Windows.Forms.CheckBox();
             this.cogRecordDisplay1 = new Cognex.VisionPro.CogRecordDisplay();
+            this.numToolSelect = new System.Windows.Forms.NumericUpDown();
             this.plControl.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.cogRecordDisplay1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numToolSelect)).BeginInit();
             this.SuspendLayout();
             // 
             // bttnCameraLog
@@ -157,6 +159,7 @@
             this.plControl.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.plControl.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.plControl.Controls.Add(this.numToolSelect);
             this.plControl.Controls.Add(this.lbToolRunTime);
             this.plControl.Controls.Add(this.cbToolPassed);
             this.plControl.Controls.Add(this.lbToolName);
@@ -251,6 +254,13 @@
             this.cogRecordDisplay1.Size = new System.Drawing.Size(307, 293);
             this.cogRecordDisplay1.TabIndex = 19;
             // 
+            // numToolSelect
+            // 
+            this.numToolSelect.Location = new System.Drawing.Point(6, 252);
+            this.numToolSelect.Name = "numToolSelect";
+            this.numToolSelect.Size = new System.Drawing.Size(146, 20);
+            this.numToolSelect.TabIndex = 30;
+            // 
             // CameraControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -269,6 +279,7 @@
             this.plControl.ResumeLayout(false);
             this.plControl.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.cogRecordDisplay1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numToolSelect)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -291,5 +302,6 @@
         private Cognex.VisionPro.CogRecordDisplay cogRecordDisplay1;
         private System.Windows.Forms.CheckBox cbToolPassed;
         private System.Windows.Forms.Label lbToolRunTime;
+        private System.Windows.Forms.NumericUpDown numToolSelect;
     }
 }
