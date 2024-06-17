@@ -111,9 +111,11 @@ namespace CognexVisionProForm
                 if (bAcq)
                 {
                     cbServerList.Items.Add(new MyListBoxItem(SapManager.GetServerName(i), true));
+                    
                 }
                 else if (bAcqDevice)
                 {
+
                     cbServerList.Items.Add(new MyListBoxItem(SapManager.GetServerName(i), false));
                 }
             }
@@ -146,6 +148,7 @@ namespace CognexVisionProForm
             //Get count of both Acq (frame-grabber) or AcqDevices (camera)
             if (!string.IsNullOrEmpty(CameraAcqArray[cameraIndex].LoadServerSelect) && CameraAcqArray[cameraIndex].LoadServerSelect != ServerNotFound)
             {
+                
                 AcqCount = SapManager.GetResourceCount(CameraAcqArray[cameraIndex].LoadServerSelect, SapManager.ResourceType.Acq);
                 AcqDeviceCount = SapManager.GetResourceCount(CameraAcqArray[cameraIndex].LoadServerSelect, SapManager.ResourceType.AcqDevice);
             }

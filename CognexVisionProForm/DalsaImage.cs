@@ -32,6 +32,7 @@ public class DalsaImage
     string configFileLocation;
     string configFileType = "ConfigFile";
     string configFileExtension = ".cff";
+    string serialNumber = "";
 
 
     FileInfo[] archiveImageArray;
@@ -76,7 +77,7 @@ public class DalsaImage
         { 
             cameraName = value;
             imageFilePath = Utilities.ExeFilePath + "\\Camera" + Id.ToString("00")+ "\\Images\\";
-            configFileLocation = Utilities.ExeFilePath + "\\Camera" + Id.ToString("00") + "\\" + configFileType + configFileExtension;
+            
             if (File.Exists(configFileLocation))
             {
                 ConfigFilePresent = true;
@@ -177,6 +178,13 @@ public class DalsaImage
     {
         get; set;
     }
+    public string GetSerialNumber
+    {
+        get
+        {
+            return serialNumber;
+        }
+    }
     public int LoadResourceIndex
     {
         get; set;
@@ -265,8 +273,8 @@ public class DalsaImage
     public void LoadConfigFile()
     {
         string filePath = Utilities.ExeFilePath + "\\Camera" + Id.ToString("00");
-        Utilities.Import(filePath,cameraName, "ConfigFile", ".cff");
-        CongfigFile = configFileLocation;
+        Utilities.Import(Utilities.ExeFilePath, cameraName, "ConfigFile", ".ccf");
+        CongfigFile = Utilities.ExeFilePath + "\\Camera" + Id.ToString("00") + "\\" + cameraName +"_" + configFileType + configFileExtension;
         ConfigFilePresent = true;
 
         Utilities.LoggingStatment(cameraName + ": new log file from: " + CongfigFile);
@@ -278,14 +286,13 @@ public class DalsaImage
         Cleaning();
 
         serverLocation = new SapLocation(LoadServerSelect, LoadResourceIndex);
-        
 
         if (SapManager.GetResourceCount(serverLocation, SapManager.ResourceType.Acq) > 0)
         {
             ServerType = ServerCategory.ServerAcq;
 
             acquisition = new SapAcquisition(serverLocation, CongfigFile);
-            buffers = new SapBufferWithTrash(2, acquisition, SapBuffer.MemoryType.ScatterGather);
+            buffers = new SapBufferWithTrash(4, acquisition, SapBuffer.MemoryType.ScatterGather);
             acqXfer = new SapAcqToBuf(acquisition, buffers);
             
             // End of frame event
@@ -302,8 +309,9 @@ public class DalsaImage
         {
             ServerType = ServerCategory.ServerAcqDevice;
             acqDevice = new SapAcqDevice(serverLocation, CongfigFile);
-            
-            buffers = new SapBufferWithTrash(4, acqDevice, SapBuffer.MemoryType.ScatterGather);
+
+            //bool temp = SapBuffer.IsBufferTypeSupported(serverLocation, SapBuffer.MemoryType.ScatterGatherPhysical);
+            buffers = new SapBufferWithTrash(4, acqDevice, SapBuffer.MemoryType.ScatterGatherPhysical);
             acqDeviceXfer = new SapAcqDeviceToBuf(acqDevice, buffers);
 
             // End of frame event
@@ -316,21 +324,24 @@ public class DalsaImage
 
         if(acquisition != null && !acquisition.Initialized)
         {
-            acquisition.Create();
+            if (acquisition.Create() == false) { return; }
+            
         }
         if (acqDevice != null && !acqDevice.Initialized)
         {
-            acqDevice.Create();
+            if (acqDevice.Create() == false) { return; }
         }
         if (buffers != null && !buffers.Initialized)
         {
             ArchiveImageActive = false;
-            buffers.Create();
+            if (buffers.Create() == false) { return; }
         }
         if (acqDeviceXfer != null && !acqDeviceXfer.Initialized)
         {
-            acqDeviceXfer.Create();
+            if (acqDeviceXfer.Create() == false) { return; }
         }
+
+        serialNumber = SapManager.GetSerialNumber(serverLocation);
     }
     public void SnapPicture()
     {
