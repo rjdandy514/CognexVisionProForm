@@ -33,7 +33,10 @@ namespace CognexVisionProForm
         int cameraConnectCount;
         public DalsaImage[] CameraAcqArray;
         ICogImage CameraImage;
-        bool cameraSnapComplete;
+        bool[] cameraSnap;
+        bool[] cameraSnapComplete;
+        bool[] toolTrigger;
+        bool[] toolTriggerComplete;
         public CameraControl[] cameraControl;
 
         SplashScreen splashScreen;
@@ -69,8 +72,8 @@ namespace CognexVisionProForm
         double Robot_Y;
         double Robot_Degree;
 
-        int cameraCount;
-        int toolCount;
+        int cameraCount = 2;
+        int toolCount = 4;
 
         string ServerNotFound = "No Server Found";
 
@@ -122,12 +125,14 @@ namespace CognexVisionProForm
             string ArchiveLogDir = LogDir + "Archive\\";
             Utilities.InitializeLog(LogDir, ArchiveLogDir);
 
-            cameraCount = 6;
-            toolCount = 4;
             CameraAcqArray = new DalsaImage[cameraCount];
             toolblockArray = new ToolBlock[cameraCount, toolCount];
             desiredTool = new int[cameraCount];
             cameraControl = new CameraControl[cameraCount];
+            cameraSnap = new bool[cameraCount];
+            cameraSnapComplete = new bool[cameraCount];
+            toolTrigger = new bool[cameraCount];
+            toolTriggerComplete = new bool[cameraCount];
 
             splashScreen.UpdateProgress("Initialize Classes", 10);
             InitializeClasses();
@@ -242,10 +247,11 @@ namespace CognexVisionProForm
             InitializeServerList(selectedCameraId);
             InitializeResourceList(selectedCameraId);
 
-
+            cbToolBlock.Items.Clear();
             for (int i = 0; i < toolCount; i++)
             {
-                if (toolblockArray[0, i].FilePresent) { cbToolBlock.Items.Add(toolblockArray[0, i].Name); }
+
+                if (toolblockArray[cbCameraIdSelected.SelectedIndex, i].FilePresent) { cbToolBlock.Items.Add(toolblockArray[cbCameraIdSelected.SelectedIndex, i].Name); }
                 else { cbToolBlock.Items.Add($"Empty{i}"); }
             }
             cbToolBlock.SelectedIndex = 0;
@@ -291,7 +297,7 @@ namespace CognexVisionProForm
             cbToolBlock.Items.Clear();
             for (int i = 0; i < toolblockArray.GetLength(1); i++)
             {
-                cbToolBlock.Items.Add(toolblockArray[0, i].Name);
+                cbToolBlock.Items.Add(toolblockArray[cbCameraIdSelected.SelectedIndex, i].Name);
             }
         }
         private void bttnC1Config_Click(object sender, EventArgs e)
@@ -331,6 +337,24 @@ namespace CognexVisionProForm
                 desiredTool[cbCameraIdSelected.SelectedIndex] = cbToolBlock.SelectedIndex;
             }
         }
+        private void bttnToolBockFileSelect_Click(object sender, EventArgs e)
+        {
+
+            string toolNameUpdated = tbC1TB1Name.Text.ToString();
+            int toolSelected = cbToolBlock.SelectedIndex;
+
+
+            if (toolSelected >= 0 && toolSelected < toolCount)
+            {
+                toolblockArray[cbCameraIdSelected.SelectedIndex, toolSelected].Name = toolNameUpdated;
+                toolblockArray[cbCameraIdSelected.SelectedIndex, toolSelected].LoadvisionProject();
+                toolblockArray[cbCameraIdSelected.SelectedIndex, toolSelected].InitializeJobManager();
+
+                cbToolBlock.Items[toolSelected] = toolNameUpdated;
+            }
+
+
+        }
         //*********************************************************************
         //lICENSE CHECK
         //*********************************************************************
@@ -352,24 +376,7 @@ namespace CognexVisionProForm
         //*********************************************************************
         //TOOL BLOCK
         //*********************************************************************
-        private void bttnToolBockFileSelect_Click(object sender, EventArgs e)
-        {
 
-            string toolNameUpdated = tbC1TB1Name.Text.ToString();
-            int toolSelected = cbToolBlock.SelectedIndex;
-
-
-            if (toolSelected >= 0 && toolSelected < toolCount)
-            {
-                toolblockArray[0, toolSelected].Name = toolNameUpdated;
-                toolblockArray[0, toolSelected].LoadvisionProject();
-                toolblockArray[0, toolSelected].InitializeJobManager();
-
-                cbToolBlock.Items[toolSelected] = toolNameUpdated;
-            }
-
-
-        }
         private void cogToolBlockEditV21_Load(object sender, EventArgs e)
         {
 

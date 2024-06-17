@@ -69,17 +69,9 @@ namespace CognexVisionProForm
         {
             get
             {
-                if(cogToolBlock != null)
-                {
-                    return Convert.ToBoolean(cogToolBlock.RunStatus.Result);
-                }
-                else
-                {
-                    return false;
-                }
-                
+                if (cogToolBlock != null && cogToolBlock.RunStatus.Result == CogToolResultConstants.Accept) { return true; }
+                else { return false; }
             }
-
         }
         public double TotalTime
         {
@@ -236,9 +228,9 @@ namespace CognexVisionProForm
 
             ToolReady = true;
             ResultUpdated = true;
-            form.ToolBlockRunComplete = Id;
+            form.ToolBlockRunComplete = CameraId;
 
-            Utilities.LoggingStatment($"{toolName}: Number of Ouptuss - {toolOutputCount}");
+            Utilities.LoggingStatment($"{toolName}: Number of Outputs - {toolOutputCount}");
         }
         public void Cleaning()
         {

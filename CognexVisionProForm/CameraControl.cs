@@ -16,7 +16,7 @@ namespace CognexVisionProForm
     {
         CognexVisionProForm _form;
         DalsaImage camera;
-        double acqTime;
+        double acqTime = 0;
         public ICogImage image;
         public ICogRecord record;
         private Timer pollingTimer;
@@ -29,7 +29,6 @@ namespace CognexVisionProForm
             set
             {
                 image = value;
-                ResizeWindow();
             }
         }
         public double AcqTime
@@ -38,28 +37,15 @@ namespace CognexVisionProForm
             set
             {
                 acqTime = value;
-                AcqTimeUpdate();
+                //AcqTimeUpdate();
             }
         }
-        public CogToolBlockTerminal[] ToolData
-        {
-            set
-            {
-                lbToolData.Items.Clear();
-                lbToolData.BeginUpdate();
-                for (int i = 0; i < value.Length; i++)
-                {
-                    if (value[i] != null) { lbToolData.Items.Add(value[i].Value.ToString()); }
-                    
-                }
-                lbToolData.EndUpdate();
-                lbToolData.Height = lbToolData.PreferredHeight;
-            }
-        }
-        public string ToolName
+        public ToolBlock Tool
         {
             get;set;
         }
+
+
         public CameraControl(CognexVisionProForm Sender, DalsaImage Camera)
         {
             _form = new CognexVisionProForm();
@@ -72,18 +58,12 @@ namespace CognexVisionProForm
         {
             pollingTimer.Stop();
 
-            lbToolName.Text = ToolName;
             cbCameraConnected.Checked = camera.Connected;
             cbTriggerAck.Checked = camera.TriggerAck;
             cbAbortTriggeAck.Checked = camera.AbortTriggerAck;
             cbArchiveImageActive.Checked = camera.ArchiveImageActive;
             cbImageReady.Checked = camera.ImageReady;
 
-            if(camera.TriggerAck)
-            {
-                bttnCameraSnap.Text = "Single Snap";
-            }
-            
             pollingTimer.Start();
         }
         private void CameraControl_Load(object sender, EventArgs e)
@@ -102,7 +82,7 @@ namespace CognexVisionProForm
         }
         private void bttnCameraSnap_Click(object sender, EventArgs e)
         {
-
+            /*
             if(camera.Trigger == true)
             {
                 camera.Trigger = false;
@@ -113,6 +93,7 @@ namespace CognexVisionProForm
                 camera.Trigger = true;
                 bttnCameraSnap.Text = "Triggering";
             }
+            */
         }
         private void bttnCameraAbort_Click(object sender, EventArgs e)
         {
@@ -131,11 +112,36 @@ namespace CognexVisionProForm
                 bttnCameraLog.Text = "Log Images - Active";
             }
         }
+        public void UpdateDisplay()
+        {
+            ResizeWindow();
+
+            lbAcqTime.Text = $"Aquisition: {AcqTime}ms";
+            lbToolName.Text = Tool.Name;
+            lbToolRunTime.Text = $"Tool Time: {Tool.TotalTime}ms";
+            cbToolPassed.Checked = Tool.Result;
+
+            lbToolData.Items.Clear();
+            lbToolData.BeginUpdate();
+            for (int i = 0; i < Tool.ToolOutput.Length; i++)
+            {
+                if (Tool.ToolOutput[i] != null) 
+                {
+                    string tooldata =   Tool.ToolOutput[i].Name + ": " + 
+                                        Math.Round(Convert.ToDouble(Tool.ToolOutput[i].Value), 2).ToString(); 
+                    lbToolData.Items.Add(tooldata);
+                }
+
+            }
+            lbToolData.EndUpdate();
+            lbToolData.Height = lbToolData.PreferredHeight;
+        }
         private delegate void Set_ResizeWindow();
         public void ResizeWindow()
         {
+            record = Tool.cogToolBlock.CreateLastRunRecord();
             //Determine last record to display
-            if (record != null)
+            if (record != null && Tool.Result)
             {
                 int lastRecordIndex = Math.Max(record.SubRecords.Count - 1, 0);
                 cogRecordDisplay1.Record = record.SubRecords[lastRecordIndex];
@@ -150,8 +156,6 @@ namespace CognexVisionProForm
 
             double zoomWidth = Convert.ToDouble(cogWidth) / Convert.ToDouble(image.Width);
             double zoomHeight = Convert.ToDouble(cogHeight) / Convert.ToDouble(image.Height);
-            
-            
 
             if (zoomWidth < zoomHeight)
             {
@@ -172,27 +176,15 @@ namespace CognexVisionProForm
             cogRecordDisplay1.Height = Convert.ToInt16(Convert.ToDouble(image.Height) * cogRecordDisplay1.Zoom);
             cogRecordDisplay1.Image = image;
 
-            
-            
-            
-
-
-
         }
-        private delegate void Set_AcqTimeUpdate();
-        public void AcqTimeUpdate()
+        private void bttnCameraSnap_MouseUp(object sender, MouseEventArgs e)
         {
-            if (this.InvokeRequired)
-            {
-                BeginInvoke(new Set_AcqTimeUpdate(AcqTimeUpdate));
-                return;
-            }
-            lbAcqTime.Text = $"Aquisition: {AcqTime}ms";
+            camera.Trigger = false;
         }
 
-        private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
+        private void bttnCameraSnap_MouseDown(object sender, MouseEventArgs e)
         {
-
+            camera.Trigger = true;
         }
     }
 }

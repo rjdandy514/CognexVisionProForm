@@ -112,6 +112,7 @@ public class DalsaImage
         }
         set
         {
+            form.CameraSnap = Id;
             trigger = value;
             TriggerAck = trigger;
             if (trigger && !triggerMem) 
@@ -125,7 +126,7 @@ public class DalsaImage
                     CreateBufferFromFile();
                     ArchiveImageIndex++;
                 }
-                 
+                
             }
             triggerMem = trigger;
 
@@ -334,8 +335,9 @@ public class DalsaImage
     public void SnapPicture()
     {
         ImageReady = false;
-
+        
         acqTimeWatch.Start();
+
         if(acqDeviceXfer.Connected)
         {
             if (acqDeviceXfer.Snap())
@@ -449,7 +451,7 @@ public class DalsaImage
         if (buffers != null && SaveImageSelected) { SaveImageBMP(); }
 
         ImageReady = true;
-        form.CameraSnapComplete = true;
+        form.CameraSnapComplete = Id;
 
         acqTimeWatch.Stop();
         acqTimeWatch.Reset();
