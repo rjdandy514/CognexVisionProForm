@@ -273,11 +273,14 @@ public class DalsaImage
     public void LoadConfigFile()
     {
         string filePath = Utilities.ExeFilePath + "\\Camera" + Id.ToString("00");
-        Utilities.Import(Utilities.ExeFilePath, cameraName, "ConfigFile", ".ccf");
-        CongfigFile = Utilities.ExeFilePath + "\\Camera" + Id.ToString("00") + "\\" + cameraName +"_" + configFileType + configFileExtension;
+        //Utilities.Import(filePath, cameraName, "ConfigFile", ".ccf");
+        //CongfigFile = filePath + "\\" + cameraName +"_" + configFileType + configFileExtension;
+        CongfigFile = @"C:\Program Files\Teledyne DALSA\Sapera\CamFiles\User\E_LineaHS-8K_FG1_master_C1.ccf";
         ConfigFilePresent = true;
 
         Utilities.LoggingStatment(cameraName + ": new log file from: " + CongfigFile);
+
+        var isReadonly = new System.IO.FileInfo(CongfigFile).Attributes;
 
     }
     public void CreateCamera()
@@ -317,8 +320,8 @@ public class DalsaImage
             // End of frame event
             acqDeviceXfer.Pairs[0].EventType = SapXferPair.XferEventType.EndOfTransfer;
             acqDeviceXfer.XferNotify += new SapXferNotifyHandler(XferNotify);
-            acqDeviceXfer.XferNotifyContext = this;
             acqDeviceXfer.Pairs[0].Cycle = SapXferPair.CycleMode.NextWithTrash;
+            acqDeviceXfer.XferNotifyContext = this;
         }
 
 
@@ -340,6 +343,10 @@ public class DalsaImage
         {
             if (acqDeviceXfer.Create() == false) { return; }
         }
+        if (acqXfer != null && !acqXfer.Initialized)
+        {
+            if (acqXfer.Create() == false) { return; }
+        }
 
         serialNumber = SapManager.GetSerialNumber(serverLocation);
     }
@@ -349,7 +356,7 @@ public class DalsaImage
         
         acqTimeWatch.Start();
 
-        if(acqDeviceXfer.Connected)
+        if(acqDeviceXfer != null && acqDeviceXfer.Connected)
         {
             if (acqDeviceXfer.Snap())
             {
@@ -358,7 +365,7 @@ public class DalsaImage
                 acqDeviceXfer.Wait(5000);
             }
         }
-        else if(acqXfer.Connected)
+        else if(acqXfer != null && acqXfer.Connected)
         {
             if (acqXfer.Snap())
             {
@@ -369,11 +376,11 @@ public class DalsaImage
     }
     public void Abort()
     {
-        if (acqDeviceXfer.Connected)
+        if (acqDeviceXfer != null && acqDeviceXfer.Connected)
         {
             acqDeviceXfer.Abort();
         }
-        else if (acqXfer.Connected)
+        else if (acqXfer != null && acqXfer.Connected)
         {
             acqXfer.Abort();
         }
