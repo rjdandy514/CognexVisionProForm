@@ -606,7 +606,8 @@ namespace CognexVisionProForm
                 RegKey.SetValue($"Camera{i}_Description", CameraAcqArray[i].Description);
                 RegKey.SetValue($"Camera{i}_Server", CameraAcqArray[i].LoadServerSelect);
                 RegKey.SetValue($"Camera{i}_Resource", CameraAcqArray[i].LoadResourceIndex);
-                
+                RegKey.SetValue($"Camera{i}CongfigFile", CameraAcqArray[i].CongfigFile);
+
                 for (int j = 0; j < toolCount; j++)
                 {
                     RegKey.SetValue($"Camera{i}_ToolBlock{j}", toolblockArray[i, j].Name);
@@ -636,6 +637,8 @@ namespace CognexVisionProForm
                     CameraAcqArray[i].Description = RegKey.GetValue($"Camera{i}_Description", "").ToString();
                     CameraAcqArray[i].LoadServerSelect = RegKey.GetValue($"Camera{i}_Server", "").ToString();
                     CameraAcqArray[i].LoadResourceIndex = (int)RegKey.GetValue($"Camera{i}_Resource", 0);
+                    CameraAcqArray[i].CongfigFile = RegKey.GetValue($"Camera{i}CongfigFile", "").ToString();
+                    CameraAcqArray[i].ConfigFilePresent = System.IO.File.Exists(CameraAcqArray[i].CongfigFile);
 
                     for (int j = 0; j < toolCount; j++)
                     {

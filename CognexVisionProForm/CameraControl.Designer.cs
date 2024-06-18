@@ -40,6 +40,7 @@
             this.cbImageReady = new System.Windows.Forms.CheckBox();
             this.cbArchiveImageActive = new System.Windows.Forms.CheckBox();
             this.plControl = new System.Windows.Forms.Panel();
+            this.numToolSelect = new System.Windows.Forms.NumericUpDown();
             this.lbToolRunTime = new System.Windows.Forms.Label();
             this.cbToolPassed = new System.Windows.Forms.CheckBox();
             this.lbToolName = new System.Windows.Forms.Label();
@@ -47,10 +48,9 @@
             this.cbAbortTriggeAck = new System.Windows.Forms.CheckBox();
             this.cbTriggerAck = new System.Windows.Forms.CheckBox();
             this.cogRecordDisplay1 = new Cognex.VisionPro.CogRecordDisplay();
-            this.numToolSelect = new System.Windows.Forms.NumericUpDown();
             this.plControl.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.cogRecordDisplay1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numToolSelect)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.cogRecordDisplay1)).BeginInit();
             this.SuspendLayout();
             // 
             // bttnCameraLog
@@ -181,6 +181,14 @@
             this.plControl.Size = new System.Drawing.Size(158, 420);
             this.plControl.TabIndex = 18;
             // 
+            // numToolSelect
+            // 
+            this.numToolSelect.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.numToolSelect.Location = new System.Drawing.Point(6, 252);
+            this.numToolSelect.Name = "numToolSelect";
+            this.numToolSelect.Size = new System.Drawing.Size(146, 20);
+            this.numToolSelect.TabIndex = 30;
+            // 
             // lbToolRunTime
             // 
             this.lbToolRunTime.AutoSize = true;
@@ -254,13 +262,6 @@
             this.cogRecordDisplay1.Size = new System.Drawing.Size(307, 293);
             this.cogRecordDisplay1.TabIndex = 19;
             // 
-            // numToolSelect
-            // 
-            this.numToolSelect.Location = new System.Drawing.Point(6, 252);
-            this.numToolSelect.Name = "numToolSelect";
-            this.numToolSelect.Size = new System.Drawing.Size(146, 20);
-            this.numToolSelect.TabIndex = 30;
-            // 
             // CameraControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -278,8 +279,8 @@
             this.Load += new System.EventHandler(this.CameraControl_Load);
             this.plControl.ResumeLayout(false);
             this.plControl.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.cogRecordDisplay1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numToolSelect)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.cogRecordDisplay1)).EndInit();
             this.ResumeLayout(false);
 
         }

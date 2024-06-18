@@ -9,6 +9,7 @@ using Cognex.VisionPro;
 using Microsoft.Win32;
 using System.Drawing;
 using System.Threading.Tasks;
+using Cognex.Vision;
 
 public class DalsaImage
 {
@@ -29,9 +30,8 @@ public class DalsaImage
 
     Stopwatch acqTimeWatch;
 
-    string configFileLocation;
     string configFileType = "ConfigFile";
-    string configFileExtension = ".cff";
+    string configFileExtension = ".ccf";
     string serialNumber = "";
 
 
@@ -77,17 +77,6 @@ public class DalsaImage
         { 
             cameraName = value;
             imageFilePath = Utilities.ExeFilePath + "\\Camera" + Id.ToString("00")+ "\\Images\\";
-            
-            if (File.Exists(configFileLocation))
-            {
-                ConfigFilePresent = true;
-                CongfigFile = configFileLocation;
-            }
-            else
-            {
-                ConfigFilePresent = false;
-                CongfigFile = "";
-            }
         }
     }
     public string Description
@@ -273,10 +262,9 @@ public class DalsaImage
     public void LoadConfigFile()
     {
         string filePath = Utilities.ExeFilePath + "\\Camera" + Id.ToString("00");
-        //Utilities.Import(filePath, cameraName, "ConfigFile", ".ccf");
-        //CongfigFile = filePath + "\\" + cameraName +"_" + configFileType + configFileExtension;
-        CongfigFile = @"C:\Program Files\Teledyne DALSA\Sapera\CamFiles\User\E_LineaHS-8K_FG1_master_C1.ccf";
-        ConfigFilePresent = true;
+        Utilities.Import(filePath, cameraName, "ConfigFile", configFileExtension);
+        CongfigFile = filePath + "\\" + cameraName +"_" + configFileType + configFileExtension;
+        ConfigFilePresent = File.Exists(CongfigFile);
 
         Utilities.LoggingStatment(cameraName + ": new log file from: " + CongfigFile);
 
@@ -311,9 +299,8 @@ public class DalsaImage
         else if (SapManager.GetResourceCount(serverLocation, SapManager.ResourceType.AcqDevice) > 0)
         {
             ServerType = ServerCategory.ServerAcqDevice;
+            
             acqDevice = new SapAcqDevice(serverLocation, CongfigFile);
-
-            //bool temp = SapBuffer.IsBufferTypeSupported(serverLocation, SapBuffer.MemoryType.ScatterGatherPhysical);
             buffers = new SapBufferWithTrash(4, acqDevice, SapBuffer.MemoryType.ScatterGatherPhysical);
             acqDeviceXfer = new SapAcqDeviceToBuf(acqDevice, buffers);
 
@@ -358,9 +345,8 @@ public class DalsaImage
 
         if(acqDeviceXfer != null && acqDeviceXfer.Connected)
         {
-            if (acqDeviceXfer.Snap())
+            if (acqDeviceXfer != null && acqDeviceXfer.Snap())
             {
-                
                 SnapTime = acqTimeWatch.ElapsedMilliseconds;
                 acqDeviceXfer.Wait(5000);
             }
@@ -525,10 +511,7 @@ public class DalsaImage
     {
         SapAcquisition.AcqSignalStatus signalStatus = argsSignal.SignalStatus;
     }
-    static void SapXferPair_XferNotify(Object sender, SapXferNotifyEventArgs args)
-    {
-        MessageBox.Show("Transfer Pair Notfy event handler");        
-    }
+
 
 
 }
