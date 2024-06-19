@@ -142,7 +142,7 @@ namespace CognexVisionProForm
             }
             else
             {
-                bttnCameraSnap.Text = "Snap";
+                bttnCameraSnap.Text = " Press To Snap";
                 bttnCameraSnap.Enabled = true;
             }
 
@@ -213,6 +213,7 @@ namespace CognexVisionProForm
 
         private void bttnCameraSnap_MouseDown(object sender, MouseEventArgs e)
         {
+            bttnCameraSnap.Enabled = false;
             toolSelect = Convert.ToInt32(numToolSelect.Value);
             camera.Trigger = true;
         }

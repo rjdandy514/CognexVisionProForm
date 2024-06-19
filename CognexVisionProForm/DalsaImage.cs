@@ -277,8 +277,12 @@ public class DalsaImage
     public void LoadConfigFile()
     {
         string filePath = Utilities.ExeFilePath + "\\Camera" + Id.ToString("00");
-        Utilities.Import(filePath, configFileType, configFileExtension);
-        CongfigFile = filePath + "\\" + configFileType + configFileExtension;
+        if (Utilities.Import(filePath, configFileType, configFileExtension))
+        {
+            CongfigFile = filePath + "\\" + configFileType + configFileExtension;
+        }
+        else { CongfigFile = ""; }
+
         ConfigFilePresent = File.Exists(CongfigFile);
 
         Utilities.LoggingStatment(cameraName + ": new log file from: " + CongfigFile);
@@ -290,11 +294,15 @@ public class DalsaImage
 
         serverLocation = new SapLocation(LoadServerSelect, LoadResourceIndex);
 
+
+        string configFile = "";
+        if (ConfigFilePresent) { configFile = CongfigFile; }
+
         if (SapManager.GetResourceCount(serverLocation, SapManager.ResourceType.Acq) > 0)
         {
             ServerType = ServerCategory.ServerAcq;
 
-            acquisition = new SapAcquisition(serverLocation, CongfigFile);
+            acquisition = new SapAcquisition(serverLocation, configFile);
             buffers = new SapBufferWithTrash(4, acquisition, SapBuffer.MemoryType.ScatterGather);
             acqXfer = new SapAcqToBuf(acquisition, buffers);
             
@@ -312,7 +320,7 @@ public class DalsaImage
         {
             ServerType = ServerCategory.ServerAcqDevice;
             
-            acqDevice = new SapAcqDevice(serverLocation, CongfigFile);
+            acqDevice = new SapAcqDevice(serverLocation, configFile);
             buffers = new SapBufferWithTrash(4, acqDevice, SapBuffer.MemoryType.ScatterGatherPhysical);
             acqDeviceXfer = new SapAcqDeviceToBuf(acqDevice, buffers);
 

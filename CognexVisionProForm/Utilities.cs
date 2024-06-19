@@ -93,7 +93,7 @@ namespace CognexVisionProForm
             File.Move(FullFilePath, fullArchivePath);
 
         }
-        public static void Import(string NewPath, string NewFileName, string Extension)
+        public static bool Import(string NewPath, string NewFileName, string Extension)
         {
             string newfigFile = "";
             string newfigFileExtension = "";
@@ -114,13 +114,13 @@ namespace CognexVisionProForm
             }
             else
             {
-                return;
+                return false;
             }
             //CONFIRM SELECTED FILE IS CORRECT TYPE, IF NOT END WITH MESSAGE
             if (newfigFileExtension != Extension)
             {
                 MessageBox.Show("FILE DOES NOT HAVE CORRECT EXTENSION");
-                return;
+                return false;
             }
 
             string fullFilePath = NewPath + "\\" + NewFileName + Extension;
@@ -134,7 +134,7 @@ namespace CognexVisionProForm
             {
                 File.Copy(newfigFile, fullFilePath);
             }
-            
+            return true;
         }
         public static double DirSize(DirectoryInfo Folder)
         {
