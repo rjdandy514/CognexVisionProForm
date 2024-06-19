@@ -262,14 +262,11 @@ public class DalsaImage
     public void LoadConfigFile()
     {
         string filePath = Utilities.ExeFilePath + "\\Camera" + Id.ToString("00");
-        Utilities.Import(filePath, cameraName, "ConfigFile", configFileExtension);
+        Utilities.Import(filePath, "ConfigFile", configFileExtension);
         CongfigFile = filePath + "\\" + cameraName +"_" + configFileType + configFileExtension;
         ConfigFilePresent = File.Exists(CongfigFile);
 
         Utilities.LoggingStatment(cameraName + ": new log file from: " + CongfigFile);
-
-        var isReadonly = new System.IO.FileInfo(CongfigFile).Attributes;
-
     }
     public void CreateCamera()
     {

@@ -93,7 +93,7 @@ namespace CognexVisionProForm
             File.Move(FullFilePath, fullArchivePath);
 
         }
-        public static void Import(string NewPath, string DeviceID, String FileType, String Extension)
+        public static void Import(string NewPath, string NewFileName, string Extension)
         {
             string newfigFile = "";
             string newfigFileExtension = "";
@@ -123,7 +123,7 @@ namespace CognexVisionProForm
                 return;
             }
 
-            string fullFilePath = NewPath + "\\" + DeviceID + "_" + FileType + Extension;
+            string fullFilePath = NewPath + "\\" + NewFileName + Extension;
             System.IO.Directory.CreateDirectory(NewPath);
 
             if (File.Exists(fullFilePath) && newfigFile != fullFilePath)

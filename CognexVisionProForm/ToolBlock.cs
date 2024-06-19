@@ -135,7 +135,7 @@ namespace CognexVisionProForm
 
             string filePath = Utilities.ExeFilePath + "\\Camera" + CameraId.ToString("00");
 
-            Utilities.Import(filePath,toolName, toolFileType, toolFileExtension);
+            Utilities.Import(filePath,toolName + "_" + toolFileType, toolFileExtension);
 
             toolFileLocation = filePath + "\\" +toolName + "_" + toolFileType + toolFileExtension;
             
