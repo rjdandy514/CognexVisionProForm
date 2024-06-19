@@ -45,7 +45,6 @@ namespace CognexVisionProForm
                 {
                     toolRunComplete = true;
                     ToolBlockUpdate();
-
                 }
 
             }
@@ -157,7 +156,8 @@ namespace CognexVisionProForm
             {
                 for (int i = 0; i < AcqCount; i++)
                 {
-                    string AcqName = SapManager.GetResourceName(CameraAcqArray[cameraIndex].LoadServerSelect, SapManager.ResourceType.AcqDevice, i);
+                    string AcqName = SapManager.GetResourceName(CameraAcqArray[cameraIndex].LoadServerSelect, SapManager.ResourceType.Acq, i);
+                    
                     if (SapManager.IsResourceAvailable(CameraAcqArray[cameraIndex].LoadServerSelect, SapManager.ResourceType.Acq, i))
                     {
                         cbDeviceList.Items.Add(AcqName);
@@ -234,7 +234,27 @@ namespace CognexVisionProForm
             }
 
             // Run ToolBlocks that are enabled
-            if (allCamerasComplete) { ToolBlockTrigger(); }
+            if (allCamerasComplete) 
+            {
+                //if the cognex license is present, trigger Toolblock
+                if (cogLicenseOk) { ToolBlockTrigger(); }
+                //else update display without runing toolblock
+                else
+                {
+                    for (int i = 0; i < cameraCount; i++)
+                    {
+                        if (cameraSnap[i])
+                        {
+                            cameraControl[i].Tool = toolblockArray[i, desiredTool[i]];
+                            cameraControl[i].Image = CameraAcqArray[i].Image;
+                            cameraControl[i].AcqTime = CameraAcqArray[i].AcqTime;
+                            cameraControl[i].UpdateDisplay();
+                        }
+                    }
+                    Array.Clear(cameraSnap, 0, cameraSnap.Length);
+                    Array.Clear(cameraSnapComplete, 0, cameraSnapComplete.Length);
+                }
+            }
 
         }
         public void ToolBlockTrigger()
@@ -252,8 +272,6 @@ namespace CognexVisionProForm
                         desiredTool[j] = plcTool[j];
                     }
                     else { desiredTool[j] = 0; }
-                        
-                    
                 }
                 else
                 {

@@ -135,6 +135,17 @@ namespace CognexVisionProForm
             lbToolRunTime.Text = $"Tool Time: {Tool.TotalTime}ms";
             cbToolPassed.Checked = Tool.Result;
 
+            if (camera.Grabbing)
+            {
+                bttnCameraSnap.Text = "Grabbing";
+                bttnCameraSnap.Enabled = false;
+            }
+            else
+            {
+                bttnCameraSnap.Text = "Snap";
+                bttnCameraSnap.Enabled = true;
+            }
+
             lbToolData.Items.Clear();
             lbToolData.BeginUpdate();
             for (int i = 0; i < Tool.ToolOutput.Length; i++)
@@ -153,7 +164,11 @@ namespace CognexVisionProForm
         private delegate void Set_ResizeWindow();
         public void ResizeWindow()
         {
-            record = Tool.cogToolBlock.CreateLastRunRecord();
+            if(Tool.cogToolBlock !=null)
+            {
+                record = Tool.cogToolBlock.CreateLastRunRecord();
+            }
+            
             //Determine last record to display
             if (record != null && Tool.Result)
             {

@@ -148,6 +148,21 @@ public class DalsaImage
     {
         get; set;
     }
+    public bool Grabbing
+    {
+        get
+        {
+            if (acqDeviceXfer != null && acqDeviceXfer.Grabbing)
+            {
+                return true;
+            }
+            else if (acqXfer != null && acqXfer.Grabbing)
+            {
+                return true;
+            }
+            else { return false; }
+        }
+    }
     public enum ServerCategory
     {
         ServerAll,
@@ -262,8 +277,8 @@ public class DalsaImage
     public void LoadConfigFile()
     {
         string filePath = Utilities.ExeFilePath + "\\Camera" + Id.ToString("00");
-        Utilities.Import(filePath, "ConfigFile", configFileExtension);
-        CongfigFile = filePath + "\\" + cameraName +"_" + configFileType + configFileExtension;
+        Utilities.Import(filePath, configFileType, configFileExtension);
+        CongfigFile = filePath + "\\" + configFileType + configFileExtension;
         ConfigFilePresent = File.Exists(CongfigFile);
 
         Utilities.LoggingStatment(cameraName + ": new log file from: " + CongfigFile);
@@ -284,7 +299,7 @@ public class DalsaImage
             acqXfer = new SapAcqToBuf(acquisition, buffers);
             
             // End of frame event
-            acqXfer.Pairs[0].EventType = SapXferPair.XferEventType.EndOfTransfer;
+            acqXfer.Pairs[0].EventType = SapXferPair.XferEventType.EndOfFrame;
             acqXfer.XferNotify += new SapXferNotifyHandler(XferNotify);
             acqXfer.Pairs[0].Cycle = SapXferPair.CycleMode.NextWithTrash;
             acqXfer.XferNotifyContext = this;
@@ -352,8 +367,12 @@ public class DalsaImage
         {
             if (acqXfer.Snap())
             {
-                acqXfer.Wait(5000);
+                //acqXfer.Wait(5000);
                 SnapTime = acqTimeWatch.ElapsedMilliseconds;
+            }
+            else 
+            {
+                return; 
             }
         }
     }

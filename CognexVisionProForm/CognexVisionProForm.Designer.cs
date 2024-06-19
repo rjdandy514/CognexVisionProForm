@@ -270,7 +270,7 @@ namespace CognexVisionProForm
             this.panel3.Controls.Add(this.cbToolBlock);
             this.panel3.Controls.Add(this.cbC1Tb1FileFound);
             this.panel3.Controls.Add(this.tbC1TB1Name);
-            this.panel3.Location = new System.Drawing.Point(350, 5);
+            this.panel3.Location = new System.Drawing.Point(712, 5);
             this.panel3.Margin = new System.Windows.Forms.Padding(5);
             this.panel3.Name = "panel3";
             this.panel3.Padding = new System.Windows.Forms.Padding(5);
@@ -360,7 +360,7 @@ namespace CognexVisionProForm
             this.panel4.Margin = new System.Windows.Forms.Padding(5);
             this.panel4.Name = "panel4";
             this.panel4.Padding = new System.Windows.Forms.Padding(5);
-            this.panel4.Size = new System.Drawing.Size(340, 250);
+            this.panel4.Size = new System.Drawing.Size(592, 250);
             this.panel4.TabIndex = 33;
             this.panel4.Tag = "pnCameraControl";
             // 
@@ -468,7 +468,7 @@ namespace CognexVisionProForm
             this.cbServerList.FormattingEnabled = true;
             this.cbServerList.Location = new System.Drawing.Point(120, 125);
             this.cbServerList.Name = "cbServerList";
-            this.cbServerList.Size = new System.Drawing.Size(210, 21);
+            this.cbServerList.Size = new System.Drawing.Size(451, 21);
             this.cbServerList.TabIndex = 16;
             this.cbServerList.SelectedIndexChanged += new System.EventHandler(this.cbServerList_SelectedIndexChanged);
             // 
@@ -498,7 +498,7 @@ namespace CognexVisionProForm
             this.cbDeviceList.FormattingEnabled = true;
             this.cbDeviceList.Location = new System.Drawing.Point(120, 152);
             this.cbDeviceList.Name = "cbDeviceList";
-            this.cbDeviceList.Size = new System.Drawing.Size(210, 21);
+            this.cbDeviceList.Size = new System.Drawing.Size(451, 21);
             this.cbDeviceList.TabIndex = 17;
             this.cbDeviceList.DragDrop += new System.Windows.Forms.DragEventHandler(this.cbCameraSelected_DropDown);
             // 
@@ -511,7 +511,7 @@ namespace CognexVisionProForm
             this.panel2.Controls.Add(this.label3);
             this.panel2.Controls.Add(this.tbArchiveIndex);
             this.panel2.Controls.Add(this.tbArchiveCount);
-            this.panel2.Location = new System.Drawing.Point(690, 5);
+            this.panel2.Location = new System.Drawing.Point(1049, 5);
             this.panel2.Margin = new System.Windows.Forms.Padding(5);
             this.panel2.Name = "panel2";
             this.panel2.Padding = new System.Windows.Forms.Padding(5);
