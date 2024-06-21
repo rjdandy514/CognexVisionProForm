@@ -52,6 +52,9 @@ public class DalsaImage
     {
         acqTimeWatch = new Stopwatch();
         form = Form;
+        Name = "";
+        ConfigFile = "";
+        Description = "";
         Utilities.LoggingStatment(Name + ": Dalsa Image Class created");
     }
     public double AcqTime
@@ -66,7 +69,7 @@ public class DalsaImage
     {
         get {return buffers.Index; }
     }
-    public string CongfigFile
+    public string ConfigFile
     {
         get; set;
     }
@@ -105,19 +108,17 @@ public class DalsaImage
             form.CameraSnap = Id;
             trigger = value;
             TriggerAck = trigger;
-            if (trigger && !triggerMem) 
-            { 
-                if(Connected)
-                {
-                    SnapPicture();
-                }
-                else if(ArchiveImageActive)
-                {
-                    CreateBufferFromFile();
-                    ArchiveImageIndex++;
-                }
-                
+
+            if(Connected && trigger && !triggerMem)
+            {
+                SnapPicture();
             }
+            else if(ArchiveImageActive)
+            {
+                CreateBufferFromFile();
+                ArchiveImageIndex++;
+            }
+
             triggerMem = trigger;
 
         }
@@ -279,13 +280,13 @@ public class DalsaImage
         string filePath = Utilities.ExeFilePath + "\\Camera" + Id.ToString("00");
         if (Utilities.Import(filePath, configFileType, configFileExtension))
         {
-            CongfigFile = filePath + "\\" + configFileType + configFileExtension;
+            ConfigFile = filePath + "\\" + configFileType + configFileExtension;
         }
-        else { CongfigFile = ""; }
+        else { ConfigFile = ""; }
 
-        ConfigFilePresent = File.Exists(CongfigFile);
+        ConfigFilePresent = File.Exists(ConfigFile);
 
-        Utilities.LoggingStatment(cameraName + ": new log file from: " + CongfigFile);
+        Utilities.LoggingStatment(cameraName + ": new log file from: " + ConfigFile);
     }
     public void CreateCamera()
     {
@@ -296,7 +297,7 @@ public class DalsaImage
 
 
         string configFile = "";
-        if (ConfigFilePresent) { configFile = CongfigFile; }
+        if (ConfigFilePresent) { configFile = ConfigFile; }
 
         if (SapManager.GetResourceCount(serverLocation, SapManager.ResourceType.Acq) > 0)
         {

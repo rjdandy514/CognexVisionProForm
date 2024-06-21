@@ -79,9 +79,6 @@ namespace CognexVisionProForm
                 string plcStatus =      $"{BaseTag}.IN.Status[0]";
                 string plcStatusData =  $"{BaseTag}.IN.StatusData[0]";
 
-
-
-
                 // create the tag for PLC to PC communication
                 tagPlcToPc =        new Tag(IPAddress, "1,0", CpuType.LGX, plcControl, DataType.DINT, 8);
                 tagPlcToPcData =    new Tag(IPAddress, "1,0", CpuType.LGX, plcControlData, DataType.DINT, 24);

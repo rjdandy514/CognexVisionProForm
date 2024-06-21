@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Cognex.VisionPro;
@@ -16,11 +17,12 @@ namespace CognexVisionProForm
     {
         CognexVisionProForm _form;
         DalsaImage camera;
+        bool continousSnap = false;
         double acqTime = 0;
         public ICogImage image;
         public ICogRecord record;
         private int toolSelect = 0;
-        private Timer pollingTimer;
+        private System.Windows.Forms.Timer pollingTimer;
         public ICogImage Image
         {
             get
@@ -58,8 +60,6 @@ namespace CognexVisionProForm
 
             }
         }
-
-
         public CameraControl(CognexVisionProForm Sender, DalsaImage Camera)
         {
             _form = new CognexVisionProForm();
@@ -73,16 +73,23 @@ namespace CognexVisionProForm
             pollingTimer.Stop();
 
             cbCameraConnected.Checked = camera.Connected;
+            cbTrigger.Checked = camera.Trigger;
             cbTriggerAck.Checked = camera.TriggerAck;
             cbAbortTriggeAck.Checked = camera.AbortTriggerAck;
             cbArchiveImageActive.Checked = camera.ArchiveImageActive;
             cbImageReady.Checked = camera.ImageReady;
 
+            if (!camera.Grabbing && !_form.PlcCommsActive)
+            {
+                bttnCameraSnap.Text = " Press To Snap";
+                bttnCameraSnap.Enabled = true;
+            }
+
             pollingTimer.Start();
         }
         private void CameraControl_Load(object sender, EventArgs e)
         {
-            pollingTimer = new Timer();
+            pollingTimer = new System.Windows.Forms.Timer();
             pollingTimer.Tick += new EventHandler(pollingTimer_Tick);
             pollingTimer.Interval = 200; // in miliseconds
             pollingTimer.Start();
@@ -92,22 +99,14 @@ namespace CognexVisionProForm
 
             bttnCameraAbort.Enabled = !camera.ArchiveImageActive;
             bttnCameraLog.Enabled = !camera.ArchiveImageActive;
-
         }
         private void bttnCameraSnap_Click(object sender, EventArgs e)
         {
-            /*
-            if(camera.Trigger == true)
-            {
-                camera.Trigger = false;
-                bttnCameraSnap.Text = "Single Snap";
-            }
-            else
-            {
-                camera.Trigger = true;
-                bttnCameraSnap.Text = "Triggering";
-            }
-            */
+            toolSelect = Convert.ToInt32(numToolSelect.Value);
+            camera.Trigger = true;
+            bttnCameraSnap.Enabled = false;
+            lbAcqTime.Text = $"Aquisition: --- ms";
+            bttnCameraSnap.Text = "Grabbing";
         }
         private void bttnCameraAbort_Click(object sender, EventArgs e)
         {
@@ -126,26 +125,21 @@ namespace CognexVisionProForm
                 bttnCameraLog.Text = "Log Images - Active";
             }
         }
+        private delegate void Set_UpdateDisplay();
         public void UpdateDisplay()
         {
-            ResizeWindow();
+            
+            if (this.InvokeRequired)
+            {
+                BeginInvoke(new Set_UpdateDisplay(UpdateDisplay));
+                return;
+            }
+
             numToolSelect.Value = toolSelect;
-            lbAcqTime.Text = $"Aquisition: {AcqTime}ms";
+            lbAcqTime.Text = $"Aquisition: {AcqTime} ms";
             lbToolName.Text = Tool.Name;
-            lbToolRunTime.Text = $"Tool Time: {Tool.TotalTime}ms";
+            lbToolRunTime.Text = $"Tool Time: {Tool.TotalTime} ms";
             cbToolPassed.Checked = Tool.Result;
-
-            if (camera.Grabbing)
-            {
-                bttnCameraSnap.Text = "Grabbing";
-                bttnCameraSnap.Enabled = false;
-            }
-            else
-            {
-                bttnCameraSnap.Text = " Press To Snap";
-                bttnCameraSnap.Enabled = true;
-            }
-
             lbToolData.Items.Clear();
             lbToolData.BeginUpdate();
             for (int i = 0; i < Tool.ToolOutput.Length; i++)
@@ -156,13 +150,15 @@ namespace CognexVisionProForm
                                         Math.Round(Convert.ToDouble(Tool.ToolOutput[i].Value), 2).ToString(); 
                     lbToolData.Items.Add(tooldata);
                 }
-
             }
             lbToolData.EndUpdate();
             lbToolData.Height = lbToolData.PreferredHeight;
+            
+            UpdateImage();
+
         }
         private delegate void Set_ResizeWindow();
-        public void ResizeWindow()
+        public void UpdateImage()
         {
             if(Tool.cogToolBlock !=null)
             {
@@ -173,49 +169,62 @@ namespace CognexVisionProForm
             if (record != null && Tool.Result)
             {
                 int lastRecordIndex = Math.Max(record.SubRecords.Count - 1, 0);
-                cogRecordDisplay1.Record = record.SubRecords[lastRecordIndex];
+                cogRecordDisplay.Record = record.SubRecords[lastRecordIndex];
             }
+            cogRecordDisplay.Image = image;
 
+            ResizeWindow();
+        }
+        private void bttnCameraSnap_MouseUp(object sender, MouseEventArgs e)
+        {
+                camera.Trigger = false;
+        }
+        private void CameraControl_Resize(object sender, EventArgs e)
+        {
+            ResizeWindow();
+        }
+
+        public void ResizeWindow()
+        {
+            if (image == null) { return; }
             //*********************************************
             //determine the zoom factor to use full window
             //update cogdisplay
             //*********************************************
-            int cogWidth = plControl.Location.X - cogRecordDisplay1.Location.X - 5;
-            int cogHeight = this.Size.Height - 5;
+            int cogWidth = plControl.Location.X - cogRecordDisplay.Location.X - 5;
+            int cogHeight = this.Size.Height - 10;
 
+            //Do not try to resize if App is Minimized
+            if (_form.WindowState == FormWindowState.Minimized) { return; }
+            
+            //Do not resize if Display is already correct size
+            if (cogRecordDisplay.Width == cogWidth || cogRecordDisplay.Height == cogHeight) { return; }
+
+            //determine the correct zoom factor to fill Window
             double zoomWidth = Convert.ToDouble(cogWidth) / Convert.ToDouble(image.Width);
             double zoomHeight = Convert.ToDouble(cogHeight) / Convert.ToDouble(image.Height);
+            if (zoomWidth < zoomHeight) { cogRecordDisplay.Zoom = zoomWidth; }
+            else{ cogRecordDisplay.Zoom = zoomHeight; }
 
-            if (zoomWidth < zoomHeight)
-            {
-                cogRecordDisplay1.Zoom = zoomWidth;
-            }
-            else if (zoomHeight < zoomWidth)
-            {
-                cogRecordDisplay1.Zoom = zoomHeight;
-            }
-
-            if (this.InvokeRequired)
-            {
-                BeginInvoke(new Set_ResizeWindow(ResizeWindow));
-                return;
-            }
-
-            cogRecordDisplay1.Width = Convert.ToInt16(Convert.ToDouble(image.Width) * cogRecordDisplay1.Zoom);
-            cogRecordDisplay1.Height = Convert.ToInt16(Convert.ToDouble(image.Height) * cogRecordDisplay1.Zoom);
-            cogRecordDisplay1.Image = image;
-
+            //Update Display Width and Height
+            cogRecordDisplay.Width = Convert.ToInt16(Convert.ToDouble(image.Width) * cogRecordDisplay.Zoom);
+            cogRecordDisplay.Height = Convert.ToInt16(Convert.ToDouble(image.Height) * cogRecordDisplay.Zoom);
         }
-        private void bttnCameraSnap_MouseUp(object sender, MouseEventArgs e)
+
+        public void EnableCameraControl()
         {
-            camera.Trigger = false;
+            bttnCameraSnap.Enabled = true;
+            bttnCameraAbort.Enabled = true;
         }
-
-        private void bttnCameraSnap_MouseDown(object sender, MouseEventArgs e)
+        public void DisableCameraControl()
         {
             bttnCameraSnap.Enabled = false;
-            toolSelect = Convert.ToInt32(numToolSelect.Value);
-            camera.Trigger = true;
+            bttnCameraAbort.Enabled = false;
+        }
+
+        private void CameraControl_Shown(object sender, EventArgs e)
+        {
+
         }
     }
 }

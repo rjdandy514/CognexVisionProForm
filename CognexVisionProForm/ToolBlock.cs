@@ -19,7 +19,7 @@ namespace CognexVisionProForm
         string toolFileExtension = ".vpp";
         string Previous = "";
 
-        CogToolBlockTerminal[] toolOutput;
+        CogToolBlockTerminal[] toolOutput = new CogToolBlockTerminal[1];
         double[] toolInput;
 
         public CogToolBlock cogToolBlock;
@@ -113,7 +113,21 @@ namespace CognexVisionProForm
         }
         public CogToolBlockTerminal[] ToolOutput
         {
-            get { return toolOutput; }
+            get 
+            { 
+                if (toolOutput != null)
+                {
+                    return toolOutput;
+                }
+                else
+                {
+                    CogToolBlockTerminal[] Empty = new CogToolBlockTerminal[1];
+                    return Empty; 
+                
+                }
+            
+                
+            }
         }
         public double[] ToolInput
         {

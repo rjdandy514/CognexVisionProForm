@@ -12,7 +12,6 @@ namespace CognexVisionProForm
     public partial class CognexVisionProForm : Form
     {
         private bool heartBeat = false;
-        private bool CommsUp = false;
         private bool PlcAutoMode;
 
         private BitArray generalControl;
@@ -503,14 +502,25 @@ namespace CognexVisionProForm
         private void bttnPLC_Click(object sender, EventArgs e)
         {
             MainPLC.BaseTag = tbBaseTag.Text;
-
             MainPLC.IPAddress = $"{numIP1.Value.ToString()}.{numIP2.Value.ToString()}.{numIP3.Value.ToString()}.{numIP4.Value.ToString()}";
 
-            MainPLC.InitializePlcComms();
-
-            if (MainPLC.InitialCheck.Status == IPStatus.Success)
+            if(!PlcCommsActive)
             {
-                pollingTimer.Start();
+                MainPLC.InitializePlcComms();
+
+                if (MainPLC.InitialCheck.Status == IPStatus.Success)
+                {
+                    pollingTimer.Start();
+                }
+                for (int i = 0; i < cameraCount; i++) { cameraControl[i].DisableCameraControl(); }
+
+                PlcCommsActive = true;
+            }
+            else
+            {
+                pollingTimer.Stop();
+                for (int i = 0; i < cameraCount; i++) { cameraControl[i].EnableCameraControl(); }
+                PlcCommsActive = false;
             }
 
         }
