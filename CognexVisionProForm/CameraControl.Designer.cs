@@ -48,10 +48,10 @@
             this.lbToolData = new System.Windows.Forms.ListBox();
             this.cbAbortTriggeAck = new System.Windows.Forms.CheckBox();
             this.cbTriggerAck = new System.Windows.Forms.CheckBox();
-            this.cogRecordDisplay = new Cognex.VisionPro.CogRecordDisplay();
+            this.recordDisplay = new Cognex.VisionPro.CogRecordDisplay();
             this.plControl.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numToolSelect)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.cogRecordDisplay)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.recordDisplay)).BeginInit();
             this.SuspendLayout();
             // 
             // bttnCameraLog
@@ -137,7 +137,7 @@
             // cbImageReady
             // 
             this.cbImageReady.AutoSize = true;
-            this.cbImageReady.Location = new System.Drawing.Point(3, 169);
+            this.cbImageReady.Location = new System.Drawing.Point(3, 179);
             this.cbImageReady.Name = "cbImageReady";
             this.cbImageReady.Size = new System.Drawing.Size(89, 17);
             this.cbImageReady.TabIndex = 22;
@@ -147,7 +147,7 @@
             // cbArchiveImageActive
             // 
             this.cbArchiveImageActive.AutoSize = true;
-            this.cbArchiveImageActive.Location = new System.Drawing.Point(3, 149);
+            this.cbArchiveImageActive.Location = new System.Drawing.Point(3, 107);
             this.cbArchiveImageActive.Name = "cbArchiveImageActive";
             this.cbArchiveImageActive.Size = new System.Drawing.Size(135, 17);
             this.cbArchiveImageActive.TabIndex = 23;
@@ -185,7 +185,7 @@
             // cbTrigger
             // 
             this.cbTrigger.AutoSize = true;
-            this.cbTrigger.Location = new System.Drawing.Point(3, 209);
+            this.cbTrigger.Location = new System.Drawing.Point(3, 125);
             this.cbTrigger.Name = "cbTrigger";
             this.cbTrigger.Size = new System.Drawing.Size(59, 17);
             this.cbTrigger.TabIndex = 31;
@@ -195,7 +195,7 @@
             // numToolSelect
             // 
             this.numToolSelect.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.numToolSelect.Location = new System.Drawing.Point(6, 367);
+            this.numToolSelect.Location = new System.Drawing.Point(3, 367);
             this.numToolSelect.Name = "numToolSelect";
             this.numToolSelect.Size = new System.Drawing.Size(146, 20);
             this.numToolSelect.TabIndex = 30;
@@ -212,7 +212,7 @@
             // cbToolPassed
             // 
             this.cbToolPassed.AutoSize = true;
-            this.cbToolPassed.Location = new System.Drawing.Point(3, 189);
+            this.cbToolPassed.Location = new System.Drawing.Point(3, 197);
             this.cbToolPassed.Name = "cbToolPassed";
             this.cbToolPassed.Size = new System.Drawing.Size(85, 17);
             this.cbToolPassed.TabIndex = 28;
@@ -231,7 +231,7 @@
             // lbToolData
             // 
             this.lbToolData.FormattingEnabled = true;
-            this.lbToolData.Location = new System.Drawing.Point(3, 232);
+            this.lbToolData.Location = new System.Drawing.Point(3, 215);
             this.lbToolData.Name = "lbToolData";
             this.lbToolData.Size = new System.Drawing.Size(149, 17);
             this.lbToolData.TabIndex = 26;
@@ -239,7 +239,7 @@
             // cbAbortTriggeAck
             // 
             this.cbAbortTriggeAck.AutoSize = true;
-            this.cbAbortTriggeAck.Location = new System.Drawing.Point(3, 129);
+            this.cbAbortTriggeAck.Location = new System.Drawing.Point(3, 161);
             this.cbAbortTriggeAck.Name = "cbAbortTriggeAck";
             this.cbAbortTriggeAck.Size = new System.Drawing.Size(155, 17);
             this.cbAbortTriggeAck.TabIndex = 25;
@@ -249,7 +249,7 @@
             // cbTriggerAck
             // 
             this.cbTriggerAck.AutoSize = true;
-            this.cbTriggerAck.Location = new System.Drawing.Point(3, 109);
+            this.cbTriggerAck.Location = new System.Drawing.Point(3, 143);
             this.cbTriggerAck.Name = "cbTriggerAck";
             this.cbTriggerAck.Size = new System.Drawing.Size(127, 17);
             this.cbTriggerAck.TabIndex = 24;
@@ -258,20 +258,20 @@
             // 
             // cogRecordDisplay
             // 
-            this.cogRecordDisplay.ColorMapLowerClipColor = System.Drawing.Color.Black;
-            this.cogRecordDisplay.ColorMapLowerRoiLimit = 0D;
-            this.cogRecordDisplay.ColorMapPredefined = Cognex.VisionPro.Display.CogDisplayColorMapPredefinedConstants.None;
-            this.cogRecordDisplay.ColorMapUpperClipColor = System.Drawing.Color.Black;
-            this.cogRecordDisplay.ColorMapUpperRoiLimit = 1D;
-            this.cogRecordDisplay.DoubleTapZoomCycleLength = 2;
-            this.cogRecordDisplay.DoubleTapZoomSensitivity = 2.5D;
-            this.cogRecordDisplay.Location = new System.Drawing.Point(5, 5);
-            this.cogRecordDisplay.MouseWheelMode = Cognex.VisionPro.Display.CogDisplayMouseWheelModeConstants.Zoom1;
-            this.cogRecordDisplay.MouseWheelSensitivity = 1D;
-            this.cogRecordDisplay.Name = "cogRecordDisplay";
-            this.cogRecordDisplay.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("cogRecordDisplay.OcxState")));
-            this.cogRecordDisplay.Size = new System.Drawing.Size(307, 293);
-            this.cogRecordDisplay.TabIndex = 19;
+            this.recordDisplay.ColorMapLowerClipColor = System.Drawing.Color.Black;
+            this.recordDisplay.ColorMapLowerRoiLimit = 0D;
+            this.recordDisplay.ColorMapPredefined = Cognex.VisionPro.Display.CogDisplayColorMapPredefinedConstants.None;
+            this.recordDisplay.ColorMapUpperClipColor = System.Drawing.Color.Black;
+            this.recordDisplay.ColorMapUpperRoiLimit = 1D;
+            this.recordDisplay.DoubleTapZoomCycleLength = 2;
+            this.recordDisplay.DoubleTapZoomSensitivity = 2.5D;
+            this.recordDisplay.Location = new System.Drawing.Point(5, 5);
+            this.recordDisplay.MouseWheelMode = Cognex.VisionPro.Display.CogDisplayMouseWheelModeConstants.Zoom1;
+            this.recordDisplay.MouseWheelSensitivity = 1D;
+            this.recordDisplay.Name = "cogRecordDisplay";
+            this.recordDisplay.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("cogRecordDisplay.OcxState")));
+            this.recordDisplay.Size = new System.Drawing.Size(307, 293);
+            this.recordDisplay.TabIndex = 19;
             // 
             // CameraControl
             // 
@@ -280,7 +280,7 @@
             this.BackColor = System.Drawing.SystemColors.ControlDarkDark;
             this.ClientSize = new System.Drawing.Size(713, 543);
             this.ControlBox = false;
-            this.Controls.Add(this.cogRecordDisplay);
+            this.Controls.Add(this.recordDisplay);
             this.Controls.Add(this.plControl);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "CameraControl";
@@ -288,12 +288,11 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "CameraControl";
             this.Load += new System.EventHandler(this.CameraControl_Load);
-            this.Shown += new System.EventHandler(this.CameraControl_Shown);
             this.Resize += new System.EventHandler(this.CameraControl_Resize);
             this.plControl.ResumeLayout(false);
             this.plControl.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numToolSelect)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.cogRecordDisplay)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.recordDisplay)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -313,7 +312,7 @@
         private System.Windows.Forms.CheckBox cbTriggerAck;
         private System.Windows.Forms.ListBox lbToolData;
         private System.Windows.Forms.Label lbToolName;
-        private Cognex.VisionPro.CogRecordDisplay cogRecordDisplay;
+        private Cognex.VisionPro.CogRecordDisplay recordDisplay;
         private System.Windows.Forms.CheckBox cbToolPassed;
         private System.Windows.Forms.Label lbToolRunTime;
         private System.Windows.Forms.NumericUpDown numToolSelect;

@@ -416,7 +416,28 @@ namespace CognexVisionProForm
 
 
             }
-            else if (cameraConnectCount < 4)
+            else if (cameraConnectCount == 2)
+            {
+                height = (this.tabImage.Height - (2 * Camera1Panel.Location.X));
+                width = (this.tabImage.Width - (3 * Camera1Panel.Location.Y)) / 2;
+
+                right = 2 * Camera1Panel.Location.X + width;
+                yMiddle = 2 * Camera1Panel.Location.Y + height;
+
+                Camera1Panel.Height = height;
+                Camera1Panel.Width = width;
+                Camera1Panel.Location = new Point(5, 5);
+
+                Camera2Panel.Height = height;
+                Camera2Panel.Width = width;
+                Camera2Panel.Location = new Point(right, 5);
+
+                Camera3Panel.SendToBack();
+                Camera4Panel.SendToBack();
+                Camera5Panel.SendToBack();
+                Camera6Panel.SendToBack();
+            }
+            else if (cameraConnectCount <= 4)
             {
                 height = (this.tabImage.Height - (3 * Camera1Panel.Location.X)) / 2;
                 width = (this.tabImage.Width - (3 * Camera1Panel.Location.Y)) / 2;

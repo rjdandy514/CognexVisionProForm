@@ -125,6 +125,8 @@ namespace CognexVisionProForm
             string LogDir = Utilities.ExeFilePath + "\\LogFile\\";
             string ArchiveLogDir = LogDir + "Archive\\";
             Utilities.InitializeLog(LogDir, ArchiveLogDir);
+            txtArchive.Text = ArchiveLogDir;
+            txtLogFile.Text = LogDir + "Log.log";
 
             CameraAcqArray = new DalsaImage[cameraCount];
             toolblockArray = new ToolBlock[cameraCount, toolCount];

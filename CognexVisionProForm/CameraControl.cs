@@ -169,9 +169,9 @@ namespace CognexVisionProForm
             if (record != null && Tool.Result)
             {
                 int lastRecordIndex = Math.Max(record.SubRecords.Count - 1, 0);
-                cogRecordDisplay.Record = record.SubRecords[lastRecordIndex];
+                recordDisplay.Record = record.SubRecords[lastRecordIndex];
             }
-            cogRecordDisplay.Image = image;
+            recordDisplay.Image = image;
 
             ResizeWindow();
         }
@@ -183,32 +183,41 @@ namespace CognexVisionProForm
         {
             ResizeWindow();
         }
-
         public void ResizeWindow()
         {
+            double zoomRequired = 0;
+            double zoomWidth;
+            double zoomHeight;
+            int reqHeight;
+            int reqWidth;
+
             if (image == null) { return; }
             //*********************************************
             //determine the zoom factor to use full window
             //update cogdisplay
             //*********************************************
-            int cogWidth = plControl.Location.X - cogRecordDisplay.Location.X - 5;
+            int cogWidth = plControl.Location.X - recordDisplay.Location.X - 5;
             int cogHeight = this.Size.Height - 10;
 
             //Do not try to resize if App is Minimized
             if (_form.WindowState == FormWindowState.Minimized) { return; }
             
-            //Do not resize if Display is already correct size
-            if (cogRecordDisplay.Width == cogWidth || cogRecordDisplay.Height == cogHeight) { return; }
-
             //determine the correct zoom factor to fill Window
-            double zoomWidth = Convert.ToDouble(cogWidth) / Convert.ToDouble(image.Width);
-            double zoomHeight = Convert.ToDouble(cogHeight) / Convert.ToDouble(image.Height);
-            if (zoomWidth < zoomHeight) { cogRecordDisplay.Zoom = zoomWidth; }
-            else{ cogRecordDisplay.Zoom = zoomHeight; }
+            zoomWidth = Convert.ToDouble(cogWidth) / Convert.ToDouble(image.Width);
+            zoomHeight = Convert.ToDouble(cogHeight) / Convert.ToDouble(image.Height);
+            if (zoomWidth < zoomHeight) { zoomRequired = zoomWidth; }
+            else{ zoomRequired = zoomHeight; }
 
-            //Update Display Width and Height
-            cogRecordDisplay.Width = Convert.ToInt16(Convert.ToDouble(image.Width) * cogRecordDisplay.Zoom);
-            cogRecordDisplay.Height = Convert.ToInt16(Convert.ToDouble(image.Height) * cogRecordDisplay.Zoom);
+            //Update Display Width and Height - if needed
+            reqHeight = Convert.ToInt16(Convert.ToDouble(image.Width) * zoomRequired);
+            reqWidth = Convert.ToInt16(Convert.ToDouble(image.Height) * zoomRequired);
+            if(recordDisplay.Width != reqHeight  && recordDisplay.Height != reqWidth)
+            {
+                recordDisplay.Width = Convert.ToInt16(Convert.ToDouble(image.Width) * zoomRequired);
+                recordDisplay.Height = Convert.ToInt16(Convert.ToDouble(image.Height) * zoomRequired);
+            }
+            // Fit Image to Display
+            recordDisplay.Fit();
         }
 
         public void EnableCameraControl()
@@ -222,9 +231,5 @@ namespace CognexVisionProForm
             bttnCameraAbort.Enabled = false;
         }
 
-        private void CameraControl_Shown(object sender, EventArgs e)
-        {
-
-        }
     }
 }
