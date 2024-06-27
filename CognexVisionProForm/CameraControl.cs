@@ -37,11 +37,7 @@ namespace CognexVisionProForm
         public double AcqTime
         {
             get { return acqTime; }
-            set
-            {
-                acqTime = value;
-                //AcqTimeUpdate();
-            }
+            set { acqTime = value; }
         }
         public ToolBlock Tool
         {
@@ -55,9 +51,7 @@ namespace CognexVisionProForm
             }
             set
             {
-                
                 toolSelect = value;
-
             }
         }
         public CameraControl(CognexVisionProForm Sender, DalsaImage Camera)
@@ -83,6 +77,10 @@ namespace CognexVisionProForm
             {
                 bttnCameraSnap.Text = " Press To Snap";
                 bttnCameraSnap.Enabled = true;
+            }
+            if(camera.Grabbing)
+            {
+                bttnCameraSnap.Text = " Grabbing";
             }
 
             pollingTimer.Start();
@@ -231,5 +229,13 @@ namespace CognexVisionProForm
             bttnCameraAbort.Enabled = false;
         }
 
+        private void bttnEncoderPhase_Click(object sender, EventArgs e)
+        {
+            int encoderPhase = camera.EncoderPhase();
+
+            bttnEncoderPhase.Text = $"Current Phase - {encoderPhase}";
+
+
+        }
     }
 }

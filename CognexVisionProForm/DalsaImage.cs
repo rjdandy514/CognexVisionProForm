@@ -151,18 +151,8 @@ public class DalsaImage
     }
     public bool Grabbing
     {
-        get
-        {
-            if (acqDeviceXfer != null && acqDeviceXfer.Grabbing)
-            {
-                return true;
-            }
-            else if (acqXfer != null && acqXfer.Grabbing)
-            {
-                return true;
-            }
-            else { return false; }
-        }
+        get;set;
+
     }
     public enum ServerCategory
     {
@@ -313,6 +303,13 @@ public class DalsaImage
             acqXfer.Pairs[0].Cycle = SapXferPair.CycleMode.NextWithTrash;
             acqXfer.XferNotifyContext = this;
 
+            // event fot Acqcallback (Frame lost)
+            acquisition.EventType = SapAcquisition.AcqEventType.StartOfFrame;
+            acquisition.AcqNotify += new SapAcqNotifyHandler(StartOfFrameEvent);
+            acquisition.AcqNotifyContext = this;
+
+
+
             // event for signal status
             acquisition.SignalNotify += new SapSignalNotifyHandler(GetSignalStatus);
             acquisition.SignalNotifyContext = this;
@@ -366,10 +363,11 @@ public class DalsaImage
 
         if(acqDeviceXfer != null && acqDeviceXfer.Connected)
         {
-            if (acqDeviceXfer != null && acqDeviceXfer.Snap())
+            if (acqDeviceXfer.Snap())
             {
                 SnapTime = acqTimeWatch.ElapsedMilliseconds;
                 acqDeviceXfer.Wait(5000);
+                Grabbing = true;
             }
         }
         else if(acqXfer != null && acqXfer.Connected)
@@ -377,11 +375,9 @@ public class DalsaImage
             if (acqXfer.Snap())
             {
                 //acqXfer.Wait(5000);
+                    
                 SnapTime = acqTimeWatch.ElapsedMilliseconds;
-            }
-            else 
-            {
-                return; 
+                Grabbing = true;
             }
         }
     }
@@ -395,6 +391,7 @@ public class DalsaImage
         {
             acqXfer.Abort();
         }
+        Grabbing = false;
         ImageReady = true;
     }
     public void SaveImageBMP()
@@ -454,6 +451,7 @@ public class DalsaImage
     }
     public void UpdateImageData()
     {
+        
         AcqTime = acqTimeWatch.ElapsedMilliseconds;
 
         // logic for using Camera
@@ -484,6 +482,7 @@ public class DalsaImage
 
         acqTimeWatch.Stop();
         acqTimeWatch.Reset();
+        Grabbing = false;
     }
     public ICogImage RawToCogImage()
     {
@@ -528,6 +527,41 @@ public class DalsaImage
             return NewImage24Color;
         }
     }
+    public int EncoderPhase()
+    {
+        bool getResult;
+        bool setResult;
+        bool checkResult;
+        
+        int returnGetParm = 0;
+        int returnCheckParm = 0;
+
+        int phaseA = 1;
+        int phaseB = 2;
+        if (acquisition == null) { return 0; }
+
+        getResult = acquisition.GetParameter(SapAcquisition.Prm.EXT_LINE_TRIGGER_SOURCE, out returnGetParm);
+        returnCheckParm = returnGetParm;
+
+        if (getResult && (returnGetParm == phaseA || returnGetParm == phaseB))
+        {
+            if(returnGetParm == phaseA)
+            {
+                setResult = acquisition.SetParameter(SapAcquisition.Prm.EXT_LINE_TRIGGER_SOURCE, phaseB, true);
+            }
+            if(returnGetParm == phaseB)
+            {
+                setResult = acquisition.SetParameter(SapAcquisition.Prm.EXT_LINE_TRIGGER_SOURCE, phaseA, true);
+            }
+        }
+
+        checkResult = acquisition.GetParameter(SapAcquisition.Prm.EXT_LINE_TRIGGER_SOURCE, out returnCheckParm);
+        return returnCheckParm;
+
+
+
+
+    }
     public void XferNotify(object sender, SapXferNotifyEventArgs argsNotify)
     {
         UpdateImageData();
@@ -535,6 +569,10 @@ public class DalsaImage
     static void GetSignalStatus(object sender, SapSignalNotifyEventArgs argsSignal)
     {
         SapAcquisition.AcqSignalStatus signalStatus = argsSignal.SignalStatus;
+    }
+    static void StartOfFrameEvent(object sender, SapAcqNotifyEventArgs argsSignal)
+    {
+        bool temp = false;
     }
 
 

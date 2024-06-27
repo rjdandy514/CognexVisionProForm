@@ -73,7 +73,7 @@ namespace CognexVisionProForm
         double Robot_Y;
         double Robot_Degree;
 
-        int cameraCount = 2;
+        int cameraCount = 6;
         int toolCount = 4;
 
         string ServerNotFound = "No Server Found";

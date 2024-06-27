@@ -49,6 +49,7 @@
             this.cbAbortTriggeAck = new System.Windows.Forms.CheckBox();
             this.cbTriggerAck = new System.Windows.Forms.CheckBox();
             this.recordDisplay = new Cognex.VisionPro.CogRecordDisplay();
+            this.bttnEncoderPhase = new System.Windows.Forms.Button();
             this.plControl.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numToolSelect)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.recordDisplay)).BeginInit();
@@ -159,6 +160,7 @@
             this.plControl.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.plControl.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.plControl.Controls.Add(this.bttnEncoderPhase);
             this.plControl.Controls.Add(this.cbTrigger);
             this.plControl.Controls.Add(this.numToolSelect);
             this.plControl.Controls.Add(this.lbToolRunTime);
@@ -256,7 +258,7 @@
             this.cbTriggerAck.Text = "Trigger Acknowledge";
             this.cbTriggerAck.UseVisualStyleBackColor = true;
             // 
-            // cogRecordDisplay
+            // recordDisplay
             // 
             this.recordDisplay.ColorMapLowerClipColor = System.Drawing.Color.Black;
             this.recordDisplay.ColorMapLowerRoiLimit = 0D;
@@ -268,10 +270,24 @@
             this.recordDisplay.Location = new System.Drawing.Point(5, 5);
             this.recordDisplay.MouseWheelMode = Cognex.VisionPro.Display.CogDisplayMouseWheelModeConstants.Zoom1;
             this.recordDisplay.MouseWheelSensitivity = 1D;
-            this.recordDisplay.Name = "cogRecordDisplay";
-            this.recordDisplay.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("cogRecordDisplay.OcxState")));
+            this.recordDisplay.Name = "recordDisplay";
+            this.recordDisplay.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("recordDisplay.OcxState")));
             this.recordDisplay.Size = new System.Drawing.Size(307, 293);
             this.recordDisplay.TabIndex = 19;
+            // 
+            // bttnEncoderPhase
+            // 
+            this.bttnEncoderPhase.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.bttnEncoderPhase.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.bttnEncoderPhase.FlatAppearance.BorderColor = System.Drawing.Color.Red;
+            this.bttnEncoderPhase.FlatAppearance.BorderSize = 2;
+            this.bttnEncoderPhase.Location = new System.Drawing.Point(3, 246);
+            this.bttnEncoderPhase.Name = "bttnEncoderPhase";
+            this.bttnEncoderPhase.Size = new System.Drawing.Size(152, 43);
+            this.bttnEncoderPhase.TabIndex = 32;
+            this.bttnEncoderPhase.Text = "Change Encoder Phase";
+            this.bttnEncoderPhase.UseVisualStyleBackColor = false;
+            this.bttnEncoderPhase.Click += new System.EventHandler(this.bttnEncoderPhase_Click);
             // 
             // CameraControl
             // 
@@ -317,5 +333,6 @@
         private System.Windows.Forms.Label lbToolRunTime;
         private System.Windows.Forms.NumericUpDown numToolSelect;
         private System.Windows.Forms.CheckBox cbTrigger;
+        private System.Windows.Forms.Button bttnEncoderPhase;
     }
 }

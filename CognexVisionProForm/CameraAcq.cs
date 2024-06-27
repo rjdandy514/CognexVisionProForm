@@ -19,10 +19,7 @@ namespace CognexVisionProForm
 
         public CameraAcq(String UniqueName, CognexVisionProForm Sender)
         {
-            CameraName = UniqueName;
-            
-            ImageSaveLocation = "C:\\Users\\Robert.j.Dandy\\source\\repos\\CognexVisionProForm\\CognexVisionProForm\\Images\\Camera1_IDB.idb";
-       
+            CameraName = UniqueName; 
             _form = Sender;
         }
 
