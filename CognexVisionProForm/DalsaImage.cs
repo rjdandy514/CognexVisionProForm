@@ -34,6 +34,7 @@ public class DalsaImage
     string configFileExtension = ".ccf";
     string serialNumber = "";
 
+    IntPtr cogImageAddress;
 
     FileInfo[] archiveImageArray;
     int archiveImageCount;
@@ -474,11 +475,11 @@ public class DalsaImage
         }
 
         //Save Dalsa Image to Cog Image
-        Image = MarshalToCogImage();
+        Image =MarshalToCogImage();
 
         // Save Image as BMP to pre-defined location
         if (buffers != null && SaveImageSelected) { SaveImageBMP(); }
-
+        buffers.Clear();
         ImageReady = true;
         form.CameraSnapComplete = Id;
 
@@ -499,7 +500,6 @@ public class DalsaImage
     }
     public ICogImage MarshalToCogImage()
     {
-        
         CogImage8Root NewImageRoot = new CogImage8Root();
         CogImage8Grey NewImage8Grey = new CogImage8Grey();
         CogImage24PlanarColor NewImage24Color = new CogImage24PlanarColor();
@@ -507,12 +507,14 @@ public class DalsaImage
         int managedArraySize = imageWidth * imageHeight;
         byte[] managedArray = new byte[managedArraySize];
         int size = Marshal.SizeOf(managedArray[0]) * managedArray.Length;
-        IntPtr tempImageAddress = Marshal.AllocHGlobal(size);
+        if(cogImageAddress.ToString().Contains("0x0000000000000000")) { cogImageAddress = Marshal.AllocHGlobal(size); }
+
+        //cogImageAddress = Marshal.AllocHGlobal(size);
+
 
         Marshal.Copy(imageAddress, managedArray, 0, size);
-        Marshal.Copy(managedArray, 0, tempImageAddress, size);
-
-        NewImageRoot.Initialize(imageWidth, imageHeight, tempImageAddress, imageWidth, null);
+        Marshal.Copy(managedArray, 0, cogImageAddress, size);
+        NewImageRoot.Initialize(imageWidth, imageHeight, cogImageAddress, imageWidth, null);
 
         if (imageFormat == SapFormat.Mono8)
         {
