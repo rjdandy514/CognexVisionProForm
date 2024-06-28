@@ -73,15 +73,9 @@ namespace CognexVisionProForm
             cbArchiveImageActive.Checked = camera.ArchiveImageActive;
             cbImageReady.Checked = camera.ImageReady;
 
-            if (!camera.Grabbing && !_form.PlcCommsActive)
-            {
-                bttnCameraSnap.Text = " Press To Snap";
-                bttnCameraSnap.Enabled = true;
-            }
-            if(camera.Grabbing)
-            {
-                bttnCameraSnap.Text = " Grabbing";
-            }
+            bttnCameraSnap.Enabled = !_form.PlcCommsActive;
+            if (!camera.Snapping) { bttnCameraSnap.Text = " Press To Snap"; }
+            else if (camera.Snapping) { bttnCameraSnap.Text = " Grabbing"; }
 
             pollingTimer.Start();
         }
@@ -97,6 +91,10 @@ namespace CognexVisionProForm
 
             bttnCameraAbort.Enabled = !camera.ArchiveImageActive;
             bttnCameraLog.Enabled = !camera.ArchiveImageActive;
+
+            if (camera.ServerType == DalsaImage.ServerCategory.ServerAcq) { bttnEncoderPhase.Visible = true; }
+            else { bttnEncoderPhase.Visible = false; }
+
         }
         private void bttnCameraSnap_Click(object sender, EventArgs e)
         {

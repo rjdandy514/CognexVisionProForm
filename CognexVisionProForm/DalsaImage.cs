@@ -105,18 +105,20 @@ public class DalsaImage
         }
         set
         {
-            form.CameraSnap = Id;
+            
             trigger = value;
             TriggerAck = trigger;
 
             if(Connected && trigger && !triggerMem)
             {
                 SnapPicture();
+                form.CameraSnap = Id;
             }
             else if(ArchiveImageActive)
             {
                 CreateBufferFromFile();
                 ArchiveImageIndex++;
+                form.CameraSnap = Id;
             }
 
             triggerMem = trigger;
@@ -149,7 +151,7 @@ public class DalsaImage
     {
         get; set;
     }
-    public bool Grabbing
+    public bool Snapping
     {
         get;set;
 
@@ -367,7 +369,7 @@ public class DalsaImage
             {
                 SnapTime = acqTimeWatch.ElapsedMilliseconds;
                 acqDeviceXfer.Wait(5000);
-                Grabbing = true;
+                Snapping = true;
             }
         }
         else if(acqXfer != null && acqXfer.Connected)
@@ -377,7 +379,7 @@ public class DalsaImage
                 //acqXfer.Wait(5000);
                     
                 SnapTime = acqTimeWatch.ElapsedMilliseconds;
-                Grabbing = true;
+                Snapping = true;
             }
         }
     }
@@ -391,7 +393,7 @@ public class DalsaImage
         {
             acqXfer.Abort();
         }
-        Grabbing = false;
+        Snapping = false;
         ImageReady = true;
     }
     public void SaveImageBMP()
@@ -482,7 +484,7 @@ public class DalsaImage
 
         acqTimeWatch.Stop();
         acqTimeWatch.Reset();
-        Grabbing = false;
+        Snapping = false;
     }
     public ICogImage RawToCogImage()
     {

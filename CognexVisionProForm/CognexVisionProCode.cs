@@ -59,7 +59,6 @@ namespace CognexVisionProForm
             pollingTimer.Tick += new EventHandler(pollingTimer_Tick);
             pollingTimer.Interval = 200; // in miliseconds
 
-            Camera01Calc = new Calculations();
 
             for (int j = 0; j < cameraCount; j++)
             {
@@ -716,6 +715,46 @@ namespace CognexVisionProForm
             p.Controls.Add(f);
             p.Tag = f;
             f.Show();
+        }
+        public void ComputerSetup()
+        {
+            string OP15_IP = "10.10.30.87";
+            string OP45_55_IP = "10.10.30.88";
+            string OP70_IP = "10.10.30.207";
+            string OP90_IP = "10.10.30.208";
+
+            string iP = Utilities.GetLocalIPAddress("10.10.30.");
+
+            if (iP == OP15_IP)
+            {
+                computerName = "OP15 Computer";
+                cameraCount = 2;
+                toolCount = 4;
+            }
+            else if(iP == OP45_55_IP)
+            {
+                computerName = "OP45/55 Computer";
+                cameraCount = 2;
+                toolCount = 4;
+            }
+            else if (iP == OP70_IP)
+            {
+                computerName = "OP70 Computer";
+                cameraCount = 6;
+                toolCount = 4;
+            }
+            else if (iP == OP90_IP)
+            {
+                computerName = "OP90 Computer";
+                cameraCount = 6;
+                toolCount = 4;
+            }
+            else
+            {
+                computerName = "Unknown Computer";
+                cameraCount = 6;
+                toolCount = 4;
+            }
         }
 
     }

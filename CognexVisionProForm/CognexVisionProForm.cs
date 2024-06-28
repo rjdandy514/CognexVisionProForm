@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Diagnostics;
+using System.Net;
 using System.Net.NetworkInformation;
 using System.Windows.Forms;
 using EventArgs = System.EventArgs;
@@ -73,8 +74,9 @@ namespace CognexVisionProForm
         double Robot_Y;
         double Robot_Degree;
 
-        int cameraCount = 6;
-        int toolCount = 4;
+        int cameraCount;
+        int toolCount;
+        string computerName;
 
         string ServerNotFound = "No Server Found";
 
@@ -114,12 +116,13 @@ namespace CognexVisionProForm
         //*********************************************************************
         private void Form1_Load(object sender, EventArgs e)
         {
-            this.Text = "Eclipse Vision Application";
+
+            ComputerSetup();
+
+            this.Text = $"{computerName} - Eclipse Vision Application";
 
             splashScreen = new SplashScreen();
-            splashScreen.Show();
-
-            splashScreen.UpdateProgress("Form Load", 10);
+            splashScreen.Show();splashScreen.UpdateProgress("Form Load", 10);
 
 
             string LogDir = Utilities.ExeFilePath + "\\LogFile\\";
