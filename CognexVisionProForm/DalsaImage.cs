@@ -451,6 +451,7 @@ public class DalsaImage
             archiveBuffers.Destroy();
             archiveBuffers.Dispose();
         }
+        Marshal.FreeHGlobal(cogImageAddress);
     }
     public void UpdateImageData()
     {
@@ -475,7 +476,7 @@ public class DalsaImage
         }
 
         //Save Dalsa Image to Cog Image
-        Image =MarshalToCogImage();
+        Image = MarshalToCogImage();
 
         // Save Image as BMP to pre-defined location
         if (buffers != null && SaveImageSelected) { SaveImageBMP(); }
@@ -507,7 +508,11 @@ public class DalsaImage
         int managedArraySize = imageWidth * imageHeight;
         byte[] managedArray = new byte[managedArraySize];
         int size = Marshal.SizeOf(managedArray[0]) * managedArray.Length;
-        if(cogImageAddress.ToString().Contains("0x0000000000000000")) { cogImageAddress = Marshal.AllocHGlobal(size); }
+
+        if (cogImageAddress.ToString().Equals("0")) 
+        { 
+            cogImageAddress = Marshal.AllocHGlobal(size); 
+        }
 
         //cogImageAddress = Marshal.AllocHGlobal(size);
 
