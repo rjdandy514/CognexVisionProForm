@@ -508,6 +508,9 @@ namespace CognexVisionProForm
             cogToolBlockEditV21.Height = this.tabToolBlock.Height - cogToolBlockEditV21.Location.Y - 5;
 
         }
+        public void resize_tabFileControl()
+        {
+        }
         public void PlcRead()
         {
 

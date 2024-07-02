@@ -77,6 +77,7 @@ namespace CognexVisionProForm
             this.tbExpireDate = new System.Windows.Forms.TextBox();
             this.tabFileControl = new System.Windows.Forms.TabPage();
             this.panel10 = new System.Windows.Forms.Panel();
+            this.bttnOpenProject = new System.Windows.Forms.Button();
             this.bttnArchive = new System.Windows.Forms.Button();
             this.bttnLog = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
@@ -270,7 +271,7 @@ namespace CognexVisionProForm
             this.panel3.Controls.Add(this.cbToolBlock);
             this.panel3.Controls.Add(this.cbC1Tb1FileFound);
             this.panel3.Controls.Add(this.tbC1TB1Name);
-            this.panel3.Location = new System.Drawing.Point(712, 5);
+            this.panel3.Location = new System.Drawing.Point(599, 5);
             this.panel3.Margin = new System.Windows.Forms.Padding(5);
             this.panel3.Name = "panel3";
             this.panel3.Padding = new System.Windows.Forms.Padding(5);
@@ -511,7 +512,7 @@ namespace CognexVisionProForm
             this.panel2.Controls.Add(this.label3);
             this.panel2.Controls.Add(this.tbArchiveIndex);
             this.panel2.Controls.Add(this.tbArchiveCount);
-            this.panel2.Location = new System.Drawing.Point(1049, 5);
+            this.panel2.Location = new System.Drawing.Point(936, 5);
             this.panel2.Margin = new System.Windows.Forms.Padding(5);
             this.panel2.Name = "panel2";
             this.panel2.Padding = new System.Windows.Forms.Padding(5);
@@ -631,7 +632,10 @@ namespace CognexVisionProForm
             // 
             // panel10
             // 
+            this.panel10.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.panel10.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.panel10.Controls.Add(this.bttnOpenProject);
             this.panel10.Controls.Add(this.bttnArchive);
             this.panel10.Controls.Add(this.bttnLog);
             this.panel10.Controls.Add(this.label1);
@@ -640,13 +644,23 @@ namespace CognexVisionProForm
             this.panel10.Controls.Add(this.txtArchive);
             this.panel10.Location = new System.Drawing.Point(5, 5);
             this.panel10.Name = "panel10";
-            this.panel10.Size = new System.Drawing.Size(739, 61);
+            this.panel10.Size = new System.Drawing.Size(1273, 170);
             this.panel10.TabIndex = 70;
             this.panel10.Tag = "pnCameraControl";
             // 
+            // bttnOpenProject
+            // 
+            this.bttnOpenProject.Location = new System.Drawing.Point(3, 19);
+            this.bttnOpenProject.Name = "bttnOpenProject";
+            this.bttnOpenProject.Size = new System.Drawing.Size(115, 23);
+            this.bttnOpenProject.TabIndex = 17;
+            this.bttnOpenProject.Text = "Open Project Folder";
+            this.bttnOpenProject.UseVisualStyleBackColor = true;
+            this.bttnOpenProject.Click += new System.EventHandler(this.bttnOpenProject_Click);
+            // 
             // bttnArchive
             // 
-            this.bttnArchive.Location = new System.Drawing.Point(5, 5);
+            this.bttnArchive.Location = new System.Drawing.Point(3, 48);
             this.bttnArchive.Name = "bttnArchive";
             this.bttnArchive.Size = new System.Drawing.Size(115, 23);
             this.bttnArchive.TabIndex = 15;
@@ -656,7 +670,7 @@ namespace CognexVisionProForm
             // 
             // bttnLog
             // 
-            this.bttnLog.Location = new System.Drawing.Point(5, 35);
+            this.bttnLog.Location = new System.Drawing.Point(3, 78);
             this.bttnLog.Name = "bttnLog";
             this.bttnLog.Size = new System.Drawing.Size(115, 23);
             this.bttnLog.TabIndex = 16;
@@ -667,7 +681,7 @@ namespace CognexVisionProForm
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(134, 10);
+            this.label1.Location = new System.Drawing.Point(132, 53);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(78, 13);
             this.label1.TabIndex = 9;
@@ -676,7 +690,7 @@ namespace CognexVisionProForm
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(134, 40);
+            this.label2.Location = new System.Drawing.Point(132, 83);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(79, 13);
             this.label2.TabIndex = 10;
@@ -685,7 +699,7 @@ namespace CognexVisionProForm
             // txtLogFile
             // 
             this.txtLogFile.AutoSize = true;
-            this.txtLogFile.Location = new System.Drawing.Point(218, 40);
+            this.txtLogFile.Location = new System.Drawing.Point(216, 83);
             this.txtLogFile.Name = "txtLogFile";
             this.txtLogFile.Size = new System.Drawing.Size(52, 13);
             this.txtLogFile.TabIndex = 13;
@@ -694,7 +708,7 @@ namespace CognexVisionProForm
             // txtArchive
             // 
             this.txtArchive.AutoSize = true;
-            this.txtArchive.Location = new System.Drawing.Point(218, 10);
+            this.txtArchive.Location = new System.Drawing.Point(216, 53);
             this.txtArchive.Name = "txtArchive";
             this.txtArchive.Size = new System.Drawing.Size(54, 13);
             this.txtArchive.TabIndex = 12;
@@ -1650,6 +1664,7 @@ namespace CognexVisionProForm
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.Button bttnPlcPing;
         private System.Windows.Forms.TextBox tbPlcPingResponse;
+        private System.Windows.Forms.Button bttnOpenProject;
     }
 }
 

@@ -311,8 +311,6 @@ public class DalsaImage
             acquisition.AcqNotify += new SapAcqNotifyHandler(StartOfFrameEvent);
             acquisition.AcqNotifyContext = this;
 
-
-
             // event for signal status
             acquisition.SignalNotify += new SapSignalNotifyHandler(GetSignalStatus);
             acquisition.SignalNotifyContext = this;

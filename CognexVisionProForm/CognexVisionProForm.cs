@@ -170,6 +170,7 @@ namespace CognexVisionProForm
         {
             resize_Tab00();
             resize_tabToolBlock();
+            resize_tabFileControl();
         }
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -542,6 +543,11 @@ namespace CognexVisionProForm
         private void cbHeartbeat_CheckedChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void bttnOpenProject_Click(object sender, EventArgs e)
+        {
+            Process.Start(Utilities.ExeFilePath);
         }
     }
 
