@@ -92,8 +92,8 @@ namespace CognexVisionProForm
         private void pollingTimer_Tick(object sender, EventArgs e)
         {
             pollingTimer.Stop();
-            if (heartBeat) { heartBeat = false; }
-            else { heartBeat = true; }
+
+            heartBeat = !heartBeat;
 
             cbHeartbeat.Checked = heartBeat;
 
@@ -174,9 +174,12 @@ namespace CognexVisionProForm
         }
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
+            SaveSettings();
+
             for (int j = 0; j < cameraCount; j++)
             {
-                CameraAcqArray[j].Cleaning();
+                CameraAcqArray[j].Destroy();
+                CameraAcqArray[j].Dispose();
 
                 for (int i = 0; i < toolCount; i++)
                 {
@@ -189,8 +192,9 @@ namespace CognexVisionProForm
             cogToolBlockEditV21.Dispose();
             pollingTimer.Dispose();
             Utilities.Closing();
+            
 
-            SaveSettings();
+            
         }
         private void Form1_ResizeEnd(object sender, EventArgs e)
         {
@@ -252,6 +256,9 @@ namespace CognexVisionProForm
             tbArchiveIndex.Text = CameraAcqArray[selectedCameraId].ArchiveImageIndex.ToString();
             cbArchiveActive.Checked = CameraAcqArray[selectedCameraId].ArchiveImageActive;
 
+            if (CameraAcqArray[selectedCameraId].Connected) { bttnConnectCamera.Text = "Disconnect"; }
+            else { bttnConnectCamera.Text = "Connect"; }
+
             InitializeServerList(selectedCameraId);
             InitializeResourceList(selectedCameraId);
 
@@ -296,9 +303,21 @@ namespace CognexVisionProForm
                 }
 
             }
-            else { CameraAcqArray[selectedCameraId].Disconnect(); }
+            else 
+            {
+                CameraAcqArray[selectedCameraId].Disconnect();
+            }
 
             cbCameraConnected.Checked = CameraAcqArray[selectedCameraId].Connected;
+
+            if(CameraAcqArray[selectedCameraId].Connected)
+            {
+                bttnConnectCamera.Text = "Disconnect";
+            }
+            else
+            {
+                bttnConnectCamera.Text = "Connect";
+            }
         }
         private void cbCameraSelected_DropDown(object sender, EventArgs e)
         {
@@ -516,6 +535,7 @@ namespace CognexVisionProForm
 
                 if (MainPLC.InitialCheck.Status == IPStatus.Success)
                 {
+                    bttnPLC.Text = "Connected - Press to Disconnect";
                     pollingTimer.Start();
                 }
                 for (int i = 0; i < cameraCount; i++) { cameraControl[i].DisableCameraControl(); }
@@ -524,6 +544,7 @@ namespace CognexVisionProForm
             }
             else
             {
+                bttnPLC.Text = "Disconnected - Press to Connect ";
                 pollingTimer.Stop();
                 for (int i = 0; i < cameraCount; i++) { cameraControl[i].EnableCameraControl(); }
                 PlcCommsActive = false;
@@ -548,6 +569,20 @@ namespace CognexVisionProForm
         private void bttnOpenProject_Click(object sender, EventArgs e)
         {
             Process.Start(Utilities.ExeFilePath);
+        }
+
+        private void bttnAutoConnect_Click(object sender, EventArgs e)
+        {
+            for (int i = cameraCount - 1; i >= 0; i--)
+            {
+                if (!CameraAcqArray[i].Connected && CameraAcqArray[i].LoadServerSelect != null && CameraAcqArray[i].LoadResourceIndex != -1)
+                {
+                    CameraAcqArray[i].CreateCamera();
+                    if (!CameraAcqArray[i].Connected) { return; }
+                }
+                
+            }
+            tabControl1.SelectedIndex = 0;
         }
     }
 

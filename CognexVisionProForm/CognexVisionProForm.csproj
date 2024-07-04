@@ -70,7 +70,7 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>CAB1FF3E620F99766227CF8126EAF54419B53094</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>0C5E93100C462EF9F131813CF4AB4C22D1C6F061</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
     <ManifestKeyFile>CognexVisionProForm_TemporaryKey.pfx</ManifestKeyFile>

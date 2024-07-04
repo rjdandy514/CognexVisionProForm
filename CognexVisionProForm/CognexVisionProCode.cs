@@ -249,8 +249,6 @@ namespace CognexVisionProForm
                         if (cameraSnap[i])
                         {
                             cameraControl[i].Tool = toolblockArray[i, desiredTool[i]];
-                            cameraControl[i].Image = CameraAcqArray[i].Image;
-                            cameraControl[i].AcqTime = CameraAcqArray[i].AcqTime;
                             cameraControl[i].UpdateDisplay();
                         }
                     }
@@ -323,8 +321,6 @@ namespace CognexVisionProForm
                     if (toolTriggerComplete[i])
                     {
                         cameraControl[i].Tool = toolblockArray[i, desiredTool[i]];
-                        cameraControl[i].Image = CameraAcqArray[i].Image;
-                        cameraControl[i].AcqTime = CameraAcqArray[i].AcqTime;
                         cameraControl[i].UpdateDisplay();
 
                     }
@@ -515,16 +511,12 @@ namespace CognexVisionProForm
         {
 
 
-
+            //GENERAL COMMANDS
             int index = 0;
-
-           //GENERAL COMMANDS
-           PlcAutoMode = (MainPLC.PlcToPcControl[index] & (1 << 0)) != 0;
-
-            index++;
-            
+            PlcAutoMode = (MainPLC.PlcToPcControl[index] & (1 << 0)) != 0;
 
             //CAMERA COMMANDS
+            index = 1;
             for (int cam = 0; cam < cameraCount; cam++)
             {
                 CameraAcqArray[cam].Trigger = (MainPLC.PlcToPcControl[index + cam] & (1 << 0)) != 0;
@@ -543,7 +535,7 @@ namespace CognexVisionProForm
             }
 
 
-            double[] controlData = new double[8];
+            double[] controlData = new double[4];
             for (int cam = 0; cam < cameraCount; cam++)
             {
                 for (int j = 0; j < controlData.Length; j++)
@@ -593,6 +585,7 @@ namespace CognexVisionProForm
                 tempTag |= ((toolblockArray[cam, desiredTool[cam]].ResultUpdated ? 1 : 0) << 5);
                 tempTag |= ((toolblockArray[cam, desiredTool[cam]].Result ? 1 : 0) << 6);
                 tempTag |= ((toolblockArray[cam, desiredTool[cam]].FilePresent ? 1 : 0) << 7);
+                tempTag |= ((CameraAcqArray[cam].Snapping ? 1 : 0) << 8);
 
                 tempTag |= desiredTool[cam] << 16;
 

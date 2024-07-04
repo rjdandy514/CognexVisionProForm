@@ -23,22 +23,7 @@ namespace CognexVisionProForm
         public ICogRecord record;
         private int toolSelect = 0;
         private System.Windows.Forms.Timer pollingTimer;
-        public ICogImage Image
-        {
-            get
-            {
-                return image;
-            }
-            set
-            {
-                image = value;
-            }
-        }
-        public double AcqTime
-        {
-            get { return acqTime; }
-            set { acqTime = value; }
-        }
+
         public ToolBlock Tool
         {
             get;set;
@@ -92,7 +77,7 @@ namespace CognexVisionProForm
             bttnCameraAbort.Enabled = !camera.ArchiveImageActive;
             bttnCameraLog.Enabled = !camera.ArchiveImageActive;
 
-            if (camera.ServerType == DalsaImage.ServerCategory.ServerAcq) { bttnEncoderPhase.Visible = true; }
+            if (camera.IsMaster != 0) { bttnEncoderPhase.Visible = true; }
             else { bttnEncoderPhase.Visible = false; }
 
         }
@@ -132,7 +117,7 @@ namespace CognexVisionProForm
             }
 
             numToolSelect.Value = toolSelect;
-            lbAcqTime.Text = $"Aquisition: {AcqTime} ms";
+            lbAcqTime.Text = $"Aquisition: {camera.AcqTime} ms";
             lbToolName.Text = Tool.Name;
             lbToolRunTime.Text = $"Tool Time: {Tool.TotalTime} ms";
             cbToolPassed.Checked = Tool.Result;
@@ -167,7 +152,6 @@ namespace CognexVisionProForm
                 int lastRecordIndex = Math.Max(record.SubRecords.Count - 1, 0);
                 recordDisplay.Record = record.SubRecords[lastRecordIndex];
             }
-            recordDisplay.Image = image;
 
             ResizeWindow();
         }
@@ -187,7 +171,11 @@ namespace CognexVisionProForm
             int reqHeight;
             int reqWidth;
 
+            image = camera.Image;
+
             if (image == null) { return; }
+
+            recordDisplay.Image = image;
             //*********************************************
             //determine the zoom factor to use full window
             //update cogdisplay

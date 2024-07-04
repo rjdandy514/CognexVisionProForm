@@ -159,6 +159,7 @@ namespace CognexVisionProForm
             this.cbHeartbeat = new System.Windows.Forms.CheckBox();
             this.bttnPLC = new System.Windows.Forms.Button();
             this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.bttnAutoConnect = new System.Windows.Forms.Button();
             this.tabImage.SuspendLayout();
             this.tabFrameGrabber.SuspendLayout();
             this.panel3.SuspendLayout();
@@ -342,6 +343,7 @@ namespace CognexVisionProForm
             // panel4
             // 
             this.panel4.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.panel4.Controls.Add(this.bttnAutoConnect);
             this.panel4.Controls.Add(this.label39);
             this.panel4.Controls.Add(this.tbCameraDesc);
             this.panel4.Controls.Add(this.cbCameraIdSelected);
@@ -1487,6 +1489,16 @@ namespace CognexVisionProForm
             this.tabControl1.TabIndex = 3;
             this.tabControl1.SelectedIndexChanged += new System.EventHandler(this.tabControl1_SelectedIndexChanged);
             // 
+            // bttnAutoConnect
+            // 
+            this.bttnAutoConnect.Location = new System.Drawing.Point(346, 11);
+            this.bttnAutoConnect.Name = "bttnAutoConnect";
+            this.bttnAutoConnect.Size = new System.Drawing.Size(225, 24);
+            this.bttnAutoConnect.TabIndex = 39;
+            this.bttnAutoConnect.Text = "Auto Connect All Cameras";
+            this.bttnAutoConnect.UseVisualStyleBackColor = true;
+            this.bttnAutoConnect.Click += new System.EventHandler(this.bttnAutoConnect_Click);
+            // 
             // CognexVisionProForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1665,6 +1677,7 @@ namespace CognexVisionProForm
         private System.Windows.Forms.Button bttnPlcPing;
         private System.Windows.Forms.TextBox tbPlcPingResponse;
         private System.Windows.Forms.Button bttnOpenProject;
+        private System.Windows.Forms.Button bttnAutoConnect;
     }
 }
 

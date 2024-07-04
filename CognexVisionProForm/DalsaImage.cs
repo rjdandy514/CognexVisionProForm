@@ -157,6 +157,15 @@ public class DalsaImage
         get;set;
 
     }
+    public int IsMaster
+    {
+        get 
+        {
+            int returnGetParm = 0;
+            bool returngetResult = acquisition.GetParameter(SapAcquisition.Prm.BOARD_SYNC_OUTPUT1_SOURCE, out returnGetParm);
+            return returnGetParm;
+        }
+    }
     public enum ServerCategory
     {
         ServerAll,
@@ -284,10 +293,10 @@ public class DalsaImage
     public void CreateCamera()
     {
         Utilities.LoggingStatment($"{cameraName}: Create Camera from {LoadServerSelect}  {LoadResourceIndex} ");
-        Cleaning();
+        Destroy();
+        Dispose();
 
         serverLocation = new SapLocation(LoadServerSelect, LoadResourceIndex);
-
 
         string configFile = "";
         if (ConfigFilePresent) { configFile = ConfigFile; }
@@ -333,25 +342,44 @@ public class DalsaImage
 
         if(acquisition != null && !acquisition.Initialized)
         {
-            if (acquisition.Create() == false) { return; }
-            
+            if (acquisition.Create() == false) 
+            {
+                Destroy();
+                return; 
+            }            
         }
         if (acqDevice != null && !acqDevice.Initialized)
         {
-            if (acqDevice.Create() == false) { return; }
+            if (acqDevice.Create() == false) 
+            {
+                Destroy();
+                return; 
+            }
         }
         if (buffers != null && !buffers.Initialized)
         {
             ArchiveImageActive = false;
-            if (buffers.Create() == false) { return; }
+            if (buffers.Create() == false) 
+            {
+                Destroy();
+                return; 
+            }
         }
         if (acqDeviceXfer != null && !acqDeviceXfer.Initialized)
         {
-            if (acqDeviceXfer.Create() == false) { return; }
+            if (acqDeviceXfer.Create() == false) 
+            {
+                Destroy();
+                return;
+            }
         }
         if (acqXfer != null && !acqXfer.Initialized)
         {
-            if (acqXfer.Create() == false) { return; }
+            if (acqXfer.Create() == false) 
+            {
+                Destroy();
+                return; 
+            }
         }
 
         serialNumber = SapManager.GetSerialNumber(serverLocation);
@@ -417,13 +445,20 @@ public class DalsaImage
         if (acqDeviceXfer != null)
         {
             acqDeviceXfer.Disconnect();
-            acqDeviceXfer.Destroy();
+
         }
 
         if (acqDevice != null)
         {
             acqDevice.Destroy();
         }
+        if (acqXfer != null)
+        { 
+            acqXfer.Disconnect();
+
+        }
+            
+
     }
     public void Cleaning()
     {
@@ -431,6 +466,12 @@ public class DalsaImage
         {
             acqDeviceXfer.Destroy();
             acqDeviceXfer.Dispose();
+        }
+        
+        if (acquisition != null)
+        {
+            acquisition.Destroy();
+            acquisition.Dispose();
         }
 
         if (acqDevice != null)
@@ -450,6 +491,52 @@ public class DalsaImage
             archiveBuffers.Dispose();
         }
         Marshal.FreeHGlobal(cogImageAddress);
+    }
+    public void Destroy()
+    {
+        if (acqXfer != null && acqXfer.Initialized) { acqXfer.Destroy(); }
+        if (acqDeviceXfer != null && acqDeviceXfer.Initialized) { acqDeviceXfer.Destroy(); }
+        if (acqDevice != null && acqDevice.Initialized) { acqDevice.Destroy(); }
+        if (buffers != null && buffers.Initialized) { buffers.Destroy(); }
+        if (archiveBuffers != null && archiveBuffers.Initialized) { archiveBuffers.Destroy(); }
+
+        if (acquisition != null && acquisition.Initialized) { acquisition.Destroy(); }
+    }
+    public void Dispose()
+    {
+        if (acqXfer != null)
+        {
+            acqXfer.Dispose();
+            acqXfer = null;
+        }
+        if (acqDeviceXfer != null) 
+        { 
+            acqDeviceXfer.Dispose();
+            acqDeviceXfer = null;
+        }
+        if (acqDevice != null) 
+        { 
+            acqDevice.Dispose();
+            acqDevice = null;
+        }
+        if (buffers != null) 
+        { 
+            buffers.Dispose();
+            buffers = null;
+        }
+
+        if (archiveBuffers != null) 
+        { 
+            archiveBuffers.Dispose();
+            archiveBuffers = null;
+        }
+
+        if (acquisition != null)
+        {
+            acquisition.Dispose();
+            acquisition = null;
+        }
+
     }
     public void UpdateImageData()
     {

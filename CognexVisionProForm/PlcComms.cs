@@ -26,10 +26,10 @@ namespace CognexVisionProForm
         Libplctag client;
         bool pinged;
         int DataTimeout = 2000;
-        public int[] PlcToPcControl = new int[8];
-        public int[] PcToPlcStatus = new int[8];
-        public int[] PcToPlcStatusData = new int[24];
-        public int[] PlcToPcControlData = new int[24];
+        public int[] PlcToPcControl = new int[32];
+        public int[] PcToPlcStatus = new int[32];
+        public int[] PcToPlcStatusData = new int[32];
+        public int[] PlcToPcControlData = new int[32];
         Ping pinger;
         
         public PlcComms(CognexVisionProForm Sender)
