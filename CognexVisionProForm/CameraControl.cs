@@ -19,6 +19,7 @@ namespace CognexVisionProForm
         DalsaImage camera;
         bool continousSnap = false;
         double acqTime = 0;
+        ToolBlock tool;
         public ICogImage image;
         public ICogRecord record;
         private int toolSelect = 0;
@@ -26,7 +27,15 @@ namespace CognexVisionProForm
 
         public ToolBlock Tool
         {
-            get;set;
+            get
+            {
+                return tool; 
+            }
+
+            set
+            {
+                tool = value;
+            }
         }
         public int ToolSelect
         {
@@ -59,8 +68,13 @@ namespace CognexVisionProForm
             cbImageReady.Checked = camera.ImageReady;
 
             bttnCameraSnap.Enabled = !_form.PlcCommsActive;
-            if (!camera.Snapping) { bttnCameraSnap.Text = " Press To Snap"; }
-            else if (camera.Snapping) { bttnCameraSnap.Text = " Grabbing"; }
+
+            bttnCameraAbort.Enabled = camera.Snapping || camera.Grabbing;
+            
+            
+            if(camera.Grabbing) { bttnCameraSnap.Text = " Grabbing"; }
+            else if (camera.Snapping) { bttnCameraSnap.Text = " Snapping"; }
+            else { bttnCameraSnap.Text = " Press To Snap"; }
 
             pollingTimer.Start();
         }
@@ -87,10 +101,11 @@ namespace CognexVisionProForm
             camera.Trigger = true;
             bttnCameraSnap.Enabled = false;
             lbAcqTime.Text = $"Aquisition: --- ms";
-            bttnCameraSnap.Text = "Grabbing";
+            bttnCameraSnap.Text = "Snap";
         }
         private void bttnCameraAbort_Click(object sender, EventArgs e)
         {
+            _form.CameraAbort(camera.Id);
             camera.Abort();
         }
         private void bttnCameraLog_Click(object sender, EventArgs e)
@@ -107,53 +122,50 @@ namespace CognexVisionProForm
             }
         }
         private delegate void Set_UpdateDisplay();
-        public void UpdateDisplay()
+        public void UpdateToolDisplay()
         {
             
             if (this.InvokeRequired)
             {
-                BeginInvoke(new Set_UpdateDisplay(UpdateDisplay));
+                BeginInvoke(new Set_UpdateDisplay(UpdateToolDisplay));
                 return;
             }
 
             numToolSelect.Value = toolSelect;
+            lbToolName.Text = tool.Name;
             lbAcqTime.Text = $"Aquisition: {camera.AcqTime} ms";
-            lbToolName.Text = Tool.Name;
-            lbToolRunTime.Text = $"Tool Time: {Tool.TotalTime} ms";
-            cbToolPassed.Checked = Tool.Result;
+            lbToolRunTime.Text = $"Tool Time: {tool.RunStatus.TotalTime} ms";
+            cbToolPassed.Checked = tool.Result;
             lbToolData.Items.Clear();
             lbToolData.BeginUpdate();
-            for (int i = 0; i < Tool.ToolOutput.Length; i++)
+            for (int i = 0; i < tool.ToolOutput.Length; i++)
             {
-                if (Tool.ToolOutput[i] != null) 
+                if (tool.ToolOutput[i] != null) 
                 {
-                    string tooldata =   Tool.ToolOutput[i].Name + ": " + 
-                                        Math.Round(Convert.ToDouble(Tool.ToolOutput[i].Value), 2).ToString(); 
+                    string tooldata =   tool.ToolOutput[i].Name + ": " + 
+                                        Math.Round(Convert.ToDouble(tool.ToolOutput[i].Value), 2).ToString(); 
                     lbToolData.Items.Add(tooldata);
                 }
             }
             lbToolData.EndUpdate();
             lbToolData.Height = lbToolData.PreferredHeight;
             
-            UpdateImage();
+            UpdateImageRecord();
 
         }
-        private delegate void Set_ResizeWindow();
-        public void UpdateImage()
+        public void UpdateImageRecord()
         {
-            if(Tool.cogToolBlock !=null)
+            if(tool.cogToolBlock !=null)
             {
-                record = Tool.cogToolBlock.CreateLastRunRecord();
+                record = tool.cogToolBlock.CreateLastRunRecord();
             }
             
             //Determine last record to display
-            if (record != null && Tool.Result)
+            if (record != null && tool.Result)
             {
                 int lastRecordIndex = Math.Max(record.SubRecords.Count - 1, 0);
-                recordDisplay.Record = record.SubRecords[lastRecordIndex];
+                recordDisplay.Record = record.SubRecords[0];
             }
-
-            ResizeWindow();
         }
         private void bttnCameraSnap_MouseUp(object sender, MouseEventArgs e)
         {
@@ -161,19 +173,30 @@ namespace CognexVisionProForm
         }
         private void CameraControl_Resize(object sender, EventArgs e)
         {
-            ResizeWindow();
+            UpdateImage();
         }
-        public void ResizeWindow()
+        
+        private delegate void Set_UpdateImage();
+        public void UpdateImage()
         {
+            if (this.InvokeRequired)
+            {
+                BeginInvoke(new Set_UpdateImage(UpdateImage));
+                return;
+            }
+
             double zoomRequired = 0;
             double zoomWidth;
             double zoomHeight;
             int reqHeight;
             int reqWidth;
-
+           
             image = camera.Image;
 
-            if (image == null) { return; }
+            if (image == null) 
+            { 
+                return; 
+            }
 
             recordDisplay.Image = image;
             //*********************************************
@@ -193,9 +216,9 @@ namespace CognexVisionProForm
             else{ zoomRequired = zoomHeight; }
 
             //Update Display Width and Height - if needed
-            reqHeight = Convert.ToInt16(Convert.ToDouble(image.Width) * zoomRequired);
-            reqWidth = Convert.ToInt16(Convert.ToDouble(image.Height) * zoomRequired);
-            if(recordDisplay.Width != reqHeight  && recordDisplay.Height != reqWidth)
+            reqWidth = Convert.ToInt16(Convert.ToDouble(image.Width) * zoomRequired);
+            reqHeight = Convert.ToInt16(Convert.ToDouble(image.Height) * zoomRequired);
+            if(recordDisplay.Width != reqWidth && recordDisplay.Height != reqHeight)
             {
                 recordDisplay.Width = Convert.ToInt16(Convert.ToDouble(image.Width) * zoomRequired);
                 recordDisplay.Height = Convert.ToInt16(Convert.ToDouble(image.Height) * zoomRequired);
@@ -221,6 +244,11 @@ namespace CognexVisionProForm
 
             bttnEncoderPhase.Text = $"Current Phase - {encoderPhase}";
 
+
+        }
+
+        private void numToolSelect_ValueChanged(object sender, EventArgs e)
+        {
 
         }
     }

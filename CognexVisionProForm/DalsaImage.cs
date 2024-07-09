@@ -10,6 +10,9 @@ using Microsoft.Win32;
 using System.Drawing;
 using System.Threading.Tasks;
 using Cognex.Vision;
+using System.CodeDom.Compiler;
+using System.Windows.Forms.Design.Behavior;
+using System.Threading;
 
 public class DalsaImage
 {
@@ -29,7 +32,10 @@ public class DalsaImage
     string imageFilePath;
 
     Stopwatch acqTimeWatch;
-
+    double acqTime = 0;
+    double snapTime = 0;
+    double startOfFrameTime = 0;
+    int startOfFrame = 0;
     string configFileType = "ConfigFile";
     string configFileExtension = ".ccf";
     string serialNumber = "";
@@ -44,7 +50,11 @@ public class DalsaImage
 
     bool abort;
     bool abortMem = false;
-    
+
+    bool snapping = false;
+    bool grabbing = false;
+
+
     string cameraName;
 
 
@@ -60,11 +70,17 @@ public class DalsaImage
     }
     public double AcqTime
     {
-        get;set;
+        get
+        {
+            return acqTime;
+        }
     }
     public double SnapTime
     {
-        get;set;
+        get
+        {
+            return snapTime;
+        }
     }
     public int BufferIndex
     {
@@ -108,7 +124,7 @@ public class DalsaImage
         {
             
             trigger = value;
-            TriggerAck = trigger;
+
 
             if(Connected && trigger && !triggerMem)
             {
@@ -128,7 +144,10 @@ public class DalsaImage
     }
     public bool TriggerAck
     {
-        get; set;
+        get 
+        {
+            return trigger; 
+        }
     }
     public bool AbortTrigger
     {
@@ -154,8 +173,12 @@ public class DalsaImage
     }
     public bool Snapping
     {
-        get;set;
+        get {return snapping;}
 
+    }
+    public bool Grabbing
+    {
+        get { return grabbing; }
     }
     public int IsMaster
     {
@@ -387,16 +410,15 @@ public class DalsaImage
     public void SnapPicture()
     {
         ImageReady = false;
-        
-        acqTimeWatch.Start();
+        acqTimeWatch.Restart();
 
         if(acqDeviceXfer != null && acqDeviceXfer.Connected)
         {
             if (acqDeviceXfer.Snap())
             {
-                SnapTime = acqTimeWatch.ElapsedMilliseconds;
+                snapTime = acqTimeWatch.ElapsedMilliseconds;
                 acqDeviceXfer.Wait(5000);
-                Snapping = true;
+                snapping = true;
             }
         }
         else if(acqXfer != null && acqXfer.Connected)
@@ -405,8 +427,8 @@ public class DalsaImage
             {
                 //acqXfer.Wait(5000);
                     
-                SnapTime = acqTimeWatch.ElapsedMilliseconds;
-                Snapping = true;
+                snapTime = acqTimeWatch.ElapsedMilliseconds;
+                snapping = true;
             }
         }
     }
@@ -420,7 +442,8 @@ public class DalsaImage
         {
             acqXfer.Abort();
         }
-        Snapping = false;
+        snapping = false;
+        grabbing = false;
         ImageReady = true;
     }
     public void SaveImageBMP()
@@ -445,7 +468,6 @@ public class DalsaImage
         if (acqDeviceXfer != null)
         {
             acqDeviceXfer.Disconnect();
-
         }
 
         if (acqDevice != null)
@@ -541,7 +563,7 @@ public class DalsaImage
     public void UpdateImageData()
     {
         
-        AcqTime = acqTimeWatch.ElapsedMilliseconds;
+        acqTime = acqTimeWatch.ElapsedMilliseconds - startOfFrameTime;
 
         // logic for using Camera
         if (buffers != null && Connected) 
@@ -567,11 +589,11 @@ public class DalsaImage
         if (buffers != null && SaveImageSelected) { SaveImageBMP(); }
         buffers.Clear();
         ImageReady = true;
-        form.CameraSnapComplete = Id;
-
+        
         acqTimeWatch.Stop();
         acqTimeWatch.Reset();
-        Snapping = false;
+        grabbing = false;
+        form.CameraSnapComplete = Id;
     }
     public ICogImage RawToCogImage()
     {
@@ -635,6 +657,7 @@ public class DalsaImage
         if (acquisition == null) { return 0; }
 
         getResult = acquisition.GetParameter(SapAcquisition.Prm.EXT_LINE_TRIGGER_SOURCE, out returnGetParm);
+
         returnCheckParm = returnGetParm;
 
         if (getResult && (returnGetParm == phaseA || returnGetParm == phaseB))
@@ -664,9 +687,11 @@ public class DalsaImage
     {
         SapAcquisition.AcqSignalStatus signalStatus = argsSignal.SignalStatus;
     }
-    static void StartOfFrameEvent(object sender, SapAcqNotifyEventArgs argsSignal)
+    public void StartOfFrameEvent(object sender, SapAcqNotifyEventArgs argsSignal)
     {
-        bool temp = false;
+        snapping = false;
+        grabbing = true;
+        startOfFrameTime = acqTimeWatch.ElapsedMilliseconds;
     }
 
 

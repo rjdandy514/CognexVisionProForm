@@ -19,6 +19,10 @@ namespace CognexVisionProForm
         string toolFileExtension = ".vpp";
         string Previous = "";
 
+        bool filePresent = false;
+        bool resultUpdated = false;
+        bool toolReady = false;
+
         CogToolBlockTerminal[] toolOutput = new CogToolBlockTerminal[1];
         double[] toolInput;
 
@@ -55,12 +59,12 @@ namespace CognexVisionProForm
                 
                 if (File.Exists(toolFileLocation))
                 {
-                    FilePresent = true;
+                    filePresent = true;
                     toolFile = toolFileLocation;
                 }
                 else
                 {
-                    FilePresent = false;
+                    filePresent = false;
                     toolFile = "";
                 }
             }
@@ -71,21 +75,6 @@ namespace CognexVisionProForm
             {
                 if (cogToolBlock != null && cogToolBlock.RunStatus.Result == CogToolResultConstants.Accept) { return true; }
                 else { return false; }
-            }
-        }
-        public double TotalTime
-        {
-            get
-            {
-                if(cogToolBlock != null)
-                {
-                    return cogToolBlock.RunStatus.TotalTime;
-                }
-                else
-                {
-                    return 0.0;
-                }
-                
             }
         }
         public ICogRunStatus RunStatus
@@ -101,15 +90,16 @@ namespace CognexVisionProForm
         }
         public bool ToolReady
         {
-            get;set;
+            get { return toolReady; }
         }
         public bool ResultUpdated
         {
-            get;set;
+            get { return resultUpdated; }
         }
         public bool FilePresent
         {
-            get; set;
+            get { return filePresent; }
+            
         }
         public CogToolBlockTerminal[] ToolOutput
         {
@@ -155,12 +145,12 @@ namespace CognexVisionProForm
             
             if (File.Exists(toolFileLocation))
             {
-                FilePresent = true;
+                filePresent = true;
                 toolFile = toolFileLocation;
             }
             else
             {
-                FilePresent = false;
+                filePresent = false;
                 toolFile = "";
             }
         }
@@ -168,19 +158,19 @@ namespace CognexVisionProForm
         {
             try
             {
-                if (FilePresent)
+                if (filePresent)
                 {
                     cogToolBlock = CogSerializer.LoadObjectFromFile(toolFile) as CogToolBlock;
                     cogToolBlock.Ran += new EventHandler(Subject_Ran);
                     cogToolBlock.Name = toolName;
 
-                    ToolReady = true;
+                    toolReady = true;
 
                     Utilities.LoggingStatment($"{toolName}: Initialized complete Camera Ready");
                 }
                 else
                 {
-                    ToolReady = false;
+                    toolReady = false;
                     throw new Exception($"{toolName}: No Camera Program has Been Loaded"); 
                 }
 
@@ -190,8 +180,8 @@ namespace CognexVisionProForm
         public void ToolRun(CogImage8Grey InputImage)
         {
 
-            ResultUpdated = false;
-            ToolReady = false;
+            resultUpdated = false;
+            toolReady = false;
 
             try
             {
@@ -211,7 +201,7 @@ namespace CognexVisionProForm
             }
             catch (Exception ex) 
             {
-                ToolReady = true;
+                toolReady = true;
                 Utilities.LoggingStatment(ex.Message); 
             }
 
@@ -240,8 +230,8 @@ namespace CognexVisionProForm
                 }
             }
 
-            ToolReady = true;
-            ResultUpdated = true;
+            toolReady = true;
+            resultUpdated = true;
             form.ToolBlockRunComplete = CameraId;
 
             Utilities.LoggingStatment($"{toolName}: Number of Outputs - {toolOutputCount}");

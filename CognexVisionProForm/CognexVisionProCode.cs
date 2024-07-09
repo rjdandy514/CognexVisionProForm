@@ -217,15 +217,10 @@ namespace CognexVisionProForm
         }
         public void CameraAbort(int i)
         {
-            if (CameraAcqArray[i].Connected)
-            {
-                CameraAcqArray[i].AbortTrigger = true;
-            }
-            else
-            {
-                MessageBox.Show("NO CAMERA IS CONNECTED");
-                tabControl1.SelectedIndex = 1;
-            }
+            cameraSnap[i] = false;
+            cameraSnapComplete[i] = false;
+            toolTrigger[i] = false;
+            toolTriggerComplete[i] = false;
         }
         public void CameraUpdate()
         {
@@ -241,19 +236,15 @@ namespace CognexVisionProForm
             {
                 //if the cognex license is present, trigger Toolblock
                 if (cogLicenseOk) { ToolBlockTrigger(); }
-                //else update display without runing toolblock
                 else
                 {
                     for (int i = 0; i < cameraCount; i++)
                     {
-                        if (cameraSnap[i])
+                        if (cameraSnapComplete[i])
                         {
-                            cameraControl[i].Tool = toolblockArray[i, desiredTool[i]];
-                            cameraControl[i].UpdateDisplay();
+                            cameraControl[i].UpdateImage();
                         }
                     }
-                    Array.Clear(cameraSnap, 0, cameraSnap.Length);
-                    Array.Clear(cameraSnapComplete, 0, cameraSnapComplete.Length);
                 }
             }
 
@@ -321,14 +312,14 @@ namespace CognexVisionProForm
                     if (toolTriggerComplete[i])
                     {
                         cameraControl[i].Tool = toolblockArray[i, desiredTool[i]];
-                        cameraControl[i].UpdateDisplay();
+                        cameraControl[i].UpdateImage();
+                        cameraControl[i].UpdateToolDisplay();
 
                     }
                 }
 
                 Array.Clear(toolTrigger,0, toolTrigger.Length);
                 Array.Clear(toolTriggerComplete,0, toolTriggerComplete.Length);
-
             }
         }
         private delegate void Set_UpdateImageTab();
@@ -535,7 +526,7 @@ namespace CognexVisionProForm
             }
 
 
-            double[] controlData = new double[4];
+            double[] controlData = new double[dataLength];
             for (int cam = 0; cam < cameraCount; cam++)
             {
                 for (int j = 0; j < controlData.Length; j++)
@@ -560,11 +551,9 @@ namespace CognexVisionProForm
             
             string dataTypeName;
             int index = 0;
-            int tempTag;
+            int tempTag = 0;
 
-            //Camera Status: info related to camera and general system
-            tempTag = 0;
-            
+            //Camera Status: info related to camera and general system         
             tempTag |= ((heartBeat ? 1 : 0 )<< 0);
             tempTag |= ((cogLicenseOk ? 1:0 ) << 1);
 
@@ -586,6 +575,7 @@ namespace CognexVisionProForm
                 tempTag |= ((toolblockArray[cam, desiredTool[cam]].Result ? 1 : 0) << 6);
                 tempTag |= ((toolblockArray[cam, desiredTool[cam]].FilePresent ? 1 : 0) << 7);
                 tempTag |= ((CameraAcqArray[cam].Snapping ? 1 : 0) << 8);
+                tempTag |= ((CameraAcqArray[cam].Grabbing ? 1 : 0) << 9);
 
                 tempTag |= desiredTool[cam] << 16;
 
@@ -604,7 +594,7 @@ namespace CognexVisionProForm
 
                 if (tool.ResultUpdated)
                 {
-                    for(int j = 0;j < Math.Min(tool.ToolOutput.Length,4);j++)
+                    for(int j = 0;j < Math.Min(tool.ToolOutput.Length, dataLength);j++)
                     {
                        
                         if(tool.ToolOutput[j] == null || tool.RunStatus.Result == CogToolResultConstants.Error)

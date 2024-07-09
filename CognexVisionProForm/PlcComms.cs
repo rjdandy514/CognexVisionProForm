@@ -28,8 +28,8 @@ namespace CognexVisionProForm
         int DataTimeout = 2000;
         public int[] PlcToPcControl = new int[32];
         public int[] PcToPlcStatus = new int[32];
-        public int[] PcToPlcStatusData = new int[32];
-        public int[] PlcToPcControlData = new int[32];
+        public int[] PcToPlcStatusData = new int[48];
+        public int[] PlcToPcControlData = new int[48];
         Ping pinger;
         
         public PlcComms(CognexVisionProForm Sender)
@@ -81,9 +81,9 @@ namespace CognexVisionProForm
 
                 // create the tag for PLC to PC communication
                 tagPlcToPc =        new Tag(IPAddress, "1,0", CpuType.LGX, plcControl, DataType.DINT, 8);
-                tagPlcToPcData =    new Tag(IPAddress, "1,0", CpuType.LGX, plcControlData, DataType.DINT, 24);
+                tagPlcToPcData =    new Tag(IPAddress, "1,0", CpuType.LGX, plcControlData, DataType.DINT, 48);
                 tagPcToPlc =        new Tag(IPAddress, "1,0", CpuType.LGX, plcStatus, DataType.DINT, 8);
-                tagPcToPlcData =    new Tag(IPAddress, "1,0", CpuType.LGX, plcStatusData, DataType.DINT, 24);
+                tagPcToPlcData =    new Tag(IPAddress, "1,0", CpuType.LGX, plcStatusData, DataType.DINT, 48);
 
                 //Add tags to Client
                 CreatePlcTag(tagPlcToPc, plcControl);

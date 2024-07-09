@@ -40,6 +40,7 @@
             this.cbImageReady = new System.Windows.Forms.CheckBox();
             this.cbArchiveImageActive = new System.Windows.Forms.CheckBox();
             this.plControl = new System.Windows.Forms.Panel();
+            this.bttnEncoderPhase = new System.Windows.Forms.Button();
             this.cbTrigger = new System.Windows.Forms.CheckBox();
             this.numToolSelect = new System.Windows.Forms.NumericUpDown();
             this.lbToolRunTime = new System.Windows.Forms.Label();
@@ -49,7 +50,6 @@
             this.cbAbortTriggeAck = new System.Windows.Forms.CheckBox();
             this.cbTriggerAck = new System.Windows.Forms.CheckBox();
             this.recordDisplay = new Cognex.VisionPro.CogRecordDisplay();
-            this.bttnEncoderPhase = new System.Windows.Forms.Button();
             this.plControl.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numToolSelect)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.recordDisplay)).BeginInit();
@@ -75,7 +75,7 @@
             this.bttnCameraAbort.BackColor = System.Drawing.SystemColors.ButtonFace;
             this.bttnCameraAbort.FlatAppearance.BorderColor = System.Drawing.Color.Red;
             this.bttnCameraAbort.FlatAppearance.BorderSize = 2;
-            this.bttnCameraAbort.Location = new System.Drawing.Point(3, 438);
+            this.bttnCameraAbort.Location = new System.Drawing.Point(3, 436);
             this.bttnCameraAbort.Name = "bttnCameraAbort";
             this.bttnCameraAbort.Size = new System.Drawing.Size(152, 43);
             this.bttnCameraAbort.TabIndex = 1;
@@ -89,7 +89,7 @@
             this.bttnCameraSnap.BackColor = System.Drawing.SystemColors.ButtonFace;
             this.bttnCameraSnap.FlatAppearance.BorderColor = System.Drawing.Color.Red;
             this.bttnCameraSnap.FlatAppearance.BorderSize = 2;
-            this.bttnCameraSnap.Location = new System.Drawing.Point(3, 393);
+            this.bttnCameraSnap.Location = new System.Drawing.Point(3, 389);
             this.bttnCameraSnap.Name = "bttnCameraSnap";
             this.bttnCameraSnap.Size = new System.Drawing.Size(152, 43);
             this.bttnCameraSnap.TabIndex = 0;
@@ -184,6 +184,20 @@
             this.plControl.Size = new System.Drawing.Size(158, 535);
             this.plControl.TabIndex = 18;
             // 
+            // bttnEncoderPhase
+            // 
+            this.bttnEncoderPhase.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.bttnEncoderPhase.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.bttnEncoderPhase.FlatAppearance.BorderColor = System.Drawing.Color.Red;
+            this.bttnEncoderPhase.FlatAppearance.BorderSize = 2;
+            this.bttnEncoderPhase.Location = new System.Drawing.Point(3, 342);
+            this.bttnEncoderPhase.Name = "bttnEncoderPhase";
+            this.bttnEncoderPhase.Size = new System.Drawing.Size(152, 43);
+            this.bttnEncoderPhase.TabIndex = 32;
+            this.bttnEncoderPhase.Text = "Change Encoder Phase";
+            this.bttnEncoderPhase.UseVisualStyleBackColor = false;
+            this.bttnEncoderPhase.Click += new System.EventHandler(this.bttnEncoderPhase_Click);
+            // 
             // cbTrigger
             // 
             this.cbTrigger.AutoSize = true;
@@ -197,10 +211,11 @@
             // numToolSelect
             // 
             this.numToolSelect.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.numToolSelect.Location = new System.Drawing.Point(3, 367);
+            this.numToolSelect.Location = new System.Drawing.Point(3, 318);
             this.numToolSelect.Name = "numToolSelect";
             this.numToolSelect.Size = new System.Drawing.Size(146, 20);
             this.numToolSelect.TabIndex = 30;
+            this.numToolSelect.ValueChanged += new System.EventHandler(this.numToolSelect_ValueChanged);
             // 
             // lbToolRunTime
             // 
@@ -274,20 +289,6 @@
             this.recordDisplay.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("recordDisplay.OcxState")));
             this.recordDisplay.Size = new System.Drawing.Size(307, 293);
             this.recordDisplay.TabIndex = 19;
-            // 
-            // bttnEncoderPhase
-            // 
-            this.bttnEncoderPhase.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.bttnEncoderPhase.BackColor = System.Drawing.SystemColors.ButtonFace;
-            this.bttnEncoderPhase.FlatAppearance.BorderColor = System.Drawing.Color.Red;
-            this.bttnEncoderPhase.FlatAppearance.BorderSize = 2;
-            this.bttnEncoderPhase.Location = new System.Drawing.Point(3, 246);
-            this.bttnEncoderPhase.Name = "bttnEncoderPhase";
-            this.bttnEncoderPhase.Size = new System.Drawing.Size(152, 43);
-            this.bttnEncoderPhase.TabIndex = 32;
-            this.bttnEncoderPhase.Text = "Change Encoder Phase";
-            this.bttnEncoderPhase.UseVisualStyleBackColor = false;
-            this.bttnEncoderPhase.Click += new System.EventHandler(this.bttnEncoderPhase_Click);
             // 
             // CameraControl
             // 
