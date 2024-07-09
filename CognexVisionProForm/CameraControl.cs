@@ -91,8 +91,13 @@ namespace CognexVisionProForm
             bttnCameraAbort.Enabled = !camera.ArchiveImageActive;
             bttnCameraLog.Enabled = !camera.ArchiveImageActive;
 
-            if (camera.IsMaster != 0) { bttnEncoderPhase.Visible = true; }
+            if(camera.ServerType == DalsaImage.ServerCategory.ServerAcq) 
+            {
+                if (camera.IsMaster != 0) { bttnEncoderPhase.Visible = true; }
+                else { bttnEncoderPhase.Visible = false; }
+            }
             else { bttnEncoderPhase.Visible = false; }
+
 
         }
         private void bttnCameraSnap_Click(object sender, EventArgs e)
