@@ -40,6 +40,9 @@
             this.cbImageReady = new System.Windows.Forms.CheckBox();
             this.cbArchiveImageActive = new System.Windows.Forms.CheckBox();
             this.plControl = new System.Windows.Forms.Panel();
+            this.label2 = new System.Windows.Forms.Label();
+            this.numRecordSelect = new System.Windows.Forms.NumericUpDown();
+            this.label1 = new System.Windows.Forms.Label();
             this.bttnEncoderPhase = new System.Windows.Forms.Button();
             this.cbTrigger = new System.Windows.Forms.CheckBox();
             this.numToolSelect = new System.Windows.Forms.NumericUpDown();
@@ -47,16 +50,11 @@
             this.cbToolPassed = new System.Windows.Forms.CheckBox();
             this.lbToolName = new System.Windows.Forms.Label();
             this.lbToolData = new System.Windows.Forms.ListBox();
-            this.cbAbortTriggeAck = new System.Windows.Forms.CheckBox();
-            this.cbTriggerAck = new System.Windows.Forms.CheckBox();
             this.recordDisplay = new Cognex.VisionPro.CogRecordDisplay();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.numRecordSelect = new System.Windows.Forms.NumericUpDown();
             this.plControl.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numRecordSelect)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numToolSelect)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.recordDisplay)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numRecordSelect)).BeginInit();
             this.SuspendLayout();
             // 
             // bttnCameraLog
@@ -142,7 +140,7 @@
             // cbImageReady
             // 
             this.cbImageReady.AutoSize = true;
-            this.cbImageReady.Location = new System.Drawing.Point(3, 179);
+            this.cbImageReady.Location = new System.Drawing.Point(3, 142);
             this.cbImageReady.Name = "cbImageReady";
             this.cbImageReady.Size = new System.Drawing.Size(89, 17);
             this.cbImageReady.TabIndex = 22;
@@ -174,8 +172,6 @@
             this.plControl.Controls.Add(this.cbToolPassed);
             this.plControl.Controls.Add(this.lbToolName);
             this.plControl.Controls.Add(this.lbToolData);
-            this.plControl.Controls.Add(this.cbAbortTriggeAck);
-            this.plControl.Controls.Add(this.cbTriggerAck);
             this.plControl.Controls.Add(this.cbArchiveImageActive);
             this.plControl.Controls.Add(this.cbImageReady);
             this.plControl.Controls.Add(this.cbCameraConnected);
@@ -190,6 +186,34 @@
             this.plControl.Name = "plControl";
             this.plControl.Size = new System.Drawing.Size(158, 535);
             this.plControl.TabIndex = 18;
+            // 
+            // label2
+            // 
+            this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(6, 294);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(87, 13);
+            this.label2.TabIndex = 35;
+            this.label2.Text = "Selected Record";
+            // 
+            // numRecordSelect
+            // 
+            this.numRecordSelect.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.numRecordSelect.Location = new System.Drawing.Point(99, 292);
+            this.numRecordSelect.Name = "numRecordSelect";
+            this.numRecordSelect.Size = new System.Drawing.Size(50, 20);
+            this.numRecordSelect.TabIndex = 34;
+            // 
+            // label1
+            // 
+            this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(6, 320);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(73, 13);
+            this.label1.TabIndex = 33;
+            this.label1.Text = "Selected Tool";
             // 
             // bttnEncoderPhase
             // 
@@ -241,7 +265,7 @@
             // cbToolPassed
             // 
             this.cbToolPassed.AutoSize = true;
-            this.cbToolPassed.Location = new System.Drawing.Point(3, 197);
+            this.cbToolPassed.Location = new System.Drawing.Point(3, 160);
             this.cbToolPassed.Name = "cbToolPassed";
             this.cbToolPassed.Size = new System.Drawing.Size(85, 17);
             this.cbToolPassed.TabIndex = 28;
@@ -260,30 +284,10 @@
             // lbToolData
             // 
             this.lbToolData.FormattingEnabled = true;
-            this.lbToolData.Location = new System.Drawing.Point(3, 215);
+            this.lbToolData.Location = new System.Drawing.Point(3, 178);
             this.lbToolData.Name = "lbToolData";
             this.lbToolData.Size = new System.Drawing.Size(149, 17);
             this.lbToolData.TabIndex = 26;
-            // 
-            // cbAbortTriggeAck
-            // 
-            this.cbAbortTriggeAck.AutoSize = true;
-            this.cbAbortTriggeAck.Location = new System.Drawing.Point(3, 161);
-            this.cbAbortTriggeAck.Name = "cbAbortTriggeAck";
-            this.cbAbortTriggeAck.Size = new System.Drawing.Size(155, 17);
-            this.cbAbortTriggeAck.TabIndex = 25;
-            this.cbAbortTriggeAck.Text = "Abort Trigger Acknowledge";
-            this.cbAbortTriggeAck.UseVisualStyleBackColor = true;
-            // 
-            // cbTriggerAck
-            // 
-            this.cbTriggerAck.AutoSize = true;
-            this.cbTriggerAck.Location = new System.Drawing.Point(3, 143);
-            this.cbTriggerAck.Name = "cbTriggerAck";
-            this.cbTriggerAck.Size = new System.Drawing.Size(127, 17);
-            this.cbTriggerAck.TabIndex = 24;
-            this.cbTriggerAck.Text = "Trigger Acknowledge";
-            this.cbTriggerAck.UseVisualStyleBackColor = true;
             // 
             // recordDisplay
             // 
@@ -301,34 +305,6 @@
             this.recordDisplay.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("recordDisplay.OcxState")));
             this.recordDisplay.Size = new System.Drawing.Size(307, 293);
             this.recordDisplay.TabIndex = 19;
-            // 
-            // label1
-            // 
-            this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(6, 320);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(73, 13);
-            this.label1.TabIndex = 33;
-            this.label1.Text = "Selected Tool";
-            // 
-            // label2
-            // 
-            this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(6, 294);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(87, 13);
-            this.label2.TabIndex = 35;
-            this.label2.Text = "Selected Record";
-            // 
-            // numRecordSelect
-            // 
-            this.numRecordSelect.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.numRecordSelect.Location = new System.Drawing.Point(99, 292);
-            this.numRecordSelect.Name = "numRecordSelect";
-            this.numRecordSelect.Size = new System.Drawing.Size(50, 20);
-            this.numRecordSelect.TabIndex = 34;
             // 
             // CameraControl
             // 
@@ -348,9 +324,9 @@
             this.Resize += new System.EventHandler(this.CameraControl_Resize);
             this.plControl.ResumeLayout(false);
             this.plControl.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numRecordSelect)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numToolSelect)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.recordDisplay)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numRecordSelect)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -366,8 +342,6 @@
         private System.Windows.Forms.CheckBox cbImageReady;
         private System.Windows.Forms.CheckBox cbArchiveImageActive;
         private System.Windows.Forms.Panel plControl;
-        private System.Windows.Forms.CheckBox cbAbortTriggeAck;
-        private System.Windows.Forms.CheckBox cbTriggerAck;
         private System.Windows.Forms.ListBox lbToolData;
         private System.Windows.Forms.Label lbToolName;
         private Cognex.VisionPro.CogRecordDisplay recordDisplay;

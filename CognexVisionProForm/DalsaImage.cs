@@ -320,6 +320,9 @@ public class DalsaImage
 
         serverLocation = new SapLocation(LoadServerSelect, LoadResourceIndex);
 
+        bool acq0SupportSG = SapBuffer.IsBufferTypeSupported(serverLocation, SapBuffer.MemoryType.ScatterGather);
+        bool acq0SupportSGP = SapBuffer.IsBufferTypeSupported(serverLocation, SapBuffer.MemoryType.ScatterGatherPhysical);
+
         string configFile = "";
         if (ConfigFilePresent) { configFile = ConfigFile; }
 
@@ -328,16 +331,24 @@ public class DalsaImage
             ServerType = ServerCategory.ServerAcq;
 
             acquisition = new SapAcquisition(serverLocation, configFile);
-            buffers = new SapBufferWithTrash(4, acquisition, SapBuffer.MemoryType.ScatterGather);
+
+            if(acq0SupportSG)
+            {
+                buffers = new SapBufferWithTrash(4, acquisition, SapBuffer.MemoryType.ScatterGather);
+            }
+            else if(acq0SupportSGP)
+            {
+                buffers = new SapBufferWithTrash(4, acquisition, SapBuffer.MemoryType.ScatterGatherPhysical);
+            }
             acqXfer = new SapAcqToBuf(acquisition, buffers);
             
-            // End of frame event
+            // End of frame event (End Of Frame)
             acqXfer.Pairs[0].EventType = SapXferPair.XferEventType.EndOfFrame;
             acqXfer.XferNotify += new SapXferNotifyHandler(XferNotify);
             acqXfer.Pairs[0].Cycle = SapXferPair.CycleMode.NextWithTrash;
             acqXfer.XferNotifyContext = this;
 
-            // event fot Acqcallback (Frame lost)
+            // event fot Acqcallback (Start Of Frame)
             acquisition.EventType = SapAcquisition.AcqEventType.StartOfFrame;
             acquisition.AcqNotify += new SapAcqNotifyHandler(StartOfFrameEvent);
             acquisition.AcqNotifyContext = this;
@@ -351,11 +362,20 @@ public class DalsaImage
             ServerType = ServerCategory.ServerAcqDevice;
             
             acqDevice = new SapAcqDevice(serverLocation, configFile);
-            buffers = new SapBufferWithTrash(4, acqDevice, SapBuffer.MemoryType.ScatterGatherPhysical);
+            
+            if (acq0SupportSG)
+            {
+                buffers = new SapBufferWithTrash(4, acqDevice, SapBuffer.MemoryType.ScatterGather);
+            }
+            else if (acq0SupportSGP)
+            {
+                buffers = new SapBufferWithTrash(4, acqDevice, SapBuffer.MemoryType.ScatterGatherPhysical);
+            }
+            
             acqDeviceXfer = new SapAcqDeviceToBuf(acqDevice, buffers);
 
             // End of frame event
-            acqDeviceXfer.Pairs[0].EventType = SapXferPair.XferEventType.EndOfTransfer;
+            acqDeviceXfer.Pairs[0].EventType = SapXferPair.XferEventType.EndOfFrame;
             acqDeviceXfer.XferNotify += new SapXferNotifyHandler(XferNotify);
             acqDeviceXfer.Pairs[0].Cycle = SapXferPair.CycleMode.NextWithTrash;
             acqDeviceXfer.XferNotifyContext = this;
@@ -554,7 +574,6 @@ public class DalsaImage
 
         // Save Image as BMP to pre-defined location
         if (buffers != null && SaveImageSelected) { SaveImageBMP(); }
-        buffers.Clear();
         ImageReady = true;
         
         acqTimeWatch.Stop();
@@ -645,7 +664,9 @@ public class DalsaImage
     }
     public void XferNotify(object sender, SapXferNotifyEventArgs argsNotify)
     {
-        UpdateImageData();
+        if (argsNotify.Trash) { return; }
+        else { UpdateImageData(); }
+
     }
     static void GetSignalStatus(object sender, SapSignalNotifyEventArgs argsSignal)
     {
@@ -657,6 +678,7 @@ public class DalsaImage
         grabbing = true;
         startOfFrameTime = acqTimeWatch.ElapsedMilliseconds;
     }
+
 
 
 

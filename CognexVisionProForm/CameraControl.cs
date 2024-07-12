@@ -62,8 +62,6 @@ namespace CognexVisionProForm
 
             cbCameraConnected.Checked = camera.Connected;
             cbTrigger.Checked = camera.Trigger;
-            cbTriggerAck.Checked = camera.TriggerAck;
-            cbAbortTriggeAck.Checked = camera.AbortTriggerAck;
             cbArchiveImageActive.Checked = camera.ArchiveImageActive;
             cbImageReady.Checked = camera.ImageReady;
 
@@ -168,7 +166,7 @@ namespace CognexVisionProForm
             }
             
             //Determine last record to display
-            if (record != null && tool.Result)
+            if (record != null)
             {
                 numRecordSelect.Minimum = 0;
                 numRecordSelect.Maximum = record.SubRecords.Count - 1;
