@@ -575,6 +575,7 @@ namespace CognexVisionProForm
 
         private void bttnAutoConnect_Click(object sender, EventArgs e)
         {
+            
             for (int i = cameraCount - 1; i >= 0; i--)
             {
                 if (!CameraAcqArray[i].Connected && CameraAcqArray[i].LoadServerSelect != null && CameraAcqArray[i].LoadResourceIndex != -1)
@@ -584,6 +585,8 @@ namespace CognexVisionProForm
                 }
                 
             }
+
+            this.WindowState = FormWindowState.Maximized;
             tabControl1.SelectedIndex = 0;
         }
     }

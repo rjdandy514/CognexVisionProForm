@@ -13,6 +13,7 @@ using Cognex.Vision;
 using System.CodeDom.Compiler;
 using System.Windows.Forms.Design.Behavior;
 using System.Threading;
+using System.Reflection;
 
 public class DalsaImage
 {
@@ -212,7 +213,7 @@ public class DalsaImage
     {
         get
         {
-            return serialNumber;
+            return SapManager.GetSerialNumber(serverLocation); 
         }
     }
     public int LoadResourceIndex
@@ -316,8 +317,6 @@ public class DalsaImage
     public void CreateCamera()
     {
         Utilities.LoggingStatment($"{cameraName}: Create Camera from {LoadServerSelect}  {LoadResourceIndex} ");
-        Destroy();
-        Dispose();
 
         serverLocation = new SapLocation(LoadServerSelect, LoadResourceIndex);
 
@@ -405,7 +404,6 @@ public class DalsaImage
             }
         }
 
-        serialNumber = SapManager.GetSerialNumber(serverLocation);
     }
     public void SnapPicture()
     {
@@ -504,48 +502,28 @@ public class DalsaImage
     }
     public void Destroy()
     {
-        if (acqXfer != null && acqXfer.Initialized) { acqXfer.Destroy(); }
-        if (acqDeviceXfer != null && acqDeviceXfer.Initialized) { acqDeviceXfer.Destroy(); }
-        if (acqDevice != null && acqDevice.Initialized) { acqDevice.Destroy(); }
-        if (buffers != null && buffers.Initialized) { buffers.Destroy(); }
-        if (archiveBuffers != null && archiveBuffers.Initialized) { archiveBuffers.Destroy(); }
-        if (acquisition != null && acquisition.Initialized) { acquisition.Destroy(); }
+        if (acqXfer != null && acqXfer.Initialized)                 { acqXfer.Destroy(); }
+        if (acqDeviceXfer != null && acqDeviceXfer.Initialized)     { acqDeviceXfer.Destroy(); }
+        if (acqDevice != null && acqDevice.Initialized)             { acqDevice.Destroy(); }
+        if (buffers != null && buffers.Initialized)                 { buffers.Destroy(); }
+        if (archiveBuffers != null && archiveBuffers.Initialized)   { archiveBuffers.Destroy(); }
+        if (acquisition != null && acquisition.Initialized)         { acquisition.Destroy(); }
     }
     public void Dispose()
     {
-        if (acqXfer != null)
-        {
-            acqXfer.Dispose();
-            acqXfer = null;
-        }
-        if (acqDeviceXfer != null) 
-        { 
-            acqDeviceXfer.Dispose();
-            acqDeviceXfer = null;
-        }
-        if (acqDevice != null) 
-        { 
-            acqDevice.Dispose();
-            acqDevice = null;
-        }
-        if (buffers != null) 
-        { 
-            buffers.Dispose();
-            buffers = null;
-        }
-
-        if (archiveBuffers != null) 
-        { 
-            archiveBuffers.Dispose();
-            archiveBuffers = null;
-        }
-
-        if (acquisition != null)
-        {
-            acquisition.Dispose();
-            acquisition = null;
-        }
-
+        if (acqXfer != null)            { acqXfer.Dispose(); }
+        if (acqDeviceXfer != null)      { acqDeviceXfer.Dispose(); }
+        if (acqDevice != null)          { acqDevice.Dispose(); }
+        if (buffers != null)            { buffers.Dispose(); }
+        if (archiveBuffers != null)     { archiveBuffers.Dispose(); }
+        if (acquisition != null)        { acquisition.Dispose(); }
+        
+        acqXfer = null;
+        acqDeviceXfer = null;
+        acqDevice = null;
+        buffers = null;
+        archiveBuffers = null;
+        acquisition = null;
     }
     public void UpdateImageData()
     {
@@ -559,6 +537,8 @@ public class DalsaImage
             imageWidth = buffers.Width;
             imageHeight = buffers.Height;
             imageFormat = buffers.XferParams.Format;
+
+            
         }
         //logic for using saved images
         else if(archiveBuffers != null && ArchiveImageActive)
@@ -645,10 +625,7 @@ public class DalsaImage
         int phaseB = 2;
         if (acquisition == null) { return 0; }
 
-        getResult = acquisition.GetParameter(SapAcquisition.Prm.CROP_HEIGHT, out returnTempParm);
         getResult = acquisition.GetParameter(SapAcquisition.Prm.EXT_LINE_TRIGGER_SOURCE, out returnGetParm);
-
-        returnCheckParm = returnGetParm;
 
         if (getResult && (returnGetParm == phaseA || returnGetParm == phaseB))
         {
@@ -663,11 +640,8 @@ public class DalsaImage
         }
 
         checkResult = acquisition.GetParameter(SapAcquisition.Prm.EXT_LINE_TRIGGER_SOURCE, out returnCheckParm);
-        return returnTempParm;
 
-
-
-
+        return returnCheckParm;
     }
     public void XferNotify(object sender, SapXferNotifyEventArgs argsNotify)
     {

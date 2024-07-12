@@ -67,6 +67,7 @@ namespace CognexVisionProForm
             cbArchiveImageActive.Checked = camera.ArchiveImageActive;
             cbImageReady.Checked = camera.ImageReady;
 
+            numToolSelect.Enabled = !_form.PlcCommsActive;
             bttnCameraSnap.Enabled = !_form.PlcCommsActive;
 
             bttnCameraAbort.Enabled = camera.Snapping || camera.Grabbing;
@@ -169,8 +170,11 @@ namespace CognexVisionProForm
             //Determine last record to display
             if (record != null && tool.Result)
             {
-                int lastRecordIndex = Math.Max(record.SubRecords.Count - 1, 0);
-                recordDisplay.Record = record.SubRecords[0];
+                numRecordSelect.Minimum = 0;
+                numRecordSelect.Maximum = record.SubRecords.Count - 1;
+
+                int selectedRecord = Convert.ToInt32(numRecordSelect.Value);
+                recordDisplay.Record = record.SubRecords[selectedRecord];
             }
         }
         private void bttnCameraSnap_MouseUp(object sender, MouseEventArgs e)
@@ -249,8 +253,6 @@ namespace CognexVisionProForm
             int encoderPhase = camera.EncoderPhase();
 
             bttnEncoderPhase.Text = $"Current Phase - {encoderPhase}";
-
-
         }
 
         private void numToolSelect_ValueChanged(object sender, EventArgs e)

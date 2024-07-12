@@ -50,9 +50,13 @@
             this.cbAbortTriggeAck = new System.Windows.Forms.CheckBox();
             this.cbTriggerAck = new System.Windows.Forms.CheckBox();
             this.recordDisplay = new Cognex.VisionPro.CogRecordDisplay();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.numRecordSelect = new System.Windows.Forms.NumericUpDown();
             this.plControl.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numToolSelect)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.recordDisplay)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numRecordSelect)).BeginInit();
             this.SuspendLayout();
             // 
             // bttnCameraLog
@@ -160,6 +164,9 @@
             this.plControl.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.plControl.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.plControl.Controls.Add(this.label2);
+            this.plControl.Controls.Add(this.numRecordSelect);
+            this.plControl.Controls.Add(this.label1);
             this.plControl.Controls.Add(this.bttnEncoderPhase);
             this.plControl.Controls.Add(this.cbTrigger);
             this.plControl.Controls.Add(this.numToolSelect);
@@ -211,9 +218,14 @@
             // numToolSelect
             // 
             this.numToolSelect.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.numToolSelect.Location = new System.Drawing.Point(3, 318);
+            this.numToolSelect.Location = new System.Drawing.Point(99, 318);
+            this.numToolSelect.Maximum = new decimal(new int[] {
+            4,
+            0,
+            0,
+            0});
             this.numToolSelect.Name = "numToolSelect";
-            this.numToolSelect.Size = new System.Drawing.Size(146, 20);
+            this.numToolSelect.Size = new System.Drawing.Size(50, 20);
             this.numToolSelect.TabIndex = 30;
             this.numToolSelect.ValueChanged += new System.EventHandler(this.numToolSelect_ValueChanged);
             // 
@@ -290,6 +302,34 @@
             this.recordDisplay.Size = new System.Drawing.Size(307, 293);
             this.recordDisplay.TabIndex = 19;
             // 
+            // label1
+            // 
+            this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(6, 320);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(73, 13);
+            this.label1.TabIndex = 33;
+            this.label1.Text = "Selected Tool";
+            // 
+            // label2
+            // 
+            this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(6, 294);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(87, 13);
+            this.label2.TabIndex = 35;
+            this.label2.Text = "Selected Record";
+            // 
+            // numRecordSelect
+            // 
+            this.numRecordSelect.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.numRecordSelect.Location = new System.Drawing.Point(99, 292);
+            this.numRecordSelect.Name = "numRecordSelect";
+            this.numRecordSelect.Size = new System.Drawing.Size(50, 20);
+            this.numRecordSelect.TabIndex = 34;
+            // 
             // CameraControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -310,6 +350,7 @@
             this.plControl.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numToolSelect)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.recordDisplay)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numRecordSelect)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -335,5 +376,8 @@
         private System.Windows.Forms.NumericUpDown numToolSelect;
         private System.Windows.Forms.CheckBox cbTrigger;
         private System.Windows.Forms.Button bttnEncoderPhase;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.NumericUpDown numRecordSelect;
     }
 }

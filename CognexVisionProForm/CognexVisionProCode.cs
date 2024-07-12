@@ -265,6 +265,8 @@ namespace CognexVisionProForm
                         desiredTool[j] = plcTool[j];
                     }
                     else { desiredTool[j] = 0; }
+
+                    cameraControl[j].ToolSelect = desiredTool[j];
                 }
                 else
                 {
