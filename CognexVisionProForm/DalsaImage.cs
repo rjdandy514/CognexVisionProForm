@@ -453,7 +453,7 @@ public class DalsaImage
         DirectoryInfo ImageDirInfo = new DirectoryInfo(imageFilePath);
         double ImageDirSize = Utilities.DirSize(ImageDirInfo);
         string ImageFileName = "Image_" + DateTime.Now.ToString("yyyyMMddHHmmssffff") +".bmp";
-        if (ImageDirSize < 2000)
+        if (ImageDirSize < 10000)
         {
             buffers.Save(imageFilePath + ImageFileName, "-format bmp");
         }
@@ -465,21 +465,9 @@ public class DalsaImage
     }
     public void Disconnect()
     {
-        if (acqDeviceXfer != null)
-        {
-            acqDeviceXfer.Disconnect();
-        }
-
-        if (acqDevice != null)
-        {
-            acqDevice.Destroy();
-        }
-        if (acqXfer != null)
-        { 
-            acqXfer.Disconnect();
-
-        }
-            
+        if (acqXfer != null) { acqXfer.Disconnect(); }
+        if (acqDeviceXfer != null) { acqDeviceXfer.Disconnect(); }
+        if (acqDevice != null) { acqDevice.Destroy(); }
 
     }
     public void Cleaning()
@@ -521,7 +509,6 @@ public class DalsaImage
         if (acqDevice != null && acqDevice.Initialized) { acqDevice.Destroy(); }
         if (buffers != null && buffers.Initialized) { buffers.Destroy(); }
         if (archiveBuffers != null && archiveBuffers.Initialized) { archiveBuffers.Destroy(); }
-
         if (acquisition != null && acquisition.Initialized) { acquisition.Destroy(); }
     }
     public void Dispose()
@@ -592,6 +579,7 @@ public class DalsaImage
         
         acqTimeWatch.Stop();
         acqTimeWatch.Reset();
+        snapping = false;
         grabbing = false;
         form.CameraSnapComplete = Id;
     }
@@ -651,11 +639,13 @@ public class DalsaImage
         
         int returnGetParm = 0;
         int returnCheckParm = 0;
+        int returnTempParm = 0;
 
         int phaseA = 1;
         int phaseB = 2;
         if (acquisition == null) { return 0; }
 
+        getResult = acquisition.GetParameter(SapAcquisition.Prm.CROP_HEIGHT, out returnTempParm);
         getResult = acquisition.GetParameter(SapAcquisition.Prm.EXT_LINE_TRIGGER_SOURCE, out returnGetParm);
 
         returnCheckParm = returnGetParm;
@@ -673,7 +663,7 @@ public class DalsaImage
         }
 
         checkResult = acquisition.GetParameter(SapAcquisition.Prm.EXT_LINE_TRIGGER_SOURCE, out returnCheckParm);
-        return returnCheckParm;
+        return returnTempParm;
 
 
 

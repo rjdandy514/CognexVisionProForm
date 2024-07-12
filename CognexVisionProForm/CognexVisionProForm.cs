@@ -307,6 +307,7 @@ namespace CognexVisionProForm
             else 
             {
                 CameraAcqArray[selectedCameraId].Disconnect();
+                CameraAcqArray[selectedCameraId].Cleaning();
             }
 
             cbCameraConnected.Checked = CameraAcqArray[selectedCameraId].Connected;

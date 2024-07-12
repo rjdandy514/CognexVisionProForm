@@ -221,6 +221,7 @@ namespace CognexVisionProForm
             cameraSnapComplete[i] = false;
             toolTrigger[i] = false;
             toolTriggerComplete[i] = false;
+            CameraUpdate();
         }
         public void CameraUpdate()
         {
