@@ -51,6 +51,7 @@
             this.lbToolName = new System.Windows.Forms.Label();
             this.lbToolData = new System.Windows.Forms.ListBox();
             this.recordDisplay = new Cognex.VisionPro.CogRecordDisplay();
+            this.bttnGrab = new System.Windows.Forms.Button();
             this.plControl.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numRecordSelect)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numToolSelect)).BeginInit();
@@ -63,9 +64,9 @@
             this.bttnCameraLog.BackColor = System.Drawing.SystemColors.ButtonFace;
             this.bttnCameraLog.FlatAppearance.BorderColor = System.Drawing.Color.Red;
             this.bttnCameraLog.FlatAppearance.BorderSize = 2;
-            this.bttnCameraLog.Location = new System.Drawing.Point(3, 483);
+            this.bttnCameraLog.Location = new System.Drawing.Point(3, 497);
             this.bttnCameraLog.Name = "bttnCameraLog";
-            this.bttnCameraLog.Size = new System.Drawing.Size(152, 43);
+            this.bttnCameraLog.Size = new System.Drawing.Size(152, 29);
             this.bttnCameraLog.TabIndex = 2;
             this.bttnCameraLog.Text = "Log Images";
             this.bttnCameraLog.UseVisualStyleBackColor = false;
@@ -77,9 +78,9 @@
             this.bttnCameraAbort.BackColor = System.Drawing.SystemColors.ButtonFace;
             this.bttnCameraAbort.FlatAppearance.BorderColor = System.Drawing.Color.Red;
             this.bttnCameraAbort.FlatAppearance.BorderSize = 2;
-            this.bttnCameraAbort.Location = new System.Drawing.Point(3, 436);
+            this.bttnCameraAbort.Location = new System.Drawing.Point(3, 462);
             this.bttnCameraAbort.Name = "bttnCameraAbort";
-            this.bttnCameraAbort.Size = new System.Drawing.Size(152, 43);
+            this.bttnCameraAbort.Size = new System.Drawing.Size(152, 29);
             this.bttnCameraAbort.TabIndex = 1;
             this.bttnCameraAbort.Text = "Abort";
             this.bttnCameraAbort.UseVisualStyleBackColor = false;
@@ -93,7 +94,7 @@
             this.bttnCameraSnap.FlatAppearance.BorderSize = 2;
             this.bttnCameraSnap.Location = new System.Drawing.Point(3, 389);
             this.bttnCameraSnap.Name = "bttnCameraSnap";
-            this.bttnCameraSnap.Size = new System.Drawing.Size(152, 43);
+            this.bttnCameraSnap.Size = new System.Drawing.Size(152, 29);
             this.bttnCameraSnap.TabIndex = 0;
             this.bttnCameraSnap.Text = "Single Snap";
             this.bttnCameraSnap.UseVisualStyleBackColor = false;
@@ -162,6 +163,7 @@
             this.plControl.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.plControl.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.plControl.Controls.Add(this.bttnGrab);
             this.plControl.Controls.Add(this.label2);
             this.plControl.Controls.Add(this.numRecordSelect);
             this.plControl.Controls.Add(this.label1);
@@ -223,7 +225,7 @@
             this.bttnEncoderPhase.FlatAppearance.BorderSize = 2;
             this.bttnEncoderPhase.Location = new System.Drawing.Point(3, 342);
             this.bttnEncoderPhase.Name = "bttnEncoderPhase";
-            this.bttnEncoderPhase.Size = new System.Drawing.Size(152, 43);
+            this.bttnEncoderPhase.Size = new System.Drawing.Size(152, 29);
             this.bttnEncoderPhase.TabIndex = 32;
             this.bttnEncoderPhase.Text = "Change Encoder Phase";
             this.bttnEncoderPhase.UseVisualStyleBackColor = false;
@@ -306,6 +308,20 @@
             this.recordDisplay.Size = new System.Drawing.Size(307, 293);
             this.recordDisplay.TabIndex = 19;
             // 
+            // bttnGrab
+            // 
+            this.bttnGrab.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.bttnGrab.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.bttnGrab.FlatAppearance.BorderColor = System.Drawing.Color.Red;
+            this.bttnGrab.FlatAppearance.BorderSize = 2;
+            this.bttnGrab.Location = new System.Drawing.Point(3, 424);
+            this.bttnGrab.Name = "bttnGrab";
+            this.bttnGrab.Size = new System.Drawing.Size(152, 29);
+            this.bttnGrab.TabIndex = 36;
+            this.bttnGrab.Text = "Grab";
+            this.bttnGrab.UseVisualStyleBackColor = false;
+            this.bttnGrab.Click += new System.EventHandler(this.bttnGrab_Click);
+            // 
             // CameraControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -353,5 +369,6 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.NumericUpDown numRecordSelect;
+        private System.Windows.Forms.Button bttnGrab;
     }
 }

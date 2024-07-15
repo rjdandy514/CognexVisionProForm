@@ -66,14 +66,18 @@ namespace CognexVisionProForm
             cbImageReady.Checked = camera.ImageReady;
 
             numToolSelect.Enabled = !_form.PlcCommsActive;
-            bttnCameraSnap.Enabled = !_form.PlcCommsActive;
-
-            bttnCameraAbort.Enabled = camera.Snapping || camera.Grabbing;
+            
+            bttnCameraSnap.Enabled = !_form.PlcCommsActive && !(camera.Snapping || camera.Acquiring || camera.Grabbing);
+            bttnGrab.Enabled = !_form.PlcCommsActive && !(camera.Snapping || camera.Acquiring || camera.Grabbing);
+            bttnCameraAbort.Enabled = camera.Snapping || camera.Acquiring || camera.Grabbing;
             
             
-            if(camera.Grabbing) { bttnCameraSnap.Text = " Grabbing"; }
+            if(camera.Acquiring) { bttnCameraSnap.Text = " Aquiring"; }
             else if (camera.Snapping) { bttnCameraSnap.Text = " Snapping"; }
             else { bttnCameraSnap.Text = " Press To Snap"; }
+
+            if (camera.Grabbing) { bttnGrab.Text = "Grabbing"; }
+            else { bttnGrab.Text = "Press To Grab"; }
 
             pollingTimer.Start();
         }
@@ -109,6 +113,7 @@ namespace CognexVisionProForm
         }
         private void bttnCameraAbort_Click(object sender, EventArgs e)
         {
+            camera.TriggerGrab = false;
             _form.CameraAbort(camera.Id);
             camera.Abort();
             
@@ -256,6 +261,14 @@ namespace CognexVisionProForm
         private void numToolSelect_ValueChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void bttnGrab_Click(object sender, EventArgs e)
+        {
+            camera.TriggerGrab = true;
+            bttnGrab.Enabled = false;
+
+            bttnGrab.Text = "Grabbing";
         }
     }
 }

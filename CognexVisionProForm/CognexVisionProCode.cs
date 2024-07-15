@@ -578,7 +578,7 @@ namespace CognexVisionProForm
                 tempTag |= ((toolblockArray[cam, desiredTool[cam]].Result ? 1 : 0) << 6);
                 tempTag |= ((toolblockArray[cam, desiredTool[cam]].FilePresent ? 1 : 0) << 7);
                 tempTag |= ((CameraAcqArray[cam].Snapping ? 1 : 0) << 8);
-                tempTag |= ((CameraAcqArray[cam].Grabbing ? 1 : 0) << 9);
+                tempTag |= ((CameraAcqArray[cam].Acquiring ? 1 : 0) << 9);
 
                 tempTag |= desiredTool[cam] << 16;
 

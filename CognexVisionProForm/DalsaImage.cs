@@ -45,15 +45,18 @@ public class DalsaImage
 
     FileInfo[] archiveImageArray;
     int archiveImageCount;
-    
-    bool trigger;
+
+    bool trigger = false;
     bool triggerMem = false;
+    bool triggerGrab = false;
+    bool triggerGrabMem = false;
 
     bool abort;
     bool abortMem = false;
 
     bool snapping = false;
     bool grabbing = false;
+    bool acquiring = false;
 
 
     string cameraName;
@@ -85,7 +88,7 @@ public class DalsaImage
     }
     public int BufferIndex
     {
-        get {return buffers.Index; }
+        get { return buffers.Index; }
     }
     public string ConfigFile
     {
@@ -94,10 +97,10 @@ public class DalsaImage
     public string Name
     {
         get { return cameraName; }
-        set 
-        { 
+        set
+        {
             cameraName = value;
-            imageFilePath = Utilities.ExeFilePath + "\\Camera" + Id.ToString("00")+ "\\Images\\";
+            imageFilePath = Utilities.ExeFilePath + "\\Camera" + Id.ToString("00") + "\\Images\\";
         }
     }
     public string Description
@@ -108,7 +111,7 @@ public class DalsaImage
     }
     public bool Connected
     {
-        get 
+        get
         {
             if (acqDeviceXfer != null) { return acqDeviceXfer.Connected && acqDeviceXfer.Initialized; }
             else if (acqXfer != null) { return acqXfer.Connected && acqXfer.Initialized; }
@@ -117,22 +120,19 @@ public class DalsaImage
     }
     public bool Trigger
     {
-        get
-        {
-            return trigger;
-        }
+        get { return trigger; }
         set
         {
-            
+
             trigger = value;
 
 
-            if(Connected && trigger && !triggerMem)
+            if (Connected && trigger && !triggerMem)
             {
                 SnapPicture();
                 form.CameraSnap = Id;
             }
-            else if(ArchiveImageActive)
+            else if (ArchiveImageActive)
             {
                 CreateBufferFromFile();
                 ArchiveImageIndex++;
@@ -143,11 +143,25 @@ public class DalsaImage
 
         }
     }
+    public bool TriggerGrab
+    {
+        get { return triggerGrab; }
+        set
+        {
+            triggerGrab = value;
+
+            if (Connected && triggerGrab && !triggerGrabMem && !ArchiveImageActive)
+            {
+                GrabPicture();
+            }
+            triggerGrabMem = triggerGrab;
+        }
+    }
     public bool TriggerAck
     {
-        get 
+        get
         {
-            return trigger; 
+            return trigger;
         }
     }
     public bool AbortTrigger
@@ -174,16 +188,20 @@ public class DalsaImage
     }
     public bool Snapping
     {
-        get {return snapping;}
+        get { return snapping; }
 
     }
     public bool Grabbing
     {
         get { return grabbing; }
     }
+    public bool Acquiring
+    {
+        get { return acquiring; }
+    }
     public int IsMaster
     {
-        get 
+        get
         {
             int returnGetParm = 0;
             bool returngetResult = acquisition.GetParameter(SapAcquisition.Prm.BOARD_SYNC_OUTPUT1_SOURCE, out returnGetParm);
@@ -213,7 +231,7 @@ public class DalsaImage
     {
         get
         {
-            return SapManager.GetSerialNumber(serverLocation); 
+            return SapManager.GetSerialNumber(serverLocation);
         }
     }
     public int LoadResourceIndex
@@ -222,7 +240,7 @@ public class DalsaImage
     }
     public bool SaveImageSelected
     {
-        get;set;
+        get; set;
     }
     public bool ArchiveImageActive
     {
@@ -230,10 +248,10 @@ public class DalsaImage
     }
     public int ArchiveImageCount
     {
-        get 
+        get
         {
             FindArchivedImages();
-            return archiveImageCount; 
+            return archiveImageCount;
         }
     }
     public int ArchiveImageIndex
@@ -246,12 +264,12 @@ public class DalsaImage
     }
     public ICogImage Image
     {
-        get;set;
+        get; set;
     }
     public void FindArchivedImages()
     {
         //Confirm Directory Exists
-        if(!String.IsNullOrEmpty(imageFilePath))
+        if (!String.IsNullOrEmpty(imageFilePath))
         {
 
         }
@@ -265,7 +283,7 @@ public class DalsaImage
         DirectoryInfo imageDirInfo = new DirectoryInfo(imageFilePath);
         //Create Array of names if files
         archiveImageArray = imageDirInfo.GetFiles();
-        
+
         if (archiveImageArray.Length > 0) { archiveImageCount = archiveImageArray.Length; }
         else { archiveImageCount = -1; }
 
@@ -275,9 +293,9 @@ public class DalsaImage
         acqTimeWatch.Start();
         ImageReady = false;
 
-        if (archiveImageCount == -1) {return; }
+        if (archiveImageCount == -1) { return; }
         if (ArchiveImageIndex > archiveImageCount - 1) { ArchiveImageIndex = 0; }
-        if (ArchiveImageIndex < 0 ) { ArchiveImageIndex = archiveImageCount - 1; }
+        if (ArchiveImageIndex < 0) { ArchiveImageIndex = archiveImageCount - 1; }
 
         string filename = imageFilePath + archiveImageArray[ArchiveImageIndex].Name;
 
@@ -332,16 +350,16 @@ public class DalsaImage
 
             acquisition = new SapAcquisition(serverLocation, configFile);
 
-            if(acq0SupportSG)
+            if (acq0SupportSG)
             {
                 buffers = new SapBufferWithTrash(4, acquisition, SapBuffer.MemoryType.ScatterGather);
             }
-            else if(acq0SupportSGP)
+            else if (acq0SupportSGP)
             {
                 buffers = new SapBufferWithTrash(4, acquisition, SapBuffer.MemoryType.ScatterGatherPhysical);
             }
             acqXfer = new SapAcqToBuf(acquisition, buffers);
-            
+
             // End of frame event (End Of Frame)
             acqXfer.Pairs[0].EventType = SapXferPair.XferEventType.EndOfFrame;
             acqXfer.XferNotify += new SapXferNotifyHandler(XferNotify);
@@ -356,13 +374,13 @@ public class DalsaImage
             // event for signal status
             acquisition.SignalNotify += new SapSignalNotifyHandler(GetSignalStatus);
             acquisition.SignalNotifyContext = this;
-        }      
+        }
         else if (SapManager.GetResourceCount(serverLocation, SapManager.ResourceType.AcqDevice) > 0)
         {
             ServerType = ServerCategory.ServerAcqDevice;
-            
+
             acqDevice = new SapAcqDevice(serverLocation, configFile);
-            
+
             if (acq0SupportSG)
             {
                 buffers = new SapBufferWithTrash(4, acqDevice, SapBuffer.MemoryType.ScatterGather);
@@ -371,7 +389,7 @@ public class DalsaImage
             {
                 buffers = new SapBufferWithTrash(4, acqDevice, SapBuffer.MemoryType.ScatterGatherPhysical);
             }
-            
+
             acqDeviceXfer = new SapAcqDeviceToBuf(acqDevice, buffers);
 
             // End of frame event
@@ -382,34 +400,34 @@ public class DalsaImage
         }
 
 
-        if(acquisition != null && !acquisition.Initialized)
+        if (acquisition != null && !acquisition.Initialized)
         {
-            if (acquisition.Create() == false) 
+            if (acquisition.Create() == false)
             {
                 Destroy();
-                return; 
-            }            
+                return;
+            }
         }
         if (acqDevice != null && !acqDevice.Initialized)
         {
-            if (acqDevice.Create() == false) 
+            if (acqDevice.Create() == false)
             {
                 Destroy();
-                return; 
+                return;
             }
         }
         if (buffers != null && !buffers.Initialized)
         {
             ArchiveImageActive = false;
-            if (buffers.Create() == false) 
+            if (buffers.Create() == false)
             {
                 Destroy();
-                return; 
+                return;
             }
         }
         if (acqDeviceXfer != null && !acqDeviceXfer.Initialized)
         {
-            if (acqDeviceXfer.Create() == false) 
+            if (acqDeviceXfer.Create() == false)
             {
                 Destroy();
                 return;
@@ -417,10 +435,10 @@ public class DalsaImage
         }
         if (acqXfer != null && !acqXfer.Initialized)
         {
-            if (acqXfer.Create() == false) 
+            if (acqXfer.Create() == false)
             {
                 Destroy();
-                return; 
+                return;
             }
         }
 
@@ -430,7 +448,7 @@ public class DalsaImage
         ImageReady = false;
         acqTimeWatch.Restart();
 
-        if(acqDeviceXfer != null && acqDeviceXfer.Connected)
+        if (acqDeviceXfer != null && acqDeviceXfer.Connected)
         {
             if (acqDeviceXfer.Snap())
             {
@@ -439,14 +457,33 @@ public class DalsaImage
                 snapping = true;
             }
         }
-        else if(acqXfer != null && acqXfer.Connected)
+        else if (acqXfer != null && acqXfer.Connected)
         {
             if (acqXfer.Snap())
             {
                 //acqXfer.Wait(5000);
-                    
+
                 snapTime = acqTimeWatch.ElapsedMilliseconds;
                 snapping = true;
+            }
+        }
+    }
+    public void GrabPicture()
+    {
+        ImageReady = false;
+
+        if (acqDeviceXfer != null && acqDeviceXfer.Connected)
+        {
+            if (acqDeviceXfer.Grab())
+            {
+                grabbing = true;
+            }
+        }
+        else if (acqXfer != null && acqXfer.Connected)
+        {
+            if (acqXfer.Grab())
+            {
+                grabbing = true;
             }
         }
     }
@@ -462,6 +499,7 @@ public class DalsaImage
         }
         snapping = false;
         grabbing = false;
+        acquiring = false;
         ImageReady = true;
     }
     public void SaveImageBMP()
@@ -470,7 +508,7 @@ public class DalsaImage
 
         DirectoryInfo ImageDirInfo = new DirectoryInfo(imageFilePath);
         double ImageDirSize = Utilities.DirSize(ImageDirInfo);
-        string ImageFileName = "Image_" + DateTime.Now.ToString("yyyyMMddHHmmssffff") +".bmp";
+        string ImageFileName = "Image_" + DateTime.Now.ToString("yyyyMMddHHmmssffff") + ".bmp";
         if (ImageDirSize < 10000)
         {
             buffers.Save(imageFilePath + ImageFileName, "-format bmp");
@@ -478,7 +516,7 @@ public class DalsaImage
         else { MessageBox.Show($"{Name} Image folder has reached {ImageDirSize}MB"); }
 
 
-        
+
         Utilities.LoggingStatment($"{cameraName}: Save Image to BMP ");
     }
     public void Disconnect()
@@ -495,7 +533,7 @@ public class DalsaImage
             acqDeviceXfer.Destroy();
             acqDeviceXfer.Dispose();
         }
-        
+
         if (acquisition != null)
         {
             acquisition.Destroy();
@@ -522,22 +560,22 @@ public class DalsaImage
     }
     public void Destroy()
     {
-        if (acqXfer != null && acqXfer.Initialized)                 { acqXfer.Destroy(); }
-        if (acqDeviceXfer != null && acqDeviceXfer.Initialized)     { acqDeviceXfer.Destroy(); }
-        if (acqDevice != null && acqDevice.Initialized)             { acqDevice.Destroy(); }
-        if (buffers != null && buffers.Initialized)                 { buffers.Destroy(); }
-        if (archiveBuffers != null && archiveBuffers.Initialized)   { archiveBuffers.Destroy(); }
-        if (acquisition != null && acquisition.Initialized)         { acquisition.Destroy(); }
+        if (acqXfer != null && acqXfer.Initialized) { acqXfer.Destroy(); }
+        if (acqDeviceXfer != null && acqDeviceXfer.Initialized) { acqDeviceXfer.Destroy(); }
+        if (acqDevice != null && acqDevice.Initialized) { acqDevice.Destroy(); }
+        if (buffers != null && buffers.Initialized) { buffers.Destroy(); }
+        if (archiveBuffers != null && archiveBuffers.Initialized) { archiveBuffers.Destroy(); }
+        if (acquisition != null && acquisition.Initialized) { acquisition.Destroy(); }
     }
     public void Dispose()
     {
-        if (acqXfer != null)            { acqXfer.Dispose(); }
-        if (acqDeviceXfer != null)      { acqDeviceXfer.Dispose(); }
-        if (acqDevice != null)          { acqDevice.Dispose(); }
-        if (buffers != null)            { buffers.Dispose(); }
-        if (archiveBuffers != null)     { archiveBuffers.Dispose(); }
-        if (acquisition != null)        { acquisition.Dispose(); }
-        
+        if (acqXfer != null) { acqXfer.Dispose(); }
+        if (acqDeviceXfer != null) { acqDeviceXfer.Dispose(); }
+        if (acqDevice != null) { acqDevice.Dispose(); }
+        if (buffers != null) { buffers.Dispose(); }
+        if (archiveBuffers != null) { archiveBuffers.Dispose(); }
+        if (acquisition != null) { acquisition.Dispose(); }
+
         acqXfer = null;
         acqDeviceXfer = null;
         acqDevice = null;
@@ -547,21 +585,21 @@ public class DalsaImage
     }
     public void UpdateImageData()
     {
-        
+
         acqTime = acqTimeWatch.ElapsedMilliseconds - startOfFrameTime;
 
         // logic for using Camera
-        if (buffers != null && Connected) 
-        { 
+        if (buffers != null && Connected)
+        {
             buffers.GetAddress(buffers.Index, out imageAddress);
             imageWidth = buffers.Width;
             imageHeight = buffers.Height;
             imageFormat = buffers.XferParams.Format;
 
-            
+
         }
         //logic for using saved images
-        else if(archiveBuffers != null && ArchiveImageActive)
+        else if (archiveBuffers != null && ArchiveImageActive)
         {
             archiveBuffers.GetAddress(archiveBuffers.Index, out imageAddress);
             imageWidth = archiveBuffers.Width;
@@ -575,11 +613,11 @@ public class DalsaImage
         // Save Image as BMP to pre-defined location
         if (buffers != null && SaveImageSelected) { SaveImageBMP(); }
         ImageReady = true;
-        
+
         acqTimeWatch.Stop();
         acqTimeWatch.Reset();
         snapping = false;
-        grabbing = false;
+        acquiring = false;
         form.CameraSnapComplete = Id;
     }
     public ICogImage RawToCogImage()
@@ -603,9 +641,9 @@ public class DalsaImage
         byte[] managedArray = new byte[managedArraySize];
         int size = Marshal.SizeOf(managedArray[0]) * managedArray.Length;
 
-        if (cogImageAddress.ToString().Equals("0")) 
-        { 
-            cogImageAddress = Marshal.AllocHGlobal(size); 
+        if (cogImageAddress.ToString().Equals("0"))
+        {
+            cogImageAddress = Marshal.AllocHGlobal(size);
         }
 
         //cogImageAddress = Marshal.AllocHGlobal(size);
@@ -635,7 +673,7 @@ public class DalsaImage
         bool getResult;
         bool setResult;
         bool checkResult;
-        
+
         int returnGetParm = 0;
         int returnCheckParm = 0;
         int returnTempParm = 0;
@@ -648,11 +686,11 @@ public class DalsaImage
 
         if (getResult && (returnGetParm == phaseA || returnGetParm == phaseB))
         {
-            if(returnGetParm == phaseA)
+            if (returnGetParm == phaseA)
             {
                 setResult = acquisition.SetParameter(SapAcquisition.Prm.EXT_LINE_TRIGGER_SOURCE, phaseB, true);
             }
-            if(returnGetParm == phaseB)
+            if (returnGetParm == phaseB)
             {
                 setResult = acquisition.SetParameter(SapAcquisition.Prm.EXT_LINE_TRIGGER_SOURCE, phaseA, true);
             }
@@ -665,7 +703,8 @@ public class DalsaImage
     public void XferNotify(object sender, SapXferNotifyEventArgs argsNotify)
     {
         if (argsNotify.Trash) { return; }
-        else { UpdateImageData(); }
+        else if (snapping || acquiring) { UpdateImageData(); }
+        else if (grabbing) { return; }
 
     }
     static void GetSignalStatus(object sender, SapSignalNotifyEventArgs argsSignal)
@@ -674,9 +713,11 @@ public class DalsaImage
     }
     public void StartOfFrameEvent(object sender, SapAcqNotifyEventArgs argsSignal)
     {
-        snapping = false;
-        grabbing = true;
-        startOfFrameTime = acqTimeWatch.ElapsedMilliseconds;
+
+            snapping = false;
+            acquiring = true;
+            startOfFrameTime = acqTimeWatch.ElapsedMilliseconds;
+
     }
 
 
