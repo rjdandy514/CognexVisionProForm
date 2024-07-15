@@ -193,7 +193,10 @@ public class DalsaImage
     }
     public bool Grabbing
     {
-        get { return grabbing; }
+        get 
+        { 
+            return grabbing; 
+        }
     }
     public bool Acquiring
     {
@@ -491,10 +494,12 @@ public class DalsaImage
     {
         if (acqDeviceXfer != null && acqDeviceXfer.Connected)
         {
+            if (acqDeviceXfer.Grabbing) { acqDeviceXfer.Freeze(); }
             acqDeviceXfer.Abort();
         }
         else if (acqXfer != null && acqXfer.Connected)
         {
+            if (acqXfer.Grabbing) { acqXfer.Freeze(); }
             acqXfer.Abort();
         }
         snapping = false;
@@ -595,8 +600,6 @@ public class DalsaImage
             imageWidth = buffers.Width;
             imageHeight = buffers.Height;
             imageFormat = buffers.XferParams.Format;
-
-
         }
         //logic for using saved images
         else if (archiveBuffers != null && ArchiveImageActive)
@@ -703,8 +706,7 @@ public class DalsaImage
     public void XferNotify(object sender, SapXferNotifyEventArgs argsNotify)
     {
         if (argsNotify.Trash) { return; }
-        else if (snapping || acquiring) { UpdateImageData(); }
-        else if (grabbing) { return; }
+        else{ UpdateImageData(); }
 
     }
     static void GetSignalStatus(object sender, SapSignalNotifyEventArgs argsSignal)
