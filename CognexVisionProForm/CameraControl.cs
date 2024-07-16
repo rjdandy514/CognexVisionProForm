@@ -65,21 +65,27 @@ namespace CognexVisionProForm
             cbArchiveImageActive.Checked = camera.ArchiveImageActive;
             cbImageReady.Checked = camera.ImageReady;
 
+            UpdateButton();
+
+            pollingTimer.Start();
+        }
+        private void UpdateButton()
+        {
             numToolSelect.Enabled = !_form.PlcCommsActive;
-            
-            bttnCameraSnap.Enabled = !_form.PlcCommsActive && !(camera.Snapping || camera.Acquiring || camera.Grabbing);
-            bttnGrab.Enabled = !_form.PlcCommsActive && !(camera.Snapping || camera.Acquiring || camera.Grabbing);
+
+            bool imageControl = !_form.PlcCommsActive && !(camera.Snapping || camera.Acquiring || camera.Grabbing);
+            bttnCameraSnap.Enabled = imageControl;
+            bttnGrab.Enabled = imageControl;
+
             bttnCameraAbort.Enabled = camera.Snapping || camera.Acquiring || camera.Grabbing;
-            
-            
-            if(camera.Acquiring) { bttnCameraSnap.Text = " Aquiring"; }
+
+
+            if (camera.Acquiring) { bttnCameraSnap.Text = " Aquiring"; }
             else if (camera.Snapping) { bttnCameraSnap.Text = " Snapping"; }
             else { bttnCameraSnap.Text = " Press To Snap"; }
 
             if (camera.Grabbing) { bttnGrab.Text = "Grabbing"; }
             else { bttnGrab.Text = "Press To Grab"; }
-
-            pollingTimer.Start();
         }
         private void CameraControl_Load(object sender, EventArgs e)
         {
@@ -107,9 +113,8 @@ namespace CognexVisionProForm
         {
             toolSelect = Convert.ToInt32(numToolSelect.Value);
             camera.Trigger = true;
-            bttnCameraSnap.Enabled = false;
             lbAcqTime.Text = $"Aquisition: --- ms";
-            bttnCameraSnap.Text = "Snap";
+            UpdateButton();
         }
         private void bttnCameraAbort_Click(object sender, EventArgs e)
         {
@@ -266,9 +271,7 @@ namespace CognexVisionProForm
         private void bttnGrab_Click(object sender, EventArgs e)
         {
             camera.TriggerGrab = true;
-            bttnGrab.Enabled = false;
-
-            bttnGrab.Text = "Grabbing";
+            UpdateButton();
         }
     }
 }
