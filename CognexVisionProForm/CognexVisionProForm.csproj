@@ -70,10 +70,10 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>0C5E93100C462EF9F131813CF4AB4C22D1C6F061</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>4DE40CC2CDE2C146BA09C19659DAE33A362D93CE</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>CognexVisionProForm_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>CognexVisionProForm_1_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <GenerateManifests>true</GenerateManifests>
@@ -193,7 +193,7 @@
     <EmbeddedResource Include="SplashScreen.resx">
       <DependentUpon>SplashScreen.cs</DependentUpon>
     </EmbeddedResource>
-    <None Include="CognexVisionProForm_TemporaryKey.pfx" />
+    <None Include="CognexVisionProForm_1_TemporaryKey.pfx" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

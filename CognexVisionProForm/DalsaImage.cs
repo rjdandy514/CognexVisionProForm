@@ -29,7 +29,7 @@ public class DalsaImage
     SapBuffer archiveBuffers;
     SapAcqDeviceToBuf acqDeviceXfer;
     SapAcqToBuf acqXfer;
-    SapFeature feature;
+    SapFeature deviceFeature;
 
     SapFormat imageFormat;
     int imageWidth;
@@ -457,6 +457,10 @@ public class DalsaImage
                 return;
             }
         }
+        if(acquisition.Initialized)
+        {
+            CheckCameraFeatures();
+        }
 
     }
     public void SnapPicture()
@@ -702,37 +706,8 @@ public class DalsaImage
         if (acquisition == null) { return 0; }
 
 
-        if (feature == null) { feature = new SapFeature(serverLocation); }
-        if (feature != null && !feature.Initialized) { feature.Create(); }
-        
-        int numberOfFeatures = acqDeviceData.FeatureCount;
-        string[] features = new string[numberOfFeatures];
-
-        for (int i = 0; i < features.Length; i++)
-        {
-            features[i] = acqDeviceData.FeatureNames[i];
-        }
-        
-       //Finding value of trigger mode
-        getResult = acqDeviceData.IsFeatureAvailable("TriggerMode");
-        getResult = acqDeviceData.GetFeatureInfo(features[37], feature);
-        SapFeature.Type myType = feature.DataType;
-        getResult = acqDeviceData.GetFeatureValue(features[37], out int enumValue);
-        getResult = feature.GetEnumTextFromValue(enumValue, out string enumString);
-        
-
-        getResult = acqDeviceData.IsFeatureAvailable(features[18]);
-        getResult = acqDeviceData.GetFeatureInfo(features[18], feature); myType = feature.DataType;
-        getResult = acqDeviceData.GetFeatureValue(features[18], out enumValue);
-        getResult = feature.GetEnumTextFromValue(enumValue, out enumString);
-
-        acqDeviceData.SetFeatureValue(features[18], 0);
-        getResult = acqDeviceData.GetFeatureValue(features[17], out enumValue);
-
-
         getResult = acquisition.GetParameter(SapAcquisition.Prm.EXT_LINE_TRIGGER_SOURCE, out returnGetParm);
 
-        
         if (getResult && (returnGetParm == phaseA || returnGetParm == phaseB))
         {
             if (returnGetParm == phaseA)
@@ -748,6 +723,61 @@ public class DalsaImage
         checkResult = acquisition.GetParameter(SapAcquisition.Prm.EXT_LINE_TRIGGER_SOURCE, out returnCheckParm);
 
         return returnCheckParm;
+    }
+    public void CheckCameraFeatures()
+    {
+        bool getFeatureInfo = false;
+        bool getFeatureValueResult = false;
+        bool getEnumTextFromValueResult = false;
+        bool setFeatureValueResult = false ;
+        int enumValue;
+        string enumString = "";
+        string userSetSelector = "UserSetSelector";
+        string userSetDefaultSelector = "UserSetDefaultSelector";
+        string userSetLoad = "UserSetLoad";
+        string triggerMode = "TriggerMode";
+        string userSetSave = "UserSetSave";
+
+
+        if (deviceFeature == null) { deviceFeature = new SapFeature(serverLocation); }
+        if (deviceFeature != null && !deviceFeature.Initialized) { deviceFeature.Create(); }
+
+        int numberOfFeatures = acqDeviceData.FeatureCount;
+        string[] features = new string[numberOfFeatures];
+
+        //get full List of Features Names
+        for (int i = 0; i < features.Length; i++)
+        {
+            features[i] = acqDeviceData.FeatureNames[i];
+        }
+
+        //Find and Set UserSet
+        getFeatureInfo = acqDeviceData.GetFeatureInfo(userSetSelector, deviceFeature);
+        getFeatureValueResult = acqDeviceData.GetFeatureValue(userSetSelector, out enumValue);
+        getEnumTextFromValueResult = deviceFeature.GetEnumTextFromValue(enumValue, out enumString);
+
+        if(enumString != "UserSet1")
+        {
+            //Set UserSetSelect,UserSetDefaultSelect to UserSet1
+            //Load select User Set
+            setFeatureValueResult = acqDeviceData.SetFeatureValue(userSetDefaultSelector, 1);
+            setFeatureValueResult = acqDeviceData.SetFeatureValue(userSetSelector, 1);
+            setFeatureValueResult = acqDeviceData.SetFeatureValue(userSetLoad, true);
+        }
+
+        //Finding value of trigger mode
+        getFeatureInfo = acqDeviceData.GetFeatureInfo(triggerMode, deviceFeature);
+        getFeatureValueResult = acqDeviceData.GetFeatureValue(triggerMode, out enumValue);
+        getEnumTextFromValueResult = deviceFeature.GetEnumTextFromValue(enumValue, out enumString);
+
+        if(enumString != "External")
+        {
+            //Set TriggerMode to External
+            //Save Values to UserSet1
+            setFeatureValueResult = acqDeviceData.SetFeatureValue(triggerMode, 1);
+            setFeatureValueResult = acqDeviceData.SetFeatureValue(userSetSave, true);
+        }
+
     }
     public void XferNotify(object sender, SapXferNotifyEventArgs argsNotify)
     {
