@@ -14,6 +14,8 @@ using System.CodeDom.Compiler;
 using System.Windows.Forms.Design.Behavior;
 using System.Threading;
 using System.Reflection;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using System.Runtime.InteropServices.ComTypes;
 
 public class DalsaImage
 {
@@ -22,10 +24,12 @@ public class DalsaImage
     SapLocation serverLocation;
     SapAcqDevice acqDevice;
     SapAcquisition acquisition;
+    SapAcqDevice acqDeviceData;
     SapBuffer buffers;
     SapBuffer archiveBuffers;
     SapAcqDeviceToBuf acqDeviceXfer;
     SapAcqToBuf acqXfer;
+    SapFeature feature;
 
     SapFormat imageFormat;
     int imageWidth;
@@ -352,6 +356,7 @@ public class DalsaImage
             ServerType = ServerCategory.ServerAcq;
 
             acquisition = new SapAcquisition(serverLocation, configFile);
+            acqDeviceData = new SapAcqDevice(serverLocation, "");
 
             if (acq0SupportSG)
             {
@@ -414,6 +419,14 @@ public class DalsaImage
         if (acqDevice != null && !acqDevice.Initialized)
         {
             if (acqDevice.Create() == false)
+            {
+                Destroy();
+                return;
+            }
+        }
+        if (acqDeviceData != null && !acqDeviceData.Initialized)
+        {
+            if (acqDeviceData.Create() == false)
             {
                 Destroy();
                 return;
@@ -568,6 +581,7 @@ public class DalsaImage
         if (acqXfer != null && acqXfer.Initialized) { acqXfer.Destroy(); }
         if (acqDeviceXfer != null && acqDeviceXfer.Initialized) { acqDeviceXfer.Destroy(); }
         if (acqDevice != null && acqDevice.Initialized) { acqDevice.Destroy(); }
+        if (acqDeviceData != null && acqDeviceData.Initialized) { acqDeviceData.Destroy(); }
         if (buffers != null && buffers.Initialized) { buffers.Destroy(); }
         if (archiveBuffers != null && archiveBuffers.Initialized) { archiveBuffers.Destroy(); }
         if (acquisition != null && acquisition.Initialized) { acquisition.Destroy(); }
@@ -577,6 +591,7 @@ public class DalsaImage
         if (acqXfer != null) { acqXfer.Dispose(); }
         if (acqDeviceXfer != null) { acqDeviceXfer.Dispose(); }
         if (acqDevice != null) { acqDevice.Dispose(); }
+        if (acqDeviceData != null) { acqDeviceData.Dispose(); }
         if (buffers != null) { buffers.Dispose(); }
         if (archiveBuffers != null) { archiveBuffers.Dispose(); }
         if (acquisition != null) { acquisition.Dispose(); }
@@ -584,6 +599,7 @@ public class DalsaImage
         acqXfer = null;
         acqDeviceXfer = null;
         acqDevice = null;
+        acqDeviceData = null;
         buffers = null;
         archiveBuffers = null;
         acquisition = null;
@@ -685,8 +701,38 @@ public class DalsaImage
         int phaseB = 2;
         if (acquisition == null) { return 0; }
 
+
+        if (feature == null) { feature = new SapFeature(serverLocation); }
+        if (feature != null && !feature.Initialized) { feature.Create(); }
+        
+        int numberOfFeatures = acqDeviceData.FeatureCount;
+        string[] features = new string[numberOfFeatures];
+
+        for (int i = 0; i < features.Length; i++)
+        {
+            features[i] = acqDeviceData.FeatureNames[i];
+        }
+        
+       //Finding value of trigger mode
+        getResult = acqDeviceData.IsFeatureAvailable("TriggerMode");
+        getResult = acqDeviceData.GetFeatureInfo(features[37], feature);
+        SapFeature.Type myType = feature.DataType;
+        getResult = acqDeviceData.GetFeatureValue(features[37], out int enumValue);
+        getResult = feature.GetEnumTextFromValue(enumValue, out string enumString);
+        
+
+        getResult = acqDeviceData.IsFeatureAvailable(features[18]);
+        getResult = acqDeviceData.GetFeatureInfo(features[18], feature); myType = feature.DataType;
+        getResult = acqDeviceData.GetFeatureValue(features[18], out enumValue);
+        getResult = feature.GetEnumTextFromValue(enumValue, out enumString);
+
+        acqDeviceData.SetFeatureValue(features[18], 0);
+        getResult = acqDeviceData.GetFeatureValue(features[17], out enumValue);
+
+
         getResult = acquisition.GetParameter(SapAcquisition.Prm.EXT_LINE_TRIGGER_SOURCE, out returnGetParm);
 
+        
         if (getResult && (returnGetParm == phaseA || returnGetParm == phaseB))
         {
             if (returnGetParm == phaseA)
@@ -698,7 +744,7 @@ public class DalsaImage
                 setResult = acquisition.SetParameter(SapAcquisition.Prm.EXT_LINE_TRIGGER_SOURCE, phaseA, true);
             }
         }
-
+        
         checkResult = acquisition.GetParameter(SapAcquisition.Prm.EXT_LINE_TRIGGER_SOURCE, out returnCheckParm);
 
         return returnCheckParm;
