@@ -457,7 +457,7 @@ public class DalsaImage
                 return;
             }
         }
-        if(acquisition.Initialized)
+        if(acquisition != null && acquisition.Initialized)
         {
             CheckCameraFeatures();
         }

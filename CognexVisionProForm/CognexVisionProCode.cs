@@ -250,17 +250,13 @@ namespace CognexVisionProForm
             }
 
         }
-        public void ToolBlockTrigger()
+        public void ToolNumberUpdate()
         {
-            toolRunComplete = false;
-            toolRunCount = 0;
-            toolCompleteCount = 0;
-
             for (int j = 0; j < cameraCount; j++)
             {
                 if (MainPLC.InitialCheck != null && MainPLC.InitialCheck.Status == IPStatus.Success)
                 {
-                    if (Enumerable.Range(0, toolCount - 1).Contains(plcTool[j]))
+                    if (Enumerable.Range(0, toolCount).Contains(plcTool[j]))
                     {
                         desiredTool[j] = plcTool[j];
                     }
@@ -270,17 +266,27 @@ namespace CognexVisionProForm
                 }
                 else
                 {
-                    if (Enumerable.Range(0, toolCount - 1).Contains(cameraControl[j].ToolSelect))
+                    if (Enumerable.Range(0, toolCount).Contains(cameraControl[j].ToolSelect))
                     {
                         desiredTool[j] = cameraControl[j].ToolSelect;
                     }
-                    else 
+                    else
                     {
                         cameraControl[j].ToolSelect = 0;
-                        desiredTool[j] = 0; 
+                        desiredTool[j] = 0;
                     }
                 }
+            }
 
+        }
+        public void ToolBlockTrigger()
+        {
+            toolRunComplete = false;
+            toolRunCount = 0;
+            toolCompleteCount = 0;
+
+            for (int j = 0; j < cameraCount; j++)
+            {
                 if (CameraAcqArray[j].ImageReady && cameraSnapComplete[j] && toolblockArray[j, desiredTool[j]].ToolReady)
                 {
                         toolTrigger[j] = true;
@@ -365,7 +371,7 @@ namespace CognexVisionProForm
             LicenseCheck = new CogStringCollection();
             LicenseCheck = CogLicense.GetLicensedFeatures(false, false);
             CogLicense.GetDaysRemaining(out ExpireCount, ExpireError);
-            cogLicenseOk = ExpireCount > 0;
+            cogLicenseOk = LicenseCheck.Count > 0;
 
             tbExpireDate.Text = "License Expires in: " + ExpireCount.ToString() + " days";
 
@@ -516,15 +522,7 @@ namespace CognexVisionProForm
                 CameraAcqArray[cam].Trigger = (MainPLC.PlcToPcControl[index + cam] & (1 << 0)) != 0;
                 CameraAcqArray[cam].AbortTrigger = (MainPLC.PlcToPcControl[index + cam] & (1 << 1)) != 0;
 
-                
-                int toolCheck = MainPLC.PlcToPcControl[index + cam] >> 16;
-
-                if (Enumerable.Range(0, toolCount - 1).Contains(toolCheck))
-                {
-                    plcTool[cam] = toolCheck;
-                }
-                else { plcTool[cam] = 0; }
-                
+                plcTool[cam] = MainPLC.PlcToPcControl[index + cam] >> 16;               
 
             }
 
@@ -536,7 +534,7 @@ namespace CognexVisionProForm
                 {
                     if (CameraAcqArray[cam].Connected)
                     {
-                        controlData[j] = MainPLC.PlcToPcControlData[j + cam * controlData.Length];
+                        controlData[j] = Convert.ToDouble(MainPLC.PlcToPcControlData[j + cam * controlData.Length]) / 100;
                     }
                     else
                     {

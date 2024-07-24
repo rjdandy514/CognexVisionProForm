@@ -123,7 +123,8 @@ namespace CognexVisionProForm
         {
             set
             {
-                toolInput = value;
+                toolInput = new double[value.Length];
+                value.CopyTo(toolInput, 0);
             }
             get
             {

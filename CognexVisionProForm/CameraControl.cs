@@ -183,6 +183,7 @@ namespace CognexVisionProForm
 
                 int selectedRecord = Convert.ToInt32(numRecordSelect.Value);
                 recordDisplay.Record = record.SubRecords[selectedRecord];
+
             }
         }
         private void bttnCameraSnap_MouseUp(object sender, MouseEventArgs e)
