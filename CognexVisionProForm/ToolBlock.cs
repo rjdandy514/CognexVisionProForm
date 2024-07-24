@@ -95,6 +95,7 @@ namespace CognexVisionProForm
         public bool ResultUpdated
         {
             get { return resultUpdated; }
+            set { resultUpdated = value; }
         }
         public bool FilePresent
         {
@@ -180,8 +181,6 @@ namespace CognexVisionProForm
         }
         public void ToolRun(CogImage8Grey InputImage)
         {
-
-            resultUpdated = false;
             toolReady = false;
 
             try

@@ -24,6 +24,7 @@ namespace CognexVisionProForm
             set
             {
                 cameraSnap[value] = true;
+                toolblockArray[value, desiredTool[value]].ResultUpdated = false;
             }
         }
         public int CameraSnapComplete
@@ -290,6 +291,7 @@ namespace CognexVisionProForm
                 if (CameraAcqArray[j].ImageReady && cameraSnapComplete[j] && toolblockArray[j, desiredTool[j]].ToolReady)
                 {
                         toolTrigger[j] = true;
+                        
                         toolblockArray[j, desiredTool[j]].ToolRun(CameraAcqArray[j].Image as CogImage8Grey);
                 }
             }
@@ -541,6 +543,7 @@ namespace CognexVisionProForm
                         controlData[j] = 0;
                     }
                 }
+
                 toolblockArray[cam, desiredTool[cam]].ToolInput = controlData;
                 
             }
@@ -597,11 +600,9 @@ namespace CognexVisionProForm
                 {
                     for(int j = 0;j < Math.Min(tool.ToolOutput.Length, dataLength);j++)
                     {
-                       
-                        if(tool.ToolOutput[j] == null || tool.RunStatus.Result == CogToolResultConstants.Error)
-                        {
-                            break;
-                        }
+
+                        if (tool.ToolOutput[j] == null) { break; }
+
 
                         dataTypeName = tool.ToolOutput[j].Value.GetType().Name;
 
