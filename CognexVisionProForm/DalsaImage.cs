@@ -406,6 +406,7 @@ public class DalsaImage
             acqDeviceXfer.Pairs[0].Cycle = SapXferPair.CycleMode.NextWithTrash;
             acqDeviceXfer.XferNotifyContext = this;
         }
+       
 
 
         if (acquisition != null && !acquisition.Initialized)
@@ -418,11 +419,13 @@ public class DalsaImage
         }
         if (acqDevice != null && !acqDevice.Initialized)
         {
+            
             if (acqDevice.Create() == false)
             {
                 Destroy();
                 return;
             }
+            CheckAreaCameraFeatures();
         }
         if (acqDeviceData != null && !acqDeviceData.Initialized)
         {
@@ -459,8 +462,9 @@ public class DalsaImage
         }
         if(acquisition != null && acquisition.Initialized)
         {
-            CheckCameraFeatures();
+            CheckLineScanFeatures();
         }
+        
 
     }
     public void SnapPicture()
@@ -724,7 +728,7 @@ public class DalsaImage
 
         return returnCheckParm;
     }
-    public void CheckCameraFeatures()
+    public void CheckLineScanFeatures()
     {
         bool getFeatureInfo = false;
         bool getFeatureValueResult = false;
@@ -778,6 +782,57 @@ public class DalsaImage
             setFeatureValueResult = acqDeviceData.SetFeatureValue(userSetSave, true);
         }
 
+    }
+    public void CheckAreaCameraFeatures()
+    {
+        bool getFeatureInfo = false;
+        bool getFeatureValueResult = false;
+        bool getEnumTextFromValueResult = false;
+        bool setFeatureValueResult = false;
+        int enumValue;
+        double exposureTime;
+        int width;
+        int height;
+        string enumString = "";
+        string userSetSelector = "UserSetSelector";
+        string userSetDefaultSelector = "UserSetDefaultSelector";
+        string userSetLoad = "UserSetLoad";
+
+        if (deviceFeature == null) { deviceFeature = new SapFeature(serverLocation); }
+        if (deviceFeature != null && !deviceFeature.Initialized) { deviceFeature.Create(); }
+
+        int numberOfFeatures = acqDevice.FeatureCount;
+        string[] features = new string[numberOfFeatures];
+
+        //get full List of Features Names
+        for (int i = 0; i < features.Length; i++)
+        {
+            features[i] = acqDevice.FeatureNames[i];
+        }
+
+        //Find and Set UserSet
+        getFeatureInfo = acqDevice.GetFeatureInfo(userSetSelector, deviceFeature);
+        getFeatureValueResult = acqDevice.GetFeatureValue(userSetSelector, out enumValue);
+        getEnumTextFromValueResult = deviceFeature.GetEnumTextFromValue(enumValue, out enumString);
+
+
+
+        if (enumString != "UserSet1")
+        {
+
+            //Set UserSetSelect,UserSetDefaultSelect to UserSet1
+            //Load select User Set
+            setFeatureValueResult = acqDevice.SetFeatureValue(userSetDefaultSelector, 4);
+            setFeatureValueResult = acqDevice.SetFeatureValue(userSetSelector, 4);
+            setFeatureValueResult = acqDevice.SetFeatureValue(userSetLoad, true);
+        }
+
+        //Get Image Width
+        getFeatureValueResult = acqDevice.GetFeatureValue("Width", out width);
+        //Get image height
+        getFeatureValueResult = acqDevice.GetFeatureValue("Height", out height);
+        //Get Exposure Time
+        getFeatureValueResult = acqDevice.GetFeatureValue("ExposureTime", out exposureTime);
     }
     public void XferNotify(object sender, SapXferNotifyEventArgs argsNotify)
     {

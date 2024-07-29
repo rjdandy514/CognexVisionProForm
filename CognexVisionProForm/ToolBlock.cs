@@ -114,10 +114,7 @@ namespace CognexVisionProForm
                 {
                     CogToolBlockTerminal[] Empty = new CogToolBlockTerminal[1];
                     return Empty; 
-                
                 }
-            
-                
             }
         }
         public double[] ToolInput
@@ -127,10 +124,7 @@ namespace CognexVisionProForm
                 toolInput = new double[value.Length];
                 value.CopyTo(toolInput, 0);
             }
-            get
-            {
-                return toolInput;
-            }
+            get { return toolInput; }
         }
         public void LoadvisionProject()
         {
@@ -175,7 +169,6 @@ namespace CognexVisionProForm
                     toolReady = false;
                     throw new Exception($"{toolName}: No Camera Program has Been Loaded"); 
                 }
-
             }
             catch (Exception ex) { Utilities.LoggingStatment(ex.Message); }
         }
@@ -224,10 +217,7 @@ namespace CognexVisionProForm
                 {
                     toolOutput[i] = cogToolBlock.Outputs[i];
                 }
-                else
-                {
-                    toolOutput[i] = failedTool;
-                }
+                else { toolOutput[i] = failedTool; }
             }
 
             toolReady = true;
@@ -238,9 +228,11 @@ namespace CognexVisionProForm
         }
         public void Cleaning()
         {
+            
             //clean up for vision pro
-            if(cogToolBlock != null)
+            if (cogToolBlock != null)
             {
+                CogSerializer.SaveObjectToFile(cogToolBlock,toolFile);
                 cogToolBlock.Dispose();
                 cogToolBlock.Ran -= new EventHandler(Subject_Ran);
             }

@@ -105,8 +105,6 @@ namespace CognexVisionProForm
                 MainPLC.ReadPlcDataTag();
                 PlcRead();
                 
-                ToolNumberUpdate();
-                
                 //Send Data to PLC
                 PlcWrite();
                 MainPLC.WritePlcTag();

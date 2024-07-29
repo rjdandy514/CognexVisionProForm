@@ -40,6 +40,7 @@
             this.cbImageReady = new System.Windows.Forms.CheckBox();
             this.cbArchiveImageActive = new System.Windows.Forms.CheckBox();
             this.plControl = new System.Windows.Forms.Panel();
+            this.bttnGrab = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.numRecordSelect = new System.Windows.Forms.NumericUpDown();
             this.label1 = new System.Windows.Forms.Label();
@@ -51,7 +52,7 @@
             this.lbToolName = new System.Windows.Forms.Label();
             this.lbToolData = new System.Windows.Forms.ListBox();
             this.recordDisplay = new Cognex.VisionPro.CogRecordDisplay();
-            this.bttnGrab = new System.Windows.Forms.Button();
+            this.button1 = new System.Windows.Forms.Button();
             this.plControl.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numRecordSelect)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numToolSelect)).BeginInit();
@@ -163,6 +164,7 @@
             this.plControl.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.plControl.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.plControl.Controls.Add(this.button1);
             this.plControl.Controls.Add(this.bttnGrab);
             this.plControl.Controls.Add(this.label2);
             this.plControl.Controls.Add(this.numRecordSelect);
@@ -188,6 +190,20 @@
             this.plControl.Name = "plControl";
             this.plControl.Size = new System.Drawing.Size(158, 535);
             this.plControl.TabIndex = 18;
+            // 
+            // bttnGrab
+            // 
+            this.bttnGrab.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.bttnGrab.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.bttnGrab.FlatAppearance.BorderColor = System.Drawing.Color.Red;
+            this.bttnGrab.FlatAppearance.BorderSize = 2;
+            this.bttnGrab.Location = new System.Drawing.Point(3, 424);
+            this.bttnGrab.Name = "bttnGrab";
+            this.bttnGrab.Size = new System.Drawing.Size(152, 29);
+            this.bttnGrab.TabIndex = 36;
+            this.bttnGrab.Text = "Grab";
+            this.bttnGrab.UseVisualStyleBackColor = false;
+            this.bttnGrab.Click += new System.EventHandler(this.bttnGrab_Click);
             // 
             // label2
             // 
@@ -308,19 +324,19 @@
             this.recordDisplay.Size = new System.Drawing.Size(307, 293);
             this.recordDisplay.TabIndex = 19;
             // 
-            // bttnGrab
+            // button1
             // 
-            this.bttnGrab.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.bttnGrab.BackColor = System.Drawing.SystemColors.ButtonFace;
-            this.bttnGrab.FlatAppearance.BorderColor = System.Drawing.Color.Red;
-            this.bttnGrab.FlatAppearance.BorderSize = 2;
-            this.bttnGrab.Location = new System.Drawing.Point(3, 424);
-            this.bttnGrab.Name = "bttnGrab";
-            this.bttnGrab.Size = new System.Drawing.Size(152, 29);
-            this.bttnGrab.TabIndex = 36;
-            this.bttnGrab.Text = "Grab";
-            this.bttnGrab.UseVisualStyleBackColor = false;
-            this.bttnGrab.Click += new System.EventHandler(this.bttnGrab_Click);
+            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.button1.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.button1.FlatAppearance.BorderColor = System.Drawing.Color.Red;
+            this.button1.FlatAppearance.BorderSize = 2;
+            this.button1.Location = new System.Drawing.Point(3, 253);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(152, 29);
+            this.button1.TabIndex = 37;
+            this.button1.Text = "Test Button";
+            this.button1.UseVisualStyleBackColor = false;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // CameraControl
             // 
@@ -370,5 +386,6 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.NumericUpDown numRecordSelect;
         private System.Windows.Forms.Button bttnGrab;
+        private System.Windows.Forms.Button button1;
     }
 }

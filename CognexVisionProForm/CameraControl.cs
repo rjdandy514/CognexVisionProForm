@@ -274,5 +274,10 @@ namespace CognexVisionProForm
             camera.TriggerGrab = true;
             UpdateButton();
         }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            camera.CheckAreaCameraFeatures();
+        }
     }
 }

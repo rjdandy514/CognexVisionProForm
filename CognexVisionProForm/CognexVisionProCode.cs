@@ -24,6 +24,7 @@ namespace CognexVisionProForm
             set
             {
                 cameraSnap[value] = true;
+                ToolNumberUpdate(value);
                 toolblockArray[value, desiredTool[value]].ResultUpdated = false;
             }
         }
@@ -251,33 +252,30 @@ namespace CognexVisionProForm
             }
 
         }
-        public void ToolNumberUpdate()
+        public void ToolNumberUpdate(int cam)
         {
-            for (int j = 0; j < cameraCount; j++)
-            {
                 if (MainPLC.InitialCheck != null && MainPLC.InitialCheck.Status == IPStatus.Success)
                 {
-                    if (Enumerable.Range(0, toolCount).Contains(plcTool[j]))
+                    if (Enumerable.Range(0, toolCount).Contains(plcTool[cam]))
                     {
-                        desiredTool[j] = plcTool[j];
+                        desiredTool[cam] = plcTool[cam];
                     }
-                    else { desiredTool[j] = 0; }
+                    else { desiredTool[cam] = 0; }
 
-                    cameraControl[j].ToolSelect = desiredTool[j];
+                    cameraControl[cam].ToolSelect = desiredTool[cam];
                 }
                 else
                 {
-                    if (Enumerable.Range(0, toolCount).Contains(cameraControl[j].ToolSelect))
+                    if (Enumerable.Range(0, toolCount).Contains(cameraControl[cam].ToolSelect))
                     {
-                        desiredTool[j] = cameraControl[j].ToolSelect;
+                        desiredTool[cam] = cameraControl[cam].ToolSelect;
                     }
                     else
                     {
-                        cameraControl[j].ToolSelect = 0;
-                        desiredTool[j] = 0;
+                        cameraControl[cam].ToolSelect = 0;
+                        desiredTool[cam] = 0;
                     }
                 }
-            }
 
         }
         public void ToolBlockTrigger()
