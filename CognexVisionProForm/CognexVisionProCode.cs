@@ -522,8 +522,8 @@ namespace CognexVisionProForm
                 CameraAcqArray[cam].Trigger = (MainPLC.PlcToPcControl[index + cam] & (1 << 0)) != 0;
                 CameraAcqArray[cam].AbortTrigger = (MainPLC.PlcToPcControl[index + cam] & (1 << 1)) != 0;
 
-                plcTool[cam] = MainPLC.PlcToPcControl[index + cam] >> 16;               
-
+                plcTool[cam] = MainPLC.PlcToPcControl[index + cam] >> 16;
+                ToolNumberUpdate(cam);
             }
 
 
