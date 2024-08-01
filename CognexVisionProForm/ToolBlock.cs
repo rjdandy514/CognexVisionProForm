@@ -21,6 +21,7 @@ namespace CognexVisionProForm
 
         bool filePresent = false;
         bool resultUpdated = false;
+        bool resultUpdated_Mem = false;
         bool toolReady = false;
 
         CogToolBlockTerminal[] toolOutput = new CogToolBlockTerminal[1];
@@ -96,6 +97,11 @@ namespace CognexVisionProForm
         {
             get { return resultUpdated; }
             set { resultUpdated = value; }
+        }
+        public bool ResultUpdated_Mem
+        {
+            get { return resultUpdated_Mem; }
+            set { resultUpdated_Mem = value; }
         }
         public bool FilePresent
         {
@@ -206,7 +212,7 @@ namespace CognexVisionProForm
         }
         private void GetInfoFromTool()
         {
-            CogToolBlockTerminal failedTool = new CogToolBlockTerminal("ToolFailed",0);
+            CogToolBlockTerminal failedTool = new CogToolBlockTerminal("ToolFailed",99);
 
             int toolOutputCount = cogToolBlock.Outputs.Count;
 
@@ -221,7 +227,9 @@ namespace CognexVisionProForm
             }
 
             toolReady = true;
-            resultUpdated = true;
+
+            if (resultUpdated) { resultUpdated = false; }
+            else if (!resultUpdated) { resultUpdated = true; }
             form.ToolBlockRunComplete = CameraId;
 
             Utilities.LoggingStatment($"{toolName}: Number of Outputs - {toolOutputCount}");

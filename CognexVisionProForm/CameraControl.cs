@@ -64,7 +64,7 @@ namespace CognexVisionProForm
             cbTrigger.Checked = camera.Trigger;
             cbArchiveImageActive.Checked = camera.ArchiveImageActive;
             cbImageReady.Checked = camera.ImageReady;
-
+            numToolSelect.Value = toolSelect;
             UpdateButton();
 
             pollingTimer.Start();
@@ -146,7 +146,7 @@ namespace CognexVisionProForm
                 return;
             }
 
-            numToolSelect.Value = toolSelect;
+            
             lbToolName.Text = tool.Name;
             lbAcqTime.Text = $"Aquisition: {camera.AcqTime} ms";
             lbToolRunTime.Text = $"Tool Time: {tool.RunStatus.TotalTime} ms";
@@ -277,7 +277,8 @@ namespace CognexVisionProForm
 
         private void button1_Click(object sender, EventArgs e)
         {
-            camera.CheckAreaCameraFeatures();
+            camera.Trigger = true;
+            //camera.CheckAreaCameraFeatures();
         }
     }
 }

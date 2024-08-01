@@ -48,6 +48,7 @@ namespace CognexVisionProForm
             this.cbC1Tb1FileFound = new System.Windows.Forms.CheckBox();
             this.tbC1TB1Name = new System.Windows.Forms.TextBox();
             this.panel4 = new System.Windows.Forms.Panel();
+            this.bttnAutoConnect = new System.Windows.Forms.Button();
             this.label39 = new System.Windows.Forms.Label();
             this.tbCameraDesc = new System.Windows.Forms.TextBox();
             this.cbCameraIdSelected = new System.Windows.Forms.ComboBox();
@@ -139,6 +140,7 @@ namespace CognexVisionProForm
             this.FF_YDistance = new System.Windows.Forms.TextBox();
             this.tabToolBlock = new System.Windows.Forms.TabPage();
             this.panel7 = new System.Windows.Forms.Panel();
+            this.bttnUpdateImage = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
             this.label40 = new System.Windows.Forms.Label();
             this.cbTBCameraSelected = new System.Windows.Forms.ComboBox();
@@ -159,7 +161,6 @@ namespace CognexVisionProForm
             this.cbHeartbeat = new System.Windows.Forms.CheckBox();
             this.bttnPLC = new System.Windows.Forms.Button();
             this.tabControl1 = new System.Windows.Forms.TabControl();
-            this.bttnAutoConnect = new System.Windows.Forms.Button();
             this.tabImage.SuspendLayout();
             this.tabFrameGrabber.SuspendLayout();
             this.panel3.SuspendLayout();
@@ -366,6 +367,16 @@ namespace CognexVisionProForm
             this.panel4.Size = new System.Drawing.Size(592, 250);
             this.panel4.TabIndex = 33;
             this.panel4.Tag = "pnCameraControl";
+            // 
+            // bttnAutoConnect
+            // 
+            this.bttnAutoConnect.Location = new System.Drawing.Point(346, 11);
+            this.bttnAutoConnect.Name = "bttnAutoConnect";
+            this.bttnAutoConnect.Size = new System.Drawing.Size(225, 24);
+            this.bttnAutoConnect.TabIndex = 39;
+            this.bttnAutoConnect.Text = "Auto Connect All Cameras";
+            this.bttnAutoConnect.UseVisualStyleBackColor = true;
+            this.bttnAutoConnect.Click += new System.EventHandler(this.bttnAutoConnect_Click);
             // 
             // label39
             // 
@@ -1235,6 +1246,7 @@ namespace CognexVisionProForm
             // panel7
             // 
             this.panel7.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.panel7.Controls.Add(this.bttnUpdateImage);
             this.panel7.Controls.Add(this.label4);
             this.panel7.Controls.Add(this.label40);
             this.panel7.Controls.Add(this.cbTBCameraSelected);
@@ -1244,9 +1256,19 @@ namespace CognexVisionProForm
             this.panel7.Margin = new System.Windows.Forms.Padding(5);
             this.panel7.Name = "panel7";
             this.panel7.Padding = new System.Windows.Forms.Padding(5);
-            this.panel7.Size = new System.Drawing.Size(712, 30);
+            this.panel7.Size = new System.Drawing.Size(887, 30);
             this.panel7.TabIndex = 70;
             this.panel7.Tag = "pnCameraControl";
+            // 
+            // bttnUpdateImage
+            // 
+            this.bttnUpdateImage.Location = new System.Drawing.Point(709, 3);
+            this.bttnUpdateImage.Name = "bttnUpdateImage";
+            this.bttnUpdateImage.Size = new System.Drawing.Size(128, 24);
+            this.bttnUpdateImage.TabIndex = 23;
+            this.bttnUpdateImage.Text = "Grab Updated Image";
+            this.bttnUpdateImage.UseVisualStyleBackColor = true;
+            this.bttnUpdateImage.Click += new System.EventHandler(this.bttnUpdateImage_Click);
             // 
             // label4
             // 
@@ -1489,16 +1511,6 @@ namespace CognexVisionProForm
             this.tabControl1.TabIndex = 3;
             this.tabControl1.SelectedIndexChanged += new System.EventHandler(this.tabControl1_SelectedIndexChanged);
             // 
-            // bttnAutoConnect
-            // 
-            this.bttnAutoConnect.Location = new System.Drawing.Point(346, 11);
-            this.bttnAutoConnect.Name = "bttnAutoConnect";
-            this.bttnAutoConnect.Size = new System.Drawing.Size(225, 24);
-            this.bttnAutoConnect.TabIndex = 39;
-            this.bttnAutoConnect.Text = "Auto Connect All Cameras";
-            this.bttnAutoConnect.UseVisualStyleBackColor = true;
-            this.bttnAutoConnect.Click += new System.EventHandler(this.bttnAutoConnect_Click);
-            // 
             // CognexVisionProForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1678,6 +1690,7 @@ namespace CognexVisionProForm
         private System.Windows.Forms.TextBox tbPlcPingResponse;
         private System.Windows.Forms.Button bttnOpenProject;
         private System.Windows.Forms.Button bttnAutoConnect;
+        private System.Windows.Forms.Button bttnUpdateImage;
     }
 }
 

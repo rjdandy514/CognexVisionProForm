@@ -25,7 +25,6 @@ namespace CognexVisionProForm
             {
                 cameraSnap[value] = true;
                 ToolNumberUpdate(value);
-                toolblockArray[value, desiredTool[value]].ResultUpdated = false;
             }
         }
         public int CameraSnapComplete
@@ -594,13 +593,15 @@ namespace CognexVisionProForm
 
                 ToolBlock tool = toolblockArray[i, desiredTool[i]];
 
-                if (tool.ResultUpdated)
+                if (tool.ResultUpdated != tool.ResultUpdated_Mem)
                 {
-                    for(int j = 0;j < Math.Min(tool.ToolOutput.Length, dataLength);j++)
+                    tool.ResultUpdated_Mem = tool.ResultUpdated;
+
+                    Array.Clear(MainPLC.PcToPlcStatusData, i * dataLength, dataLength);
+                    for (int j = 0;j < Math.Min(tool.ToolOutput.Length, dataLength);j++)
                     {
 
                         if (tool.ToolOutput[j] == null) { break; }
-
 
                         dataTypeName = tool.ToolOutput[j].Value.GetType().Name;
 
@@ -609,11 +610,11 @@ namespace CognexVisionProForm
                             double dData = Convert.ToDouble(tool.ToolOutput[j].Value);
                             int iData = Convert.ToInt32(dData * 100);
 
-                            MainPLC.PcToPlcStatusData[j] = iData;
+                            MainPLC.PcToPlcStatusData[(i* dataLength) + j] = iData;
                         }
                         else if (dataTypeName == "Int32")
                         {
-                            MainPLC.PcToPlcStatusData[j] = Convert.ToInt32(tool.ToolOutput[j].Value);
+                            MainPLC.PcToPlcStatusData[(i * dataLength) + j] = Convert.ToInt32(tool.ToolOutput[j].Value)*100;
                         }
 
                     }

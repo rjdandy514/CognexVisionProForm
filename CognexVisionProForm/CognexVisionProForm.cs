@@ -1,4 +1,5 @@
 ﻿using Cognex.VisionPro;
+using Cognex.VisionPro.ToolBlock;
 using System;
 using System.Collections;
 using System.Diagnostics;
@@ -77,6 +78,7 @@ namespace CognexVisionProForm
 
         int cameraCount;
         int toolCount;
+        bool toolResultUpdate_Mem;
         string computerName;
 
         string ServerNotFound = "No Server Found";
@@ -230,7 +232,7 @@ namespace CognexVisionProForm
                 {
                     cbTBCameraSelected.Items.Add(camera.Name);
                 }
-
+                cbTBCameraSelected.SelectedIndex = 0;
             }
             else if (tabControl1.SelectedIndex == 6)
             {
@@ -432,6 +434,16 @@ namespace CognexVisionProForm
 
             if (cogToolBlockEditV21.Subject != null)
             {
+                cogToolBlockEditV21.Subject.Inputs[0].Value = toolblockArray[cameraSelected, toolSelected].cogToolBlock.Inputs[0].Value;
+                cogToolBlockEditV21.Subject.Run();
+            }
+        }
+        private void bttnUpdateImage_Click(object sender, EventArgs e)
+        {
+            int cameraSelected = cbTBCameraSelected.SelectedIndex;
+            if (cogToolBlockEditV21.Subject != null)
+            {
+                cogToolBlockEditV21.Subject.Inputs[0].Value = CameraAcqArray[cameraSelected].Image;
                 cogToolBlockEditV21.Subject.Run();
             }
         }
@@ -589,6 +601,8 @@ namespace CognexVisionProForm
             this.WindowState = FormWindowState.Maximized;
             tabControl1.SelectedIndex = 0;
         }
+
+
     }
 
 }
