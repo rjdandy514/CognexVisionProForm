@@ -236,11 +236,15 @@ namespace CognexVisionProForm
         }
         public void Cleaning()
         {
-            
+
             //clean up for vision pro
             if (cogToolBlock != null)
             {
-                CogSerializer.SaveObjectToFile(cogToolBlock,toolFile);
+                if (toolFile != "")
+                {
+                    CogSerializer.SaveObjectToFile(cogToolBlock, toolFile);
+                }
+                
                 cogToolBlock.Dispose();
                 cogToolBlock.Ran -= new EventHandler(Subject_Ran);
             }
