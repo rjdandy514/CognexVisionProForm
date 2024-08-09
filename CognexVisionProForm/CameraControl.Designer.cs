@@ -40,6 +40,7 @@
             this.cbImageReady = new System.Windows.Forms.CheckBox();
             this.cbArchiveImageActive = new System.Windows.Forms.CheckBox();
             this.plControl = new System.Windows.Forms.Panel();
+            this.button1 = new System.Windows.Forms.Button();
             this.bttnGrab = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.numRecordSelect = new System.Windows.Forms.NumericUpDown();
@@ -52,7 +53,6 @@
             this.lbToolName = new System.Windows.Forms.Label();
             this.lbToolData = new System.Windows.Forms.ListBox();
             this.recordDisplay = new Cognex.VisionPro.CogRecordDisplay();
-            this.button1 = new System.Windows.Forms.Button();
             this.plControl.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numRecordSelect)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numToolSelect)).BeginInit();
@@ -191,6 +191,20 @@
             this.plControl.Size = new System.Drawing.Size(158, 535);
             this.plControl.TabIndex = 18;
             // 
+            // button1
+            // 
+            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.button1.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.button1.FlatAppearance.BorderColor = System.Drawing.Color.Red;
+            this.button1.FlatAppearance.BorderSize = 2;
+            this.button1.Location = new System.Drawing.Point(3, 253);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(152, 29);
+            this.button1.TabIndex = 37;
+            this.button1.Text = "Test Button";
+            this.button1.UseVisualStyleBackColor = false;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
             // bttnGrab
             // 
             this.bttnGrab.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
@@ -222,6 +236,7 @@
             this.numRecordSelect.Name = "numRecordSelect";
             this.numRecordSelect.Size = new System.Drawing.Size(50, 20);
             this.numRecordSelect.TabIndex = 34;
+            this.numRecordSelect.ValueChanged += new System.EventHandler(this.numRecordSelect_ValueChanged);
             // 
             // label1
             // 
@@ -323,20 +338,6 @@
             this.recordDisplay.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("recordDisplay.OcxState")));
             this.recordDisplay.Size = new System.Drawing.Size(307, 293);
             this.recordDisplay.TabIndex = 19;
-            // 
-            // button1
-            // 
-            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.button1.BackColor = System.Drawing.SystemColors.ButtonFace;
-            this.button1.FlatAppearance.BorderColor = System.Drawing.Color.Red;
-            this.button1.FlatAppearance.BorderSize = 2;
-            this.button1.Location = new System.Drawing.Point(3, 253);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(152, 29);
-            this.button1.TabIndex = 37;
-            this.button1.Text = "Test Button";
-            this.button1.UseVisualStyleBackColor = false;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // CameraControl
             // 

@@ -39,15 +39,8 @@ namespace CognexVisionProForm
         {
             set
             {
-
                 toolTriggerComplete[value] = true;
-                
-                if (toolCompleteCount == toolRunCount)
-                {
-                    toolRunComplete = true;
-                    ToolBlockUpdate();
-                }
-
+                ToolBlockUpdate();
             }
         }
         public bool PlcCommsActive
@@ -198,24 +191,6 @@ namespace CognexVisionProForm
             cbDeviceList.SelectedIndex = CameraAcqArray[cameraIndex].LoadResourceIndex;
             CameraAcqArray[cameraIndex].LoadResourceName = cbDeviceList.SelectedItem.ToString();
         }
-        public void CameraTrigger(int i)
-        {
-            if (CameraAcqArray[i].Connected)
-            {
-                CameraAcqArray[i].SnapPicture();
-            }
-            else if (CameraAcqArray[i].ArchiveImageActive)
-            {
-                CameraAcqArray[i].CreateBufferFromFile();
-                CameraAcqArray[i].ArchiveImageIndex++;
-            }
-            else
-            {
-                MessageBox.Show("NO CAMERA IS CONNECTED");
-                tabControl1.SelectedIndex = 1;
-            }
-
-        }
         public void CameraAbort(int i)
         {
             cameraSnap[i] = false;
@@ -280,8 +255,6 @@ namespace CognexVisionProForm
         public void ToolBlockTrigger()
         {
             toolRunComplete = false;
-            toolRunCount = 0;
-            toolCompleteCount = 0;
 
             for (int j = 0; j < cameraCount; j++)
             {
@@ -331,11 +304,6 @@ namespace CognexVisionProForm
             }
         }
         private delegate void Set_UpdateImageTab();
-        public void UpdateImageTab()
-        {
-
-
-        }
         public void UpdateFrameGrabberTab()
         {
             cbConfigFileFound.Checked = CameraAcqArray[selectedCameraId].ConfigFilePresent;

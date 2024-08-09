@@ -280,5 +280,10 @@ namespace CognexVisionProForm
             camera.Trigger = true;
             //camera.CheckAreaCameraFeatures();
         }
+
+        private void numRecordSelect_ValueChanged(object sender, EventArgs e)
+        {
+            UpdateImageRecord();
+        }
     }
 }
