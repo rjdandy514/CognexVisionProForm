@@ -14,6 +14,7 @@ using static System.Net.Mime.MediaTypeNames;
 using Cognex.VisionPro.QuickBuild.Implementation.Internal;
 using System.Xml.Linq;
 using System.Net.NetworkInformation;
+using Cognex.Vision.Meta;
 
 namespace CognexVisionProForm
 {
@@ -252,17 +253,25 @@ namespace CognexVisionProForm
                 }
 
         }
+        
+        private delegate void Set_ToolBlockTrigger();
         public void ToolBlockTrigger()
         {
             toolRunComplete = false;
+            
+            if (this.InvokeRequired)
+            {
+                BeginInvoke(new Set_ToolBlockTrigger(ToolBlockTrigger));
+                return;
+            }
 
             for (int j = 0; j < cameraCount; j++)
             {
-                if (CameraAcqArray[j].ImageReady && cameraSnapComplete[j] && toolblockArray[j, desiredTool[j]].ToolReady)
+                if (!toolTrigger[j] && cameraSnapComplete[j] && toolblockArray[j, desiredTool[j]].ToolReady)
                 {
-                        toolTrigger[j] = true;
-                        
-                        toolblockArray[j, desiredTool[j]].ToolRun(CameraAcqArray[j].Image as CogImage8Grey);
+                    toolblockArray[j, desiredTool[j]].ToolRun(CameraAcqArray[j].Image as CogImage8Grey);
+                    toolTrigger[j] = true;
+
                 }
             }
             Array.Clear(cameraSnap, 0, cameraSnap.Length);
@@ -545,20 +554,17 @@ namespace CognexVisionProForm
                 tempTag |= ((toolblockArray[cam, desiredTool[cam]].FilePresent ? 1 : 0) << 7);
                 tempTag |= ((CameraAcqArray[cam].Snapping ? 1 : 0) << 8);
                 tempTag |= ((CameraAcqArray[cam].Acquiring ? 1 : 0) << 9);
-                tempTag |= ((toolTrigger.All(x => x == false) ? 1 : 0) << 10);
-                tempTag |= ((toolTriggerComplete.All(x => x == false) ? 1 : 0) << 11);
 
                 tempTag |= desiredTool[cam] << 16;
 
                 MainPLC.PcToPlcStatus[index] = tempTag;
                 index++;
             }
-
-
+            bool temp = Array.TrueForAll(toolTrigger, value => { return value; });
             //Add Tool Data to String Array to send to PLC
             //Limit each tool to 4 data points
             //Limit Doubles to 2 decimal places
-            for(int i = 0; i< cameraCount;i++)
+            for (int i = 0; i< cameraCount;i++)
             {
 
                 ToolBlock tool = toolblockArray[i, desiredTool[i]];

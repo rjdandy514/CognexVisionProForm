@@ -91,7 +91,11 @@ namespace CognexVisionProForm
         }
         public bool ToolReady
         {
-            get { return toolReady; }
+            get 
+            {
+
+                return toolReady; 
+            }
         }
         public bool ResultUpdated
         {
