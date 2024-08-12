@@ -54,27 +54,9 @@ namespace CognexVisionProForm
         private int[] hmiTool;
         private ToolBlock[,] toolblockArray;
 
-        private Calculations Camera01Calc;
-
         private PlcComms MainPLC;
 
         public TextWriterTraceListener appListener;
-
-        private double FF_Radians;
-        private double FF_L;
-
-        private double FC_Radians;
-        private double FC_L;
-
-        double Part_X;
-        double Part_Y;
-        double Part_XNom;
-        double Part_YNom;
-        double Part_Radians;
-
-        double Robot_X;
-        double Robot_Y;
-        double Robot_Degree;
 
         int cameraCount;
         int toolCount;
@@ -447,94 +429,7 @@ namespace CognexVisionProForm
                 cogToolBlockEditV21.Subject.Run();
             }
         }
-        //*********************************************************************
-        //PART DATA
-        //*********************************************************************
-        private void btnPartCalc_Click(object sender, EventArgs e)
-        {
-            double temp_FC_XDistance = 214.5;
-            double temp_FC_YDistance = 20;
-            double temp_FF_XDistance = 415.5;
-            double temp_FF_YDistance = 38.7;
 
-            double temp_F1_XPos = 0.0;
-            double temp_F1_YPos = 0.0;
-            double temp_F2_XPos = 360.216;
-            double temp_F2_YPos = 210.672;
-
-            F1_XPosition.Text = temp_F1_XPos.ToString();
-            F1_YPosition.Text = temp_F1_YPos.ToString();
-            F2_XPosition.Text = temp_F2_XPos.ToString();
-            F2_YPosition.Text = temp_F2_YPos.ToString();
-
-            FC_XDistance.Text = temp_FC_XDistance.ToString();
-            FC_YDistance.Text = temp_FC_YDistance.ToString();
-            FF_XDistance.Text = temp_FF_XDistance.ToString();
-            FF_YDistance.Text = temp_FF_YDistance.ToString();
-
-            double FC_X = Convert.ToDouble(FC_XDistance.Text);
-            double FC_Y = Convert.ToDouble(FC_YDistance.Text);
-
-            double FF_X = Convert.ToDouble(FF_XDistance.Text);
-            double FF_Y = Convert.ToDouble(FF_YDistance.Text);
-
-            FC_Radians = Math.Atan2(FC_Y, FC_X);
-            FF_Radians = Math.Atan2(FF_Y, FF_X);
-
-            FC_L = Camera01Calc.DistanceBetweenPoints(0, 0, FC_X, FC_Y);
-            FF_L = Camera01Calc.DistanceBetweenPoints(0, 0, FF_X, FF_Y);
-
-            FC_Angle.Text = FC_Radians.ToString();
-            FF_Angle.Text = FF_Radians.ToString();
-
-            FC_LDistance.Text = FC_L.ToString();
-            FF_LDistance.Text = FF_L.ToString();
-
-        }
-        private void btnPartLocCalc_Click(object sender, EventArgs e)
-        {
-
-            double temp_PartData_XNom = 214.5;
-            double temp_PartData_YNom = 20;
-
-            PartData_XNom.Text = temp_PartData_XNom.ToString();
-            PartData_YNom.Text = temp_PartData_YNom.ToString();
-
-            double F1_X = Convert.ToDouble(F1_XPosition.Text);
-            double F1_Y = Convert.ToDouble(F1_YPosition.Text);
-            double F2_X = Convert.ToDouble(F2_XPosition.Text);
-            double F2_Y = Convert.ToDouble(F2_YPosition.Text);
-
-            Part_Radians = Math.Atan2(F2_Y - F1_Y, F2_X - F1_X) - FF_Radians;
-
-            Part_X = FC_L * Math.Cos(FC_Radians + Part_Radians) + F1_X;
-            Part_Y = FC_L * Math.Sin(FC_Radians + Part_Radians) + F1_Y;
-
-
-            PartData_XPosition.Text = Part_X.ToString();
-            PartData_YPosition.Text = Part_Y.ToString();
-            PartData_Angle.Text = Part_Radians.ToString();
-        }
-        private void RobotCalc_Click(object sender, EventArgs e)
-        {
-            double Robot_XNeg;
-            double Robot_YNeg;
-
-            Part_XNom = Convert.ToDouble(PartData_XNom.Text);
-            Part_YNom = Convert.ToDouble(PartData_YNom.Text);
-
-            Robot_XNeg = -1 * (Part_X - Part_XNom);
-            Robot_YNeg = -1 * (Part_Y - Part_YNom);
-
-            Robot_X = Robot_XNeg * Math.Cos(-Part_Radians) - Robot_YNeg * Math.Sin(-Part_Radians);
-            Robot_Y = Robot_XNeg * Math.Sin(-Part_Radians) + Robot_YNeg * Math.Cos(-Part_Radians);
-            Robot_Degree = Camera01Calc.RadiansToDegree(Part_Radians);
-
-            VGR_XOffset.Text = Robot_X.ToString();
-            VGR_YOffset.Text = Robot_Y.ToString();
-            VGR_DegOffset.Text = Robot_Degree.ToString();
-
-        }
         //*********************************************************************
         //PLC CONNECTION
         //*********************************************************************
@@ -602,7 +497,10 @@ namespace CognexVisionProForm
             tabControl1.SelectedIndex = 0;
         }
 
+        private void cbCameraSelected_DropDown(object sender, DragEventArgs e)
+        {
 
+        }
     }
 
 }

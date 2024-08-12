@@ -41,7 +41,7 @@ namespace CognexVisionProForm
             set
             {
                 toolTriggerComplete[value] = true;
-                ToolBlockUpdate();
+                BeginInvoke(new Set_ToolBlockUpdate(ToolBlockUpdate));
             }
         }
         public bool PlcCommsActive
@@ -198,20 +198,16 @@ namespace CognexVisionProForm
             cameraSnapComplete[i] = false;
             toolTrigger[i] = false;
             toolTriggerComplete[i] = false;
+            CameraAcqArray[i].AbortTrigger = true;
             CameraUpdate();
         }
         public void CameraUpdate()
         {
-            bool allCamerasComplete = true;
-
-            if(!cameraSnap.SequenceEqual(cameraSnapComplete))
-            {
-                allCamerasComplete = false;
-            }
-
             // Run ToolBlocks that are enabled
-            if (allCamerasComplete) 
+            if (cameraSnap.SequenceEqual(cameraSnapComplete)) 
             {
+                Array.Clear(toolTrigger, 0, toolTrigger.Length);
+                Array.Clear(toolTriggerComplete, 0, toolTriggerComplete.Length);
                 //if the cognex license is present, trigger Toolblock
                 if (cogLicenseOk) { ToolBlockTrigger(); }
                 else
@@ -254,16 +250,10 @@ namespace CognexVisionProForm
 
         }
         
-        private delegate void Set_ToolBlockTrigger();
         public void ToolBlockTrigger()
         {
             toolRunComplete = false;
-            
-            if (this.InvokeRequired)
-            {
-                BeginInvoke(new Set_ToolBlockTrigger(ToolBlockTrigger));
-                return;
-            }
+           
 
             for (int j = 0; j < cameraCount; j++)
             {
@@ -281,21 +271,14 @@ namespace CognexVisionProForm
         private delegate void Set_ToolBlockUpdate();
         public void ToolBlockUpdate()
         {
+            
             if (this.InvokeRequired)
             {
                 BeginInvoke(new Set_ToolBlockUpdate(ToolBlockUpdate));
                 return;
             }
 
-            bool allToolComplete = true;
-
-            if (!toolTrigger.SequenceEqual(toolTriggerComplete))
-            {
-                allToolComplete = false;
-            }
-
-
-            if(allToolComplete)
+            if(toolTrigger.SequenceEqual(toolTriggerComplete))
             {
                 for (int i = 0; i < cameraCount; i++)
                 {
@@ -321,6 +304,8 @@ namespace CognexVisionProForm
             tbArchiveCount.Text = CameraAcqArray[selectedCameraId].ArchiveImageCount.ToString();
             tbArchiveIndex.Text = CameraAcqArray[selectedCameraId].ArchiveImageIndex.ToString();
             cbArchiveActive.Checked = CameraAcqArray[selectedCameraId].ArchiveImageActive;
+
+            
 
             cbCameraIdSelected.Items.Clear();
             for (int i = 0; i < cameraCount; i++)
@@ -496,7 +481,8 @@ namespace CognexVisionProForm
             for (int cam = 0; cam < cameraCount; cam++)
             {
                 CameraAcqArray[cam].Trigger = (MainPLC.PlcToPcControl[index + cam] & (1 << 0)) != 0;
-                CameraAcqArray[cam].AbortTrigger = (MainPLC.PlcToPcControl[index + cam] & (1 << 1)) != 0;
+                
+                if((MainPLC.PlcToPcControl[index + cam] & (1 << 1)) != 0){ CameraAbort(cam); }
 
                 plcTool[cam] = MainPLC.PlcToPcControl[index + cam] >> 16;
                 ToolNumberUpdate(cam);
@@ -554,6 +540,8 @@ namespace CognexVisionProForm
                 tempTag |= ((toolblockArray[cam, desiredTool[cam]].FilePresent ? 1 : 0) << 7);
                 tempTag |= ((CameraAcqArray[cam].Snapping ? 1 : 0) << 8);
                 tempTag |= ((CameraAcqArray[cam].Acquiring ? 1 : 0) << 9);
+                tempTag |= ((toolTrigger.All(x => x == false) ? 1 : 0) << 10);
+                tempTag |= ((toolTriggerComplete.All(x => x == false) ? 1 : 0) << 11);
 
                 tempTag |= desiredTool[cam] << 16;
 

@@ -62,6 +62,7 @@ public class DalsaImage
     bool grabbing = false;
     bool acquiring = false;
 
+    bool limitReached = false;
 
     string cameraName;
 
@@ -205,6 +206,10 @@ public class DalsaImage
     public bool Acquiring
     {
         get { return acquiring; }
+    }
+    public bool LimitReached
+    {
+        get { return limitReached; }
     }
     public int IsMaster
     {
@@ -534,16 +539,20 @@ public class DalsaImage
 
         DirectoryInfo ImageDirInfo = new DirectoryInfo(imageFilePath);
         double ImageDirSize = Utilities.DirSize(ImageDirInfo);
+        string RemoveFile = Utilities.DirOldest(ImageDirInfo);
         string ImageFileName = "Image_" + DateTime.Now.ToString("yyyyMMddHHmmssffff") + ".bmp";
-        if (ImageDirSize < 10000)
+        
+        if (ImageDirSize >= 700) 
         {
-            buffers.Save(imageFilePath + ImageFileName, "-format bmp");
+            limitReached = true;
+            File.Delete(RemoveFile); 
         }
-        else { MessageBox.Show($"{Name} Image folder has reached {ImageDirSize}MB"); }
-
-
-
-        Utilities.LoggingStatment($"{cameraName}: Save Image to BMP ");
+        else
+        {
+            limitReached = false;
+        }
+        buffers.Save(imageFilePath + ImageFileName, "-format bmp");
+        Utilities.LoggingStatment($"{cameraName}: Save Image to BMP, folder size is {ImageDirSize}");
     }
     public void Disconnect()
     {

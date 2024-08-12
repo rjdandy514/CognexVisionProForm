@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -86,6 +87,18 @@ namespace CognexVisionProForm
 
             if (camera.Grabbing) { bttnGrab.Text = "Grabbing"; }
             else { bttnGrab.Text = "Press To Grab"; }
+
+            if (camera.SaveImageSelected)
+            {
+                if (camera.LimitReached) { bttnCameraLog.Text = "Log Images - Full"; }
+                else { bttnCameraLog.Text = "Log Images"; }
+
+            }
+            else
+            {
+                if (camera.LimitReached) { bttnCameraLog.Text = "Log Images - Active/Full"; }
+                else { bttnCameraLog.Text = "Log Images - Active"; }
+            }
         }
         private void CameraControl_Load(object sender, EventArgs e)
         {
@@ -120,7 +133,6 @@ namespace CognexVisionProForm
         {
             camera.TriggerGrab = false;
             _form.CameraAbort(camera.Id);
-            camera.Abort();
             
         }
         private void bttnCameraLog_Click(object sender, EventArgs e)
@@ -128,12 +140,15 @@ namespace CognexVisionProForm
             if (camera.SaveImageSelected)
             {
                 camera.SaveImageSelected = false;
-                bttnCameraLog.Text = "Log Images";
+                if (camera.LimitReached) { bttnCameraLog.Text = "Log Images - Full"; }
+                else { bttnCameraLog.Text = "Log Images"; }
+                
             }
             else if (!camera.SaveImageSelected)
             {
                 camera.SaveImageSelected = true;
-                bttnCameraLog.Text = "Log Images - Active";
+                if (camera.LimitReached) { bttnCameraLog.Text = "Log Images - Active/Full"; }
+                else { bttnCameraLog.Text = "Log Images - Active"; }
             }
         }
         private delegate void Set_UpdateDisplay();
@@ -164,7 +179,7 @@ namespace CognexVisionProForm
             }
             lbToolData.EndUpdate();
             lbToolData.Height = lbToolData.PreferredHeight;
-            
+
             UpdateImageRecord();
 
         }
@@ -277,7 +292,12 @@ namespace CognexVisionProForm
 
         private void button1_Click(object sender, EventArgs e)
         {
-            camera.Trigger = true;
+            string temp = @"C:\Users\Eclipse\source\repos\CognexVisionProForm\CognexVisionProForm\bin\x64\Debug\Camera00\Images";
+
+
+
+            DirectoryInfo ImageDirInfo = new DirectoryInfo(temp);
+            Utilities.DirOldest(ImageDirInfo);
             //camera.CheckAreaCameraFeatures();
         }
 

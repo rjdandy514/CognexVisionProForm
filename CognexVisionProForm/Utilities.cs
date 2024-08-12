@@ -154,6 +154,24 @@ namespace CognexVisionProForm
             }
             return size / 1000000.00;
         }
+        public static string DirOldest(DirectoryInfo Folder)
+        {
+            string OldFile = "";
+            DateTime OldFiledate = DateTime.MaxValue;
+            // Add file sizes.
+            FileInfo[] fileArray = Folder.GetFiles();
+            foreach (FileInfo file in fileArray)
+            {
+                if (DateTime.Compare(OldFiledate, file.CreationTime) > 0)
+                {
+                    OldFile = file.FullName;
+                    OldFiledate = file.CreationTime;
+                }
+
+            }
+
+            return OldFile;
+        }
         public static string GetLocalIPAddress(string range)
         {
             var host = Dns.GetHostEntry(Dns.GetHostName());

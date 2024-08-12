@@ -168,6 +168,7 @@ namespace CognexVisionProForm
                 {
                     cogToolBlock = CogSerializer.LoadObjectFromFile(toolFile) as CogToolBlock;
                     cogToolBlock.Ran += new EventHandler(Subject_Ran);
+                    cogToolBlock.Running += new EventHandler(Subject_Running);
                     cogToolBlock.Name = toolName;
 
                     toolReady = true;
@@ -212,7 +213,10 @@ namespace CognexVisionProForm
         void Subject_Ran(object sender, EventArgs e)
         {
             GetInfoFromTool();
-            Utilities.LoggingStatment($"{toolName}: Toolblock completed Run");
+        }
+        void Subject_Running(object sender, EventArgs e)
+        {
+
         }
         private void GetInfoFromTool()
         {
@@ -237,6 +241,7 @@ namespace CognexVisionProForm
             form.ToolBlockRunComplete = CameraId;
 
             Utilities.LoggingStatment($"{toolName}: Number of Outputs - {toolOutputCount}");
+            Utilities.LoggingStatment($"{toolName}: Toolblock completed Run");
         }
         public void Cleaning()
         {
@@ -244,13 +249,11 @@ namespace CognexVisionProForm
             //clean up for vision pro
             if (cogToolBlock != null)
             {
-                if (toolFile != "")
-                {
-                    CogSerializer.SaveObjectToFile(cogToolBlock, toolFile);
-                }
+                if (toolFile != "") { CogSerializer.SaveObjectToFile(cogToolBlock, toolFile); }
                 
                 cogToolBlock.Dispose();
                 cogToolBlock.Ran -= new EventHandler(Subject_Ran);
+                cogToolBlock.Running -= new EventHandler(Subject_Running);
             }
             
             Utilities.LoggingStatment($"{toolName}: Job Manager closed down");

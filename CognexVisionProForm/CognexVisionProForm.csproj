@@ -161,7 +161,6 @@
       <DependentUpon>SplashScreen.cs</DependentUpon>
     </Compile>
     <Compile Include="Utilities.cs" />
-    <Compile Include="Calculations.cs" />
     <Compile Include="CameraAcq.cs" />
     <Compile Include="DalsaImage.cs" />
     <Compile Include="CognexVisionProForm.cs">
