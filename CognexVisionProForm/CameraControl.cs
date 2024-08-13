@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -292,13 +293,7 @@ namespace CognexVisionProForm
 
         private void button1_Click(object sender, EventArgs e)
         {
-            string temp = @"C:\Users\Eclipse\source\repos\CognexVisionProForm\CognexVisionProForm\bin\x64\Debug\Camera00\Images";
-
-
-
-            DirectoryInfo ImageDirInfo = new DirectoryInfo(temp);
-            Utilities.DirOldest(ImageDirInfo);
-            //camera.CheckAreaCameraFeatures();
+            var version = Assembly.GetExecutingAssembly().GetName().Version;
         }
 
         private void numRecordSelect_ValueChanged(object sender, EventArgs e)
