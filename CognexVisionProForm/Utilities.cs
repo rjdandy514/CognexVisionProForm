@@ -27,7 +27,7 @@ namespace CognexVisionProForm
             get { return Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath); }
         }
         private static TextWriterTraceListener appListener;
-        public static void InitializeLog(string logDir, string archiveDir)
+        public static void InitLog(string logDir, string archiveDir)
         {
           
             string logFile = logDir + "Log.log";

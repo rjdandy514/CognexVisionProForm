@@ -1,5 +1,6 @@
 ﻿using Cognex.VisionPro;
 using Cognex.VisionPro.ToolBlock;
+using DALSA.SaperaLT.SapClassBasic;
 using System;
 using System.Collections;
 using System.Diagnostics;
@@ -16,17 +17,6 @@ namespace CognexVisionProForm
         private bool heartBeat = false;
         private bool PlcAutoMode;
 
-        private BitArray generalControl;
-
-        private BitArray CameraControl;
-        private BitArray generalStatus;
-
-        private BitArray toolControl;
-        private BitArray cameraStatus;
-        private bool toolRunComplete;
-        private int toolRunCount;
-        private int toolCompleteCount;
-
         private CogStringCollection LicenseCheck;
         private bool cogLicenseOk;
 
@@ -34,7 +24,6 @@ namespace CognexVisionProForm
         int cameraConnectCount;
         int dataLength = 8;
         public DalsaImage[] CameraAcqArray;
-        ICogImage CameraImage;
         bool[] cameraSnap;
         bool[] cameraSnapComplete;
         bool[] toolTrigger;
@@ -43,15 +32,12 @@ namespace CognexVisionProForm
 
         SplashScreen splashScreen;
 
-
-        int toolBlockRunComplete;
         private int ExpireCount = 0;
 
         private bool ExpireError = false;
 
         private int[] desiredTool;
         private int[] plcTool;
-        private int[] hmiTool;
         private ToolBlock[,] toolblockArray;
 
         private PlcComms MainPLC;
@@ -60,14 +46,11 @@ namespace CognexVisionProForm
 
         int cameraCount;
         int toolCount;
-        bool toolResultUpdate_Mem;
         string computerName;
 
         string ServerNotFound = "No Server Found";
 
         private Timer pollingTimer;
-
-
         public CognexVisionProForm()
         {
             InitializeComponent();
@@ -112,7 +95,7 @@ namespace CognexVisionProForm
 
             string LogDir = Utilities.ExeFilePath + "\\LogFile\\";
             string ArchiveLogDir = LogDir + "Archive\\";
-            Utilities.InitializeLog(LogDir, ArchiveLogDir);
+            Utilities.InitLog(LogDir, ArchiveLogDir);
             txtArchive.Text = ArchiveLogDir;
             txtLogFile.Text = LogDir + "Log.log";
 
@@ -127,19 +110,19 @@ namespace CognexVisionProForm
             toolTriggerComplete = new bool[cameraCount];
 
             splashScreen.UpdateProgress("Initialize Classes", 10);
-            InitializeClasses();
+            InitClasses();
 
             splashScreen.UpdateProgress("Load Settings", 10);
             LoadSettings();
 
             splashScreen.UpdateProgress("Initialize Server List", 10);
-            InitializeServerList(0);
+            InitServerList(0);
 
             splashScreen.UpdateProgress("Initialize Resource List", 10);
-            InitializeResourceList(0);
+            InitResourceList(0);
 
             splashScreen.UpdateProgress("Initialize Job Manager", 10);
-            InitializeJobManager();
+            InitJobManager();
 
             splashScreen.UpdateProgress("Check License", 10);
             CheckLicense();
@@ -153,7 +136,7 @@ namespace CognexVisionProForm
         }
         private void Form1_Resize(object sender, EventArgs e)
         {
-            resize_Tab00();
+            resize_CameraControl();
             resize_tabToolBlock();
             resize_tabFileControl();
         }
@@ -181,10 +164,6 @@ namespace CognexVisionProForm
 
             
         }
-        private void Form1_ResizeEnd(object sender, EventArgs e)
-        {
-
-        }
         private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
         {
 
@@ -200,7 +179,7 @@ namespace CognexVisionProForm
                         cameraConnectCount++;
                     }
                 }
-                resize_Tab00();
+                resize_CameraControl();
             }
             else if (tabControl1.SelectedTab.Name == "tabFrameGrabber")
             {
@@ -216,7 +195,7 @@ namespace CognexVisionProForm
                 }
                 cbTBCameraSelected.SelectedIndex = 0;
             }
-            else if (tabControl1.SelectedTab.Name == "tabToolBlock")
+            else if (tabControl1.SelectedTab.Name == "tabPlcConnection")
             {
                 tbBaseTag.Text = MainPLC.BaseTag;
             }
@@ -244,8 +223,8 @@ namespace CognexVisionProForm
             if (CameraAcqArray[selectedCameraId].Connected) { bttnConnectCamera.Text = "Disconnect"; }
             else { bttnConnectCamera.Text = "Connect"; }
 
-            InitializeServerList(selectedCameraId);
-            InitializeResourceList(selectedCameraId);
+            InitServerList(selectedCameraId);
+            InitResourceList(selectedCameraId);
 
             cbToolBlock.Items.Clear();
             for (int i = 0; i < toolCount; i++)
@@ -263,12 +242,20 @@ namespace CognexVisionProForm
         }
         private void cbServerList_SelectedIndexChanged(object sender, EventArgs e)
         {
-            MyListBoxItem item = (MyListBoxItem)cbServerList.SelectedItem;
-            bool configFileRequired = item.ItemData;
-            cbConfigFileReq.Checked = configFileRequired;
-            CameraAcqArray[selectedCameraId].LoadServerSelect = item.ToString();
+            var serverType = SapManager.GetServerType(cbServerList.SelectedItem.ToString());
 
-            InitializeResourceList(selectedCameraId);
+            if (serverType == SapManagerBase.Server.Genie)
+            {
+                cbConfigFileReq.Checked = false;
+            }
+            else
+            {
+                cbConfigFileReq.Checked = true;
+            }
+
+
+            CameraAcqArray[selectedCameraId].LoadServerSelect = cbServerList.SelectedItem.ToString();
+            InitResourceList(selectedCameraId);
 
         }
         private void bttnConnectCamera_Click(object sender, EventArgs e)
@@ -313,7 +300,7 @@ namespace CognexVisionProForm
                 cbToolBlock.Items.Add(toolblockArray[cbCameraIdSelected.SelectedIndex, i].Name);
             }
         }
-        private void bttnC1Config_Click(object sender, EventArgs e)
+        private void bttnConfigSelect_Click(object sender, EventArgs e)
         {
             CameraAcqArray[selectedCameraId].LoadConfigFile();
             cbConfigFileFound.Checked = CameraAcqArray[selectedCameraId].ConfigFilePresent;
@@ -357,12 +344,28 @@ namespace CognexVisionProForm
             {
                 toolblockArray[cbCameraIdSelected.SelectedIndex, toolSelected].Name = toolNameUpdated;
                 toolblockArray[cbCameraIdSelected.SelectedIndex, toolSelected].LoadvisionProject();
-                toolblockArray[cbCameraIdSelected.SelectedIndex, toolSelected].InitializeJobManager();
+                toolblockArray[cbCameraIdSelected.SelectedIndex, toolSelected].InitJobManager();
 
                 cbToolBlock.Items[toolSelected] = toolNameUpdated;
             }
 
 
+        }
+        private void bttnAutoConnect_Click(object sender, EventArgs e)
+        {
+
+            for (int i = cameraCount - 1; i >= 0; i--)
+            {
+                if (!CameraAcqArray[i].Connected && CameraAcqArray[i].LoadServerSelect != null && CameraAcqArray[i].LoadResourceIndex != -1)
+                {
+                    CameraAcqArray[i].CreateCamera();
+                    if (!CameraAcqArray[i].Connected) { return; }
+                }
+
+            }
+
+            this.WindowState = FormWindowState.Maximized;
+            tabControl1.SelectedIndex = 0;
         }
         //*********************************************************************
         //lICENSE CHECK
@@ -382,14 +385,14 @@ namespace CognexVisionProForm
         {
             Process.Start(txtLogFile.Text);
         }
+        private void bttnOpenProject_Click(object sender, EventArgs e)
+        {
+            Process.Start(Utilities.ExeFilePath);
+        }
         //*********************************************************************
         //TOOL BLOCK
         //*********************************************************************
 
-        private void cogToolBlockEditV21_Load(object sender, EventArgs e)
-        {
-
-        }
         private void cbTBCameraSelected_SelectedIndexChanged(object sender, EventArgs e)
         {
             cbTBToolSelected.Items.Clear();
@@ -460,7 +463,6 @@ namespace CognexVisionProForm
             }
 
         }
-
         private void bttnPlcPing_Click(object sender, EventArgs e)
         {
             MainPLC.IPAddress = $"{numIP1.Value.ToString()}.{numIP2.Value.ToString()}.{numIP3.Value.ToString()}.{numIP4.Value.ToString()}";
@@ -470,37 +472,6 @@ namespace CognexVisionProForm
             tbPlcPingResponse.Text = temp.Status.ToString();
         }
 
-        private void cbHeartbeat_CheckedChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void bttnOpenProject_Click(object sender, EventArgs e)
-        {
-            Process.Start(Utilities.ExeFilePath);
-        }
-
-        private void bttnAutoConnect_Click(object sender, EventArgs e)
-        {
-            
-            for (int i = cameraCount - 1; i >= 0; i--)
-            {
-                if (!CameraAcqArray[i].Connected && CameraAcqArray[i].LoadServerSelect != null && CameraAcqArray[i].LoadResourceIndex != -1)
-                {
-                    CameraAcqArray[i].CreateCamera();
-                    if (!CameraAcqArray[i].Connected) { return; }
-                }
-                
-            }
-
-            this.WindowState = FormWindowState.Maximized;
-            tabControl1.SelectedIndex = 0;
-        }
-
-        private void cbCameraSelected_DropDown(object sender, DragEventArgs e)
-        {
-
-        }
     }
 
 }

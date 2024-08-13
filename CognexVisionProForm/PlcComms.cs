@@ -24,7 +24,6 @@ namespace CognexVisionProForm
         Tag tagPcToPlc;
         Tag tagPcToPlcData;
         Libplctag client;
-        bool pinged;
         int DataTimeout = 2000;
         public int[] PlcToPcControl = new int[32];
         public int[] PcToPlcStatus = new int[32];
@@ -47,10 +46,7 @@ namespace CognexVisionProForm
         {
             get;set;
         }
-        public string WriteTag
-        {
-            get;set;
-        }
+
         public string DecodeError(int result)
         {
                 return client.DecodeError(result);
@@ -69,8 +65,6 @@ namespace CognexVisionProForm
 
             if (InitialCheck.Status == IPStatus.Success)
             {
-                pinged = true;
-
                 //create instance of PLC Client
                 client = new Libplctag();
 
@@ -91,10 +85,6 @@ namespace CognexVisionProForm
                 CreatePlcTag(tagPcToPlc, plcStatus);
                 CreatePlcTag(tagPcToPlcData, plcStatusData);
 
-            }
-            else
-            {
-                pinged = false;
             }
 
         }

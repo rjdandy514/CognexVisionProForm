@@ -48,7 +48,7 @@ namespace CognexVisionProForm
         {
             get;set;
         }
-        public void InitializeClasses()
+        public void InitClasses()
         {
             pollingTimer = new Timer();
             pollingTimer.Tick += new EventHandler(pollingTimer_Tick);
@@ -74,7 +74,7 @@ namespace CognexVisionProForm
 
             Utilities.LoggingStatment($"InitializeAcquisition Complete");
         }
-        public void InitializeJobManager()
+        public void InitJobManager()
         {
             splashScreen.UpdateProgress("Initialize JobManager", 10);
 
@@ -84,37 +84,31 @@ namespace CognexVisionProForm
                 {
                     if (toolblockArray[cam, i].FilePresent)
                     {
-                        toolblockArray[cam, i].InitializeJobManager();
+                        toolblockArray[cam, i].InitJobManager();
                     }
                 }
             }
             
             splashScreen.Close();
         }
-        public void InitializeServerList(int cameraIndex)
+        public void InitServerList(int cameraIndex)
         {
             cbServerList.Items.Clear();
-            for (int i = 0; i < SapManager.GetServerCount(); i++)
-            {
-                // Does this server support "Acq" (frame-grabber) or "AcqDevice" (camera)?
-                bool bAcq = (CameraAcqArray[cameraIndex].ServerType == ServerCategory.ServerAcq || CameraAcqArray[cameraIndex].ServerType == ServerCategory.ServerAll) &&
-                                (SapManager.GetResourceCount(i, SapManager.ResourceType.Acq) > 0);
 
-                bool bAcqDevice = (CameraAcqArray[cameraIndex].ServerType == ServerCategory.ServerAcqDevice || CameraAcqArray[cameraIndex].ServerType == ServerCategory.ServerAll) &&
-                                    (SapManager.GetResourceCount(i, SapManager.ResourceType.AcqDevice) > 0 &&
-                                    (SapManager.GetResourceCount(i, SapManager.ResourceType.Acq) == 0));
+            int serverCount = SapManager.GetServerCount();
+            for (int i = 0; i < serverCount; i++)
+            {
+
+                int acqCount = SapManager.GetResourceCount(i, SapManager.ResourceType.Acq);
+                int acqDeviceCount = SapManager.GetResourceCount(i, SapManager.ResourceType.AcqDevice);
+
+                // Does this server support "Acq" (frame-grabber) or "AcqDevice" (camera)?
+                bool bAcq =(acqCount > 0);
+                bool bAcqDevice =(acqDeviceCount > 0 && acqCount == 0);
 
                 //Add all servers to the combobox list
-                if (bAcq)
-                {
-                    cbServerList.Items.Add(new MyListBoxItem(SapManager.GetServerName(i), true));
-                    
-                }
-                else if (bAcqDevice)
-                {
-
-                    cbServerList.Items.Add(new MyListBoxItem(SapManager.GetServerName(i), false));
-                }
+                if (bAcq) { cbServerList.Items.Add(SapManager.GetServerName(i)); }
+                else if (bAcqDevice) { cbServerList.Items.Add(SapManager.GetServerName(i)); }
             }
 
             //select the server that was used last time
@@ -129,13 +123,13 @@ namespace CognexVisionProForm
             }
             else
             {
-                cbServerList.Items.Add(new MyListBoxItem(ServerNotFound, false));
+                cbServerList.Items.Add(ServerNotFound);
                 cbServerList.SelectedIndex = 0;
             }
 
             CameraAcqArray[cameraIndex].LoadServerSelect = cbServerList.SelectedItem.ToString();
         }
-        public void InitializeResourceList(int cameraIndex)
+        public void InitResourceList(int cameraIndex)
         {
             int AcqCount = 0;
             int AcqDeviceCount = 0;
@@ -251,9 +245,7 @@ namespace CognexVisionProForm
         }
         
         public void ToolBlockTrigger()
-        {
-            toolRunComplete = false;
-           
+        {          
 
             for (int j = 0; j < cameraCount; j++)
             {
@@ -344,7 +336,7 @@ namespace CognexVisionProForm
             LicenseCheckList.EndUpdate();
             LicenseCheckList.Height = LicenseCheckList.PreferredHeight;
         }
-        public void resize_Tab00()
+        public void resize_CameraControl()
         {
             int height;
             int width;
@@ -587,7 +579,6 @@ namespace CognexVisionProForm
         }
         public void SaveSettings()
         {
-            MyListBoxItem serverListSelected = (MyListBoxItem)cbServerList.SelectedItem;
             String KeyPath = Utilities.ExeFilePath + "\\RegisterKey";
 
             RegistryKey RegKey = Registry.CurrentUser.CreateSubKey(KeyPath);

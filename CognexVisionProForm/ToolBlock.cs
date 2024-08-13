@@ -17,7 +17,6 @@ namespace CognexVisionProForm
         string toolFileLocation;
         string toolFileType = "ToolBlock";
         string toolFileExtension = ".vpp";
-        string Previous = "";
 
         bool filePresent = false;
         bool resultUpdated = false;
@@ -160,7 +159,7 @@ namespace CognexVisionProForm
                 toolFile = "";
             }
         }
-        public void InitializeJobManager()
+        public void InitJobManager()
         {
             try
             {

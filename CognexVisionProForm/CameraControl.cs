@@ -19,8 +19,6 @@ namespace CognexVisionProForm
     {
         CognexVisionProForm _form;
         DalsaImage camera;
-        bool continousSnap = false;
-        double acqTime = 0;
         ToolBlock tool;
         public ICogImage image;
         public ICogRecord record;

@@ -79,7 +79,7 @@
     <GenerateManifests>true</GenerateManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <SignManifests>true</SignManifests>
+    <SignManifests>false</SignManifests>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Cognex.Rbbt.Net, Version=9.10.0.0, Culture=neutral, PublicKeyToken=ef0f902af9dee505, processorArchitecture=AMD64">
@@ -121,10 +121,6 @@
     <Reference Include="Cognex.VisionPro.ResultsAnalysis, Version=79.0.0.0, Culture=neutral, PublicKeyToken=ef0f902af9dee505" />
     <Reference Include="Cognex.VisionPro.ToolGroup, Version=79.0.0.0, Culture=neutral, PublicKeyToken=ef0f902af9dee505, processorArchitecture=AMD64" />
     <Reference Include="Cognex.VisionPro.ToolGroup.Controls, Version=79.0.0.0, Culture=neutral, PublicKeyToken=ef0f902af9dee505" />
-    <Reference Include="CPro.NET, Version=9.50.0.1617, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\Program Files\Teledyne DALSA\Sapera Processing\Bin\Ms.net\CPro.NET.dll</HintPath>
-    </Reference>
     <Reference Include="DALSA.SaperaLT.SapClassBasic">
       <HintPath>..\..\..\..\..\..\Program Files\Teledyne DALSA\Sapera\Components\NET\Bin\DALSA.SaperaLT.SapClassBasic.dll</HintPath>
     </Reference>
@@ -161,7 +157,6 @@
       <DependentUpon>SplashScreen.cs</DependentUpon>
     </Compile>
     <Compile Include="Utilities.cs" />
-    <Compile Include="CameraAcq.cs" />
     <Compile Include="DalsaImage.cs" />
     <Compile Include="CognexVisionProForm.cs">
       <SubType>Form</SubType>
@@ -169,7 +164,6 @@
     <Compile Include="CognexVisionProForm.Designer.cs">
       <DependentUpon>CognexVisionProForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="MyListBoxItem.cs" />
     <Compile Include="PlcComms.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -192,7 +186,6 @@
     <EmbeddedResource Include="SplashScreen.resx">
       <DependentUpon>SplashScreen.cs</DependentUpon>
     </EmbeddedResource>
-    <None Include="CognexVisionProForm_1_TemporaryKey.pfx" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

@@ -40,10 +40,8 @@ public class DalsaImage
     double acqTime = 0;
     double snapTime = 0;
     double startOfFrameTime = 0;
-    int startOfFrame = 0;
     string configFileType = "ConfigFile";
     string configFileExtension = ".ccf";
-    string serialNumber = "";
 
     IntPtr cogImageAddress;
 
@@ -84,17 +82,7 @@ public class DalsaImage
             return acqTime;
         }
     }
-    public double SnapTime
-    {
-        get
-        {
-            return snapTime;
-        }
-    }
-    public int BufferIndex
-    {
-        get { return buffers.Index; }
-    }
+
     public string ConfigFile
     {
         get; set;
@@ -238,13 +226,6 @@ public class DalsaImage
     public string LoadResourceName
     {
         get; set;
-    }
-    public string GetSerialNumber
-    {
-        get
-        {
-            return SapManager.GetSerialNumber(serverLocation);
-        }
     }
     public int LoadResourceIndex
     {
@@ -656,17 +637,6 @@ public class DalsaImage
         acquiring = false;
         form.CameraSnapComplete = Id;
     }
-    public ICogImage RawToCogImage()
-    {
-        CogImage8Root NewImageRoot = new CogImage8Root();
-        CogImage8Grey NewImage = new CogImage8Grey();
-
-        NewImageRoot.Initialize(imageWidth, imageHeight, imageAddress, imageWidth, null);
-
-        NewImage.SetRoot(NewImageRoot);
-
-        return NewImage;
-    }
     public ICogImage MarshalToCogImage()
     {
         CogImage8Root NewImageRoot = new CogImage8Root();
@@ -712,7 +682,6 @@ public class DalsaImage
 
         int returnGetParm = 0;
         int returnCheckParm = 0;
-        int returnTempParm = 0;
 
         int phaseA = 1;
         int phaseB = 2;
