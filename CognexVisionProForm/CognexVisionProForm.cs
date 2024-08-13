@@ -188,7 +188,7 @@ namespace CognexVisionProForm
         private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
         {
 
-            if (tabControl1.SelectedIndex == 0)
+            if (tabControl1.SelectedTab.Name == "tabImage")
             {
                 Panel[] allPanels = new Panel[] { Camera1Panel, Camera2Panel, Camera3Panel, Camera4Panel, Camera5Panel, Camera6Panel };
                 cameraConnectCount = 0;
@@ -202,11 +202,11 @@ namespace CognexVisionProForm
                 }
                 resize_Tab00();
             }
-            else if (tabControl1.SelectedIndex == 1)
+            else if (tabControl1.SelectedTab.Name == "tabFrameGrabber")
             {
                 UpdateFrameGrabberTab();
             }
-            else if (tabControl1.SelectedIndex == 5)
+            else if (tabControl1.SelectedTab.Name == "tabToolBlock")
             {
                 cbTBCameraSelected.Items.Clear();
 
@@ -216,7 +216,7 @@ namespace CognexVisionProForm
                 }
                 cbTBCameraSelected.SelectedIndex = 0;
             }
-            else if (tabControl1.SelectedIndex == 6)
+            else if (tabControl1.SelectedTab.Name == "tabToolBlock")
             {
                 tbBaseTag.Text = MainPLC.BaseTag;
             }
