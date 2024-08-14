@@ -89,14 +89,14 @@ namespace CognexVisionProForm
 
             if (camera.SaveImageSelected)
             {
-                if (camera.LimitReached) { bttnCameraLog.Text = "Log Images - Full"; }
-                else { bttnCameraLog.Text = "Log Images"; }
-
-            }
-            else
-            {
                 if (camera.LimitReached) { bttnCameraLog.Text = "Log Images - Active/Full"; }
                 else { bttnCameraLog.Text = "Log Images - Active"; }
+
+            }
+            else if(!camera.SaveImageSelected)
+            {
+                if (camera.LimitReached) { bttnCameraLog.Text = "Log Images - Full"; }
+                else { bttnCameraLog.Text = "Log Images"; }
             }
         }
         private void CameraControl_Load(object sender, EventArgs e)
@@ -291,7 +291,8 @@ namespace CognexVisionProForm
 
         private void button1_Click(object sender, EventArgs e)
         {
-            var version = Assembly.GetExecutingAssembly().GetName().Version;
+            //var version = Assembly.GetExecutingAssembly().GetName().Version;
+            camera.CheckAreaCameraFeatures();
         }
 
         private void numRecordSelect_ValueChanged(object sender, EventArgs e)

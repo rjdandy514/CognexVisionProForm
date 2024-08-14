@@ -324,6 +324,7 @@ namespace CognexVisionProForm
 
             cbC1Tb1FileFound.Checked = toolblockArray[cbCameraIdSelected.SelectedIndex, cbToolBlock.SelectedIndex].FilePresent;
             tbToolBlockName.Text = toolblockArray[cbCameraIdSelected.SelectedIndex, cbToolBlock.SelectedIndex].Name;
+            cbToolBlockEnabled.Checked = toolblockArray[cbCameraIdSelected.SelectedIndex, cbToolBlock.SelectedIndex].ToolReady;
 
         }
         private void bttnToolBockFileSelect_Click(object sender, EventArgs e)
