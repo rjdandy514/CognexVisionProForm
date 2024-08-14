@@ -242,18 +242,11 @@ namespace CognexVisionProForm
         }
         private void cbServerList_SelectedIndexChanged(object sender, EventArgs e)
         {
-            var serverType = SapManager.GetServerType(cbServerList.SelectedItem.ToString());
-
-            if (serverType == SapManagerBase.Server.Genie)
-            {
-                cbConfigFileReq.Checked = false;
-            }
-            else
-            {
-                cbConfigFileReq.Checked = true;
-            }
+            int acqCount = SapManager.GetResourceCount(cbServerList.SelectedItem.ToString(), SapManager.ResourceType.Acq);
+            int acqDeviceCount = SapManager.GetResourceCount(cbServerList.SelectedItem.ToString(), SapManager.ResourceType.AcqDevice);
 
 
+            cbConfigFileReq.Checked = acqCount >0;
             CameraAcqArray[selectedCameraId].LoadServerSelect = cbServerList.SelectedItem.ToString();
             InitResourceList(selectedCameraId);
 
