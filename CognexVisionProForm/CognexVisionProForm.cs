@@ -322,14 +322,14 @@ namespace CognexVisionProForm
         private void cbToolBlock_SelectedIndexChanged(object sender, EventArgs e)
         {
 
-            cbC1Tb1FileFound.Checked = toolblockArray[cbCameraIdSelected.SelectedIndex, cbToolBlock.SelectedIndex].FilePresent;
+            cbToolBlockFileFound.Checked = toolblockArray[cbCameraIdSelected.SelectedIndex, cbToolBlock.SelectedIndex].FilePresent;
             tbToolBlockName.Text = toolblockArray[cbCameraIdSelected.SelectedIndex, cbToolBlock.SelectedIndex].Name;
 
         }
         private void bttnToolBockFileSelect_Click(object sender, EventArgs e)
         {
 
-            string toolNameUpdated = tbC1TB1Name.Text.ToString();
+            string toolNameUpdated = tbToolBlockNameEdit.Text.ToString();
             int toolSelected = cbToolBlock.SelectedIndex;
 
 
