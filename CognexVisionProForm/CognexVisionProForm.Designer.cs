@@ -74,8 +74,8 @@ namespace CognexVisionProForm
             this.tbToolBlockName = new System.Windows.Forms.TextBox();
             this.bttnToolBlockFileSelect = new System.Windows.Forms.Button();
             this.cbToolBlock = new System.Windows.Forms.ComboBox();
-            this.cbC1Tb1FileFound = new System.Windows.Forms.CheckBox();
-            this.tbC1TB1Name = new System.Windows.Forms.TextBox();
+            this.cbToolBlockFileFound = new System.Windows.Forms.CheckBox();
+            this.tbToolBlockNameEdit = new System.Windows.Forms.TextBox();
             this.panel4 = new System.Windows.Forms.Panel();
             this.bttnAutoConnect = new System.Windows.Forms.Button();
             this.label39 = new System.Windows.Forms.Label();
@@ -558,8 +558,8 @@ namespace CognexVisionProForm
             this.panel3.Controls.Add(this.tbToolBlockName);
             this.panel3.Controls.Add(this.bttnToolBlockFileSelect);
             this.panel3.Controls.Add(this.cbToolBlock);
-            this.panel3.Controls.Add(this.cbC1Tb1FileFound);
-            this.panel3.Controls.Add(this.tbC1TB1Name);
+            this.panel3.Controls.Add(this.cbToolBlockFileFound);
+            this.panel3.Controls.Add(this.tbToolBlockNameEdit);
             this.panel3.Location = new System.Drawing.Point(599, 5);
             this.panel3.Margin = new System.Windows.Forms.Padding(5);
             this.panel3.Name = "panel3";
@@ -612,21 +612,21 @@ namespace CognexVisionProForm
             this.cbToolBlock.TabIndex = 35;
             this.cbToolBlock.SelectedIndexChanged += new System.EventHandler(this.cbToolBlock_SelectedIndexChanged);
             // 
-            // cbC1Tb1FileFound
+            // cbToolBlockFileFound
             // 
-            this.cbC1Tb1FileFound.AutoCheck = false;
-            this.cbC1Tb1FileFound.Location = new System.Drawing.Point(5, 38);
-            this.cbC1Tb1FileFound.Name = "cbC1Tb1FileFound";
-            this.cbC1Tb1FileFound.Size = new System.Drawing.Size(147, 24);
-            this.cbC1Tb1FileFound.TabIndex = 24;
-            this.cbC1Tb1FileFound.Text = "Tool Block Found";
+            this.cbToolBlockFileFound.AutoCheck = false;
+            this.cbToolBlockFileFound.Location = new System.Drawing.Point(5, 38);
+            this.cbToolBlockFileFound.Name = "cbToolBlockFileFound";
+            this.cbToolBlockFileFound.Size = new System.Drawing.Size(147, 24);
+            this.cbToolBlockFileFound.TabIndex = 24;
+            this.cbToolBlockFileFound.Text = "Tool Block Found";
             // 
-            // tbC1TB1Name
+            // tbToolBlockNameEdit
             // 
-            this.tbC1TB1Name.Location = new System.Drawing.Point(126, 11);
-            this.tbC1TB1Name.Name = "tbC1TB1Name";
-            this.tbC1TB1Name.Size = new System.Drawing.Size(203, 20);
-            this.tbC1TB1Name.TabIndex = 34;
+            this.tbToolBlockNameEdit.Location = new System.Drawing.Point(126, 11);
+            this.tbToolBlockNameEdit.Name = "tbToolBlockNameEdit";
+            this.tbToolBlockNameEdit.Size = new System.Drawing.Size(203, 20);
+            this.tbToolBlockNameEdit.TabIndex = 34;
             // 
             // panel4
             // 
@@ -1038,8 +1038,8 @@ namespace CognexVisionProForm
         private System.Windows.Forms.TextBox tbToolBlockName;
         private System.Windows.Forms.Button bttnToolBlockFileSelect;
         private System.Windows.Forms.ComboBox cbToolBlock;
-        private System.Windows.Forms.CheckBox cbC1Tb1FileFound;
-        private System.Windows.Forms.TextBox tbC1TB1Name;
+        private System.Windows.Forms.CheckBox cbToolBlockFileFound;
+        private System.Windows.Forms.TextBox tbToolBlockNameEdit;
         private System.Windows.Forms.Panel panel4;
         private System.Windows.Forms.Button bttnAutoConnect;
         private System.Windows.Forms.Label label39;
