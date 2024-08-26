@@ -124,7 +124,6 @@ namespace CognexVisionProForm
         }
         private void bttnCameraSnap_Click(object sender, EventArgs e)
         {
-            toolSelect = Convert.ToInt32(numToolSelect.Value);
             camera.Trigger = true;
             lbAcqTime.Text = $"Aquisition: --- ms";
             UpdateButton();
@@ -166,9 +165,23 @@ namespace CognexVisionProForm
             lbAcqTime.Text = $"Aquisition: {camera.AcqTime} ms";
             lbToolRunTime.Text = $"Tool Time: {tool.RunStatus.TotalTime} ms";
             cbToolPassed.Checked = tool.Result;
-            
+
+            lbToolInput.Items.Clear();
+            lbToolInput.BeginUpdate();
+            for (int i = 1; i < tool.cogToolBlock.Inputs.Count; i++)
+            {
+                if (tool.cogToolBlock.Inputs[i] != null)
+                {
+                    string toolInput = tool.cogToolBlock.Inputs[i].Name + ": " + Math.Round(Convert.ToDouble(tool.cogToolBlock.Inputs[i].Value), 2).ToString();
+                    lbToolInput.Items.Add(toolInput);
+                }
+            }
+            lbToolInput.EndUpdate();
+            lbToolInput.Height = lbToolInput.PreferredHeight;
+
             lbToolData.Items.Clear();
             lbToolData.BeginUpdate();
+            lbToolData.Location = new Point(lbToolData.Location.X,lbToolInput.Location.Y + lbToolInput.Height + 5);
             for (int i = 0; i < tool.ToolOutput.Length; i++)
             {
                 if (tool.ToolOutput[i] != null) 
@@ -181,18 +194,7 @@ namespace CognexVisionProForm
             lbToolData.EndUpdate();
             lbToolData.Height = lbToolData.PreferredHeight;
 
-            lbToolInput.Items.Clear();
-            lbToolInput.BeginUpdate();
-            for (int i = 0; i < tool.ToolOutput.Length; i++)
-            {
-                if (tool.ToolOutput[i] != null)
-                {
-                    string toolInput = tool.cogToolBlock.Inputs[i].Name + ": " +Math.Round(Convert.ToDouble(tool.ToolInput[i]), 2).ToString();
-                    lbToolInput.Items.Add(toolInput);
-                }
-            }
-            lbToolInput.EndUpdate();
-            lbToolInput.Height = lbToolInput.PreferredHeight;
+
 
 
             UpdateImageRecord();
@@ -213,6 +215,7 @@ namespace CognexVisionProForm
 
                 int selectedRecord = Convert.ToInt32(numRecordSelect.Value);
                 recordDisplay.Record = record.SubRecords[selectedRecord];
+                //MessageBox.Show(recordDisplay.Record.RecordKey);
 
             }
         }
@@ -296,7 +299,7 @@ namespace CognexVisionProForm
 
         private void numToolSelect_ValueChanged(object sender, EventArgs e)
         {
-
+            toolSelect = Convert.ToInt32(numToolSelect.Value);
         }
 
         private void bttnGrab_Click(object sender, EventArgs e)
@@ -315,7 +318,10 @@ namespace CognexVisionProForm
         private static extern int GetPrivateProfileString(string section,string key, string def, StringBuilder retVal,int size, string filePath);
         private void numRecordSelect_ValueChanged(object sender, EventArgs e)
         {
+            
             UpdateImageRecord();
+
+                
         }
     }
 }

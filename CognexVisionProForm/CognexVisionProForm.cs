@@ -6,6 +6,7 @@ using System.Collections;
 using System.Diagnostics;
 using System.Net;
 using System.Net.NetworkInformation;
+using System.Runtime.CompilerServices;
 using System.Windows.Forms;
 using EventArgs = System.EventArgs;
 
@@ -16,6 +17,7 @@ namespace CognexVisionProForm
     {
         private bool heartBeat = false;
         private bool PlcAutoMode;
+        private bool[] ResultReadyOk;
 
         private CogStringCollection LicenseCheck;
         private bool cogLicenseOk;
@@ -68,14 +70,18 @@ namespace CognexVisionProForm
             if (MainPLC.InitialCheck.Status == IPStatus.Success)
             {
                 //Get all data from PLC
-                MainPLC.ReadPlcTag();
                 MainPLC.ReadPlcDataTag();
+                MainPLC.ReadPlcTag();
+               
+                PlcReadData();
                 PlcRead();
-                
+
                 //Send Data to PLC
+                PlcWriteData();
                 PlcWrite();
-                MainPLC.WritePlcTag();
                 MainPLC.WritePlcDataTag();
+                MainPLC.WritePlcTag();
+                
             }
             pollingTimer.Start();
         }
@@ -106,6 +112,7 @@ namespace CognexVisionProForm
             cameraControl = new CameraControl[cameraCount];
             cameraSnap = new bool[cameraCount];
             cameraSnapComplete = new bool[cameraCount];
+            ResultReadyOk = new bool[cameraCount];
             toolTrigger = new bool[cameraCount];
             toolTriggerComplete = new bool[cameraCount];
 

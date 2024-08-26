@@ -234,7 +234,7 @@ namespace CognexVisionProForm
         }
         public void ToolNumberUpdate(int cam)
         {
-                if (MainPLC.InitialCheck != null && MainPLC.InitialCheck.Status == IPStatus.Success)
+                if (MainPLC.InitialCheck != null && MainPLC.InitialCheck.Status == IPStatus.Success && PlcCommsActive)
                 {
                     if (Enumerable.Range(0, toolCount).Contains(plcTool[cam]))
                     {
@@ -495,8 +495,9 @@ namespace CognexVisionProForm
                 plcTool[cam] = MainPLC.PlcToPcControl[index + cam] >> 16;
                 ToolNumberUpdate(cam);
             }
-
-
+        }
+        public void PlcReadData()
+        {
             double[] controlData = new double[dataLength];
             for (int cam = 0; cam < cameraCount; cam++)
             {
@@ -513,15 +514,11 @@ namespace CognexVisionProForm
                 }
 
                 toolblockArray[cam, desiredTool[cam]].ToolInput = controlData;
-                
+
             }
-
-
         }
         public void PlcWrite()
         {
-            
-            string dataTypeName;
             int index = 0;
             int tempTag = 0;
 
@@ -543,7 +540,9 @@ namespace CognexVisionProForm
                 tempTag |= ((CameraAcqArray[cam].AbortTriggerAck ? 1 : 0) << 2);
                 tempTag |= ((CameraAcqArray[cam].ImageReady ? 1 : 0) << 3);
                 tempTag |= ((toolblockArray[cam, desiredTool[cam]].ToolReady ? 1 : 0) << 4);
+
                 tempTag |= ((toolblockArray[cam, desiredTool[cam]].ResultUpdated ? 1 : 0) << 5);
+
                 tempTag |= ((toolblockArray[cam, desiredTool[cam]].Result ? 1 : 0) << 6);
                 tempTag |= ((toolblockArray[cam, desiredTool[cam]].FilePresent ? 1 : 0) << 7);
                 tempTag |= ((CameraAcqArray[cam].Snapping ? 1 : 0) << 8);
@@ -557,10 +556,17 @@ namespace CognexVisionProForm
                 index++;
             }
             bool temp = Array.TrueForAll(toolTrigger, value => { return value; });
+            
+        }
+        public void PlcWriteData()
+        {
+
+            string dataTypeName;
+
             //Add Tool Data to String Array to send to PLC
             //Limit each tool to 4 data points
             //Limit Doubles to 2 decimal places
-            for (int i = 0; i< cameraCount;i++)
+            for (int i = 0; i < cameraCount; i++)
             {
 
                 ToolBlock tool = toolblockArray[i, desiredTool[i]];
@@ -570,7 +576,7 @@ namespace CognexVisionProForm
                     tool.ResultUpdated_Mem = tool.ResultUpdated;
 
                     Array.Clear(MainPLC.PcToPlcStatusData, i * dataLength, dataLength);
-                    for (int j = 0;j < Math.Min(tool.ToolOutput.Length, dataLength);j++)
+                    for (int j = 0; j < Math.Min(tool.ToolOutput.Length, dataLength); j++)
                     {
 
                         if (tool.ToolOutput[j] == null) { break; }
@@ -582,11 +588,11 @@ namespace CognexVisionProForm
                             double dData = Convert.ToDouble(tool.ToolOutput[j].Value);
                             int iData = Convert.ToInt32(dData * 100);
 
-                            MainPLC.PcToPlcStatusData[(i* dataLength) + j] = iData;
+                            MainPLC.PcToPlcStatusData[(i * dataLength) + j] = iData;
                         }
                         else if (dataTypeName == "Int32")
                         {
-                            MainPLC.PcToPlcStatusData[(i * dataLength) + j] = Convert.ToInt32(tool.ToolOutput[j].Value)*100;
+                            MainPLC.PcToPlcStatusData[(i * dataLength) + j] = Convert.ToInt32(tool.ToolOutput[j].Value) * 100;
                         }
 
                     }
