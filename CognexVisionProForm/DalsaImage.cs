@@ -16,6 +16,7 @@ using System.Threading;
 using System.Reflection;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using System.Runtime.InteropServices.ComTypes;
+using System.Text;
 
 public class DalsaImage
 {
@@ -30,6 +31,24 @@ public class DalsaImage
     SapAcqDeviceToBuf acqDeviceXfer;
     SapAcqToBuf acqXfer;
     SapFeature deviceFeature;
+
+    [DllImport("kernel32")]
+    private static extern int GetPrivateProfileString(string section, string key, string def, StringBuilder retVal, int size, string filePath);
+
+    static string ConfigKeyName = "Camera Name";
+    static string CompanyKeyName = "Company Name";
+    static string ModelKeyName = "Model Name";
+    static string VicKeyName = "Vic Name";
+
+    StringBuilder tempServerName = new StringBuilder(512);
+    StringBuilder sbCameraName = new StringBuilder(512);
+    StringBuilder sbCompanyName = new StringBuilder(512);
+    StringBuilder sbModelName = new StringBuilder(512);
+    StringBuilder sbVicName = new StringBuilder(512);
+
+    string companyName;
+    string modelName;
+    string vicName;
 
     SapFormat imageFormat;
     int imageWidth;
@@ -87,6 +106,12 @@ public class DalsaImage
     {
         get; set;
     }
+    public string CompanyName 
+    { get
+        { return companyName; }
+    }
+    public string ModelName { get => modelName; }
+    public string Vicname { get => vicName; }
     public string Name
     {
         get { return cameraName; }
@@ -324,6 +349,30 @@ public class DalsaImage
         ConfigFilePresent = File.Exists(ConfigFile);
 
         Utilities.LoggingStatment(cameraName + ": new log file from: " + ConfigFile);
+    }
+    public void GetConfigFileInfo()
+    {
+        /*
+         * Get information about the config file to confirm correct one is loaded.
+         * information is create from CamExpert when saving the config file for the
+         * first time
+        */
+        var configFileInfo = new FileInfo(ConfigFile);
+        
+        StringBuilder tempServerName = new StringBuilder(512);
+        StringBuilder sbCameraName = new StringBuilder(512);
+        StringBuilder sbCompanyName = new StringBuilder(512);
+        StringBuilder sbModelName = new StringBuilder(512);
+        StringBuilder sbVicName = new StringBuilder(512);
+
+
+        GetPrivateProfileString("General", CompanyKeyName, "", sbCompanyName, 512, ConfigFile);
+        GetPrivateProfileString("General", ModelKeyName, "", sbModelName, 512, ConfigFile);
+        GetPrivateProfileString("General", VicKeyName, "", sbVicName, 512, ConfigFile);
+
+        companyName = sbCompanyName.ToString(0, sbCompanyName.Length);
+        modelName = sbModelName.ToString(0, sbModelName.Length);
+        vicName = sbVicName.ToString(0, sbVicName.Length);
     }
     public void CreateCamera()
     {

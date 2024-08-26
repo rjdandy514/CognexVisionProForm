@@ -156,7 +156,7 @@ namespace CognexVisionProForm
 
             if (result == Libplctag.PLCTAG_STATUS_OK)
             {
-                for (int i = 0; i < tagPlcToPc.ElementCount; i++)
+                for (int i = 0; i < tagPlcToPcData.ElementCount; i++)
                 {
                     PlcToPcControlData[i] = client.GetInt32Value(tagPlcToPcData, i * tagPlcToPcData.ElementSize);
                 }

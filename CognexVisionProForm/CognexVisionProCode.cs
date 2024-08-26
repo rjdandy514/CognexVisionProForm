@@ -135,7 +135,7 @@ namespace CognexVisionProForm
             int AcqDeviceCount = 0;
 
             cbDeviceList.Items.Clear();
-
+            
             //Get count of both Acq (frame-grabber) or AcqDevices (camera)
             if (!string.IsNullOrEmpty(CameraAcqArray[cameraIndex].LoadServerSelect) && CameraAcqArray[cameraIndex].LoadServerSelect != ServerNotFound)
             {
@@ -148,6 +148,7 @@ namespace CognexVisionProForm
             {
                 for (int i = 0; i < AcqCount; i++)
                 {
+                    
                     string AcqName = SapManager.GetResourceName(CameraAcqArray[cameraIndex].LoadServerSelect, SapManager.ResourceType.Acq, i);
                     
                     if (SapManager.IsResourceAvailable(CameraAcqArray[cameraIndex].LoadServerSelect, SapManager.ResourceType.Acq, i))
@@ -186,6 +187,19 @@ namespace CognexVisionProForm
             cbDeviceList.SelectedIndex = CameraAcqArray[cameraIndex].LoadResourceIndex;
             CameraAcqArray[cameraIndex].LoadResourceName = cbDeviceList.SelectedItem.ToString();
         }
+        public void UpdateConfigFileData()
+        {
+            cbConfigFileFound.Checked = CameraAcqArray[selectedCameraId].ConfigFilePresent;
+
+            if(CameraAcqArray[selectedCameraId].ConfigFilePresent)
+            {
+                CameraAcqArray[selectedCameraId].GetConfigFileInfo();
+                txtCompany.Text = CameraAcqArray[selectedCameraId].CompanyName;
+                txtModel.Text = CameraAcqArray[selectedCameraId].ModelName;
+                txtVicName.Text = CameraAcqArray[selectedCameraId].Vicname;
+            }
+            
+        }
         public void CameraAbort(int i)
         {
             cameraSnap[i] = false;
@@ -193,6 +207,7 @@ namespace CognexVisionProForm
             toolTrigger[i] = false;
             toolTriggerComplete[i] = false;
             CameraAcqArray[i].AbortTrigger = true;
+            //CameraAcqArray[i].AbortTrigger = false;
             CameraUpdate();
         }
         public void CameraUpdate()
@@ -251,8 +266,9 @@ namespace CognexVisionProForm
             {
                 if (!toolTrigger[j] && cameraSnapComplete[j] && toolblockArray[j, desiredTool[j]].ToolReady)
                 {
-                    toolblockArray[j, desiredTool[j]].ToolRun(CameraAcqArray[j].Image as CogImage8Grey);
                     toolTrigger[j] = true;
+                    toolblockArray[j, desiredTool[j]].ToolRun(CameraAcqArray[j].Image as CogImage8Grey);
+                    
 
                 }
             }

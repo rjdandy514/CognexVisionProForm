@@ -6,6 +6,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -291,10 +292,12 @@ namespace CognexVisionProForm
 
         private void button1_Click(object sender, EventArgs e)
         {
-            //var version = Assembly.GetExecutingAssembly().GetName().Version;
-            camera.CheckAreaCameraFeatures();
-        }
+            camera.GetConfigFileInfo();
 
+        }
+        
+        [DllImport("kernel32")]
+        private static extern int GetPrivateProfileString(string section,string key, string def, StringBuilder retVal,int size, string filePath);
         private void numRecordSelect_ValueChanged(object sender, EventArgs e)
         {
             UpdateImageRecord();

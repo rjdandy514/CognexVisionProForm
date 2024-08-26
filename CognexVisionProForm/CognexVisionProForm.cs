@@ -211,7 +211,7 @@ namespace CognexVisionProForm
         {
             selectedCameraId = cbCameraIdSelected.SelectedIndex;
 
-            cbConfigFileFound.Checked = CameraAcqArray[selectedCameraId].ConfigFilePresent;
+            UpdateConfigFileData();
             cbCameraConnected.Checked = CameraAcqArray[selectedCameraId].Connected;
             tbCameraName.Text = CameraAcqArray[selectedCameraId].Name;
             tbCameraDesc.Text = CameraAcqArray[selectedCameraId].Description;
@@ -296,7 +296,9 @@ namespace CognexVisionProForm
         private void bttnConfigSelect_Click(object sender, EventArgs e)
         {
             CameraAcqArray[selectedCameraId].LoadConfigFile();
-            cbConfigFileFound.Checked = CameraAcqArray[selectedCameraId].ConfigFilePresent;
+            UpdateConfigFileData();
+            
+
 
         }
         private void bttnArchiveImage_Click(object sender, EventArgs e)
