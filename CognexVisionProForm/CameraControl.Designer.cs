@@ -53,6 +53,7 @@
             this.lbToolName = new System.Windows.Forms.Label();
             this.lbToolData = new System.Windows.Forms.ListBox();
             this.recordDisplay = new Cognex.VisionPro.CogRecordDisplay();
+            this.lbToolInput = new System.Windows.Forms.ListBox();
             this.plControl.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numRecordSelect)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numToolSelect)).BeginInit();
@@ -164,6 +165,7 @@
             this.plControl.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.plControl.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.plControl.Controls.Add(this.lbToolInput);
             this.plControl.Controls.Add(this.button1);
             this.plControl.Controls.Add(this.bttnGrab);
             this.plControl.Controls.Add(this.label2);
@@ -317,7 +319,7 @@
             // lbToolData
             // 
             this.lbToolData.FormattingEnabled = true;
-            this.lbToolData.Location = new System.Drawing.Point(3, 178);
+            this.lbToolData.Location = new System.Drawing.Point(3, 206);
             this.lbToolData.Name = "lbToolData";
             this.lbToolData.Size = new System.Drawing.Size(149, 17);
             this.lbToolData.TabIndex = 26;
@@ -338,6 +340,14 @@
             this.recordDisplay.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("recordDisplay.OcxState")));
             this.recordDisplay.Size = new System.Drawing.Size(307, 293);
             this.recordDisplay.TabIndex = 19;
+            // 
+            // lbToolInput
+            // 
+            this.lbToolInput.FormattingEnabled = true;
+            this.lbToolInput.Location = new System.Drawing.Point(3, 183);
+            this.lbToolInput.Name = "lbToolInput";
+            this.lbToolInput.Size = new System.Drawing.Size(149, 17);
+            this.lbToolInput.TabIndex = 38;
             // 
             // CameraControl
             // 
@@ -388,5 +398,6 @@
         private System.Windows.Forms.NumericUpDown numRecordSelect;
         private System.Windows.Forms.Button bttnGrab;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.ListBox lbToolInput;
     }
 }

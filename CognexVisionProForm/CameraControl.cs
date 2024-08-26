@@ -166,6 +166,7 @@ namespace CognexVisionProForm
             lbAcqTime.Text = $"Aquisition: {camera.AcqTime} ms";
             lbToolRunTime.Text = $"Tool Time: {tool.RunStatus.TotalTime} ms";
             cbToolPassed.Checked = tool.Result;
+            
             lbToolData.Items.Clear();
             lbToolData.BeginUpdate();
             for (int i = 0; i < tool.ToolOutput.Length; i++)
@@ -179,6 +180,20 @@ namespace CognexVisionProForm
             }
             lbToolData.EndUpdate();
             lbToolData.Height = lbToolData.PreferredHeight;
+
+            lbToolInput.Items.Clear();
+            lbToolInput.BeginUpdate();
+            for (int i = 0; i < tool.ToolOutput.Length; i++)
+            {
+                if (tool.ToolOutput[i] != null)
+                {
+                    string toolInput = tool.cogToolBlock.Inputs[i].Name + ": " +Math.Round(Convert.ToDouble(tool.ToolInput[i]), 2).ToString();
+                    lbToolInput.Items.Add(toolInput);
+                }
+            }
+            lbToolInput.EndUpdate();
+            lbToolInput.Height = lbToolInput.PreferredHeight;
+
 
             UpdateImageRecord();
 
