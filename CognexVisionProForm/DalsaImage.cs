@@ -572,7 +572,7 @@ public class DalsaImage
         string RemoveFile = Utilities.DirOldest(ImageDirInfo);
         string ImageFileName = "Image_" + DateTime.Now.ToString("yyyyMMddHHmmssffff") + ".bmp";
         
-        if (ImageDirSize >= 700) 
+        if (ImageDirSize >= 20000) 
         {
             limitReached = true;
             File.Delete(RemoveFile); 

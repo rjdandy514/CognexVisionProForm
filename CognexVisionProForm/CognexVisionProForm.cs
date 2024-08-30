@@ -47,7 +47,7 @@ namespace CognexVisionProForm
         public TextWriterTraceListener appListener;
 
         int cameraCount;
-        int toolCount;
+        public int toolCount;
         string computerName;
 
         string ServerNotFound = "No Server Found";
@@ -115,6 +115,8 @@ namespace CognexVisionProForm
             ResultReadyOk = new bool[cameraCount];
             toolTrigger = new bool[cameraCount];
             toolTriggerComplete = new bool[cameraCount];
+
+            
 
             splashScreen.UpdateProgress("Initialize Classes", 10);
             InitClasses();
@@ -201,6 +203,14 @@ namespace CognexVisionProForm
                     cbTBCameraSelected.Items.Add(camera.Name);
                 }
                 cbTBCameraSelected.SelectedIndex = 0;
+                
+                cbTBToolSelected.Items.Clear();
+                for (int i = 0; i < toolCount; i++)
+                {
+                    cbTBToolSelected.Items.Add(toolblockArray[cbTBCameraSelected.SelectedIndex, i].Name);
+                }
+                cbTBToolSelected.SelectedIndex = 0;
+
             }
             else if (tabControl1.SelectedTab.Name == "tabPlcConnection")
             {
@@ -333,8 +343,8 @@ namespace CognexVisionProForm
 
             cbToolBlockFileFound.Checked = toolblockArray[cbCameraIdSelected.SelectedIndex, cbToolBlock.SelectedIndex].FilePresent;
             tbToolBlockName.Text = toolblockArray[cbCameraIdSelected.SelectedIndex, cbToolBlock.SelectedIndex].Name;
+            tbToolBlockNameEdit.Text = toolblockArray[cbCameraIdSelected.SelectedIndex, cbToolBlock.SelectedIndex].Name;
             cbToolBlockEnabled.Checked = toolblockArray[cbCameraIdSelected.SelectedIndex, cbToolBlock.SelectedIndex].ToolReady;
-
         }
         private void bttnToolBockFileSelect_Click(object sender, EventArgs e)
         {
@@ -435,6 +445,10 @@ namespace CognexVisionProForm
                 cogToolBlockEditV21.Subject.Run();
             }
         }
+        private void bttnSaveJob_Click(object sender, EventArgs e)
+        {
+            toolblockArray[cbTBCameraSelected.SelectedIndex, cbTBToolSelected.SelectedIndex].SaveVisionProject();
+        }
 
         //*********************************************************************
         //PLC CONNECTION
@@ -474,6 +488,7 @@ namespace CognexVisionProForm
             PingReply temp = MainPLC.PingPLC();
             tbPlcPingResponse.Text = temp.Status.ToString();
         }
+
 
     }
 

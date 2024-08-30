@@ -46,6 +46,7 @@ namespace CognexVisionProForm
             this.bttnPLC = new System.Windows.Forms.Button();
             this.tabToolBlock = new System.Windows.Forms.TabPage();
             this.panel7 = new System.Windows.Forms.Panel();
+            this.bttnSaveJob = new System.Windows.Forms.Button();
             this.bttnUpdateImage = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
             this.label40 = new System.Windows.Forms.Label();
@@ -77,6 +78,12 @@ namespace CognexVisionProForm
             this.cbToolBlockFileFound = new System.Windows.Forms.CheckBox();
             this.tbToolBlockNameEdit = new System.Windows.Forms.TextBox();
             this.panel4 = new System.Windows.Forms.Panel();
+            this.label7 = new System.Windows.Forms.Label();
+            this.txtVicName = new System.Windows.Forms.Label();
+            this.label6 = new System.Windows.Forms.Label();
+            this.txtModel = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.txtCompany = new System.Windows.Forms.Label();
             this.bttnAutoConnect = new System.Windows.Forms.Button();
             this.label39 = new System.Windows.Forms.Label();
             this.tbCameraDesc = new System.Windows.Forms.TextBox();
@@ -108,12 +115,6 @@ namespace CognexVisionProForm
             this.Camera2Panel = new System.Windows.Forms.Panel();
             this.Camera1Panel = new System.Windows.Forms.Panel();
             this.tabControl1 = new System.Windows.Forms.TabControl();
-            this.label5 = new System.Windows.Forms.Label();
-            this.txtCompany = new System.Windows.Forms.Label();
-            this.label6 = new System.Windows.Forms.Label();
-            this.txtModel = new System.Windows.Forms.Label();
-            this.label7 = new System.Windows.Forms.Label();
-            this.txtVicName = new System.Windows.Forms.Label();
             this.tabPlcConnection.SuspendLayout();
             this.panel8.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numIP1)).BeginInit();
@@ -313,6 +314,7 @@ namespace CognexVisionProForm
             this.panel7.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.panel7.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.panel7.Controls.Add(this.bttnSaveJob);
             this.panel7.Controls.Add(this.bttnUpdateImage);
             this.panel7.Controls.Add(this.label4);
             this.panel7.Controls.Add(this.label40);
@@ -326,6 +328,16 @@ namespace CognexVisionProForm
             this.panel7.Size = new System.Drawing.Size(1274, 30);
             this.panel7.TabIndex = 70;
             this.panel7.Tag = "pnCameraControl";
+            // 
+            // bttnSaveJob
+            // 
+            this.bttnSaveJob.Location = new System.Drawing.Point(843, 3);
+            this.bttnSaveJob.Name = "bttnSaveJob";
+            this.bttnSaveJob.Size = new System.Drawing.Size(128, 24);
+            this.bttnSaveJob.TabIndex = 24;
+            this.bttnSaveJob.Text = "Save Job";
+            this.bttnSaveJob.UseVisualStyleBackColor = true;
+            this.bttnSaveJob.Click += new System.EventHandler(this.bttnSaveJob_Click);
             // 
             // bttnUpdateImage
             // 
@@ -593,6 +605,7 @@ namespace CognexVisionProForm
             // 
             // tbToolBlockName
             // 
+            this.tbToolBlockName.Enabled = false;
             this.tbToolBlockName.Location = new System.Drawing.Point(109, 96);
             this.tbToolBlockName.Name = "tbToolBlockName";
             this.tbToolBlockName.Size = new System.Drawing.Size(210, 20);
@@ -666,6 +679,60 @@ namespace CognexVisionProForm
             this.panel4.Size = new System.Drawing.Size(592, 328);
             this.panel4.TabIndex = 33;
             this.panel4.Tag = "pnCameraControl";
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(9, 301);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(56, 13);
+            this.label7.TabIndex = 44;
+            this.label7.Text = "Vic Name:";
+            // 
+            // txtVicName
+            // 
+            this.txtVicName.AutoSize = true;
+            this.txtVicName.Location = new System.Drawing.Point(93, 301);
+            this.txtVicName.Name = "txtVicName";
+            this.txtVicName.Size = new System.Drawing.Size(61, 13);
+            this.txtVicName.TabIndex = 45;
+            this.txtVicName.Text = "txtVicName";
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(9, 279);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(70, 13);
+            this.label6.TabIndex = 42;
+            this.label6.Text = "Model Name:";
+            // 
+            // txtModel
+            // 
+            this.txtModel.AutoSize = true;
+            this.txtModel.Location = new System.Drawing.Point(93, 279);
+            this.txtModel.Name = "txtModel";
+            this.txtModel.Size = new System.Drawing.Size(47, 13);
+            this.txtModel.TabIndex = 43;
+            this.txtModel.Text = "txtModel";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(9, 257);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(85, 13);
+            this.label5.TabIndex = 40;
+            this.label5.Text = "Company Name:";
+            // 
+            // txtCompany
+            // 
+            this.txtCompany.AutoSize = true;
+            this.txtCompany.Location = new System.Drawing.Point(93, 257);
+            this.txtCompany.Name = "txtCompany";
+            this.txtCompany.Size = new System.Drawing.Size(62, 13);
+            this.txtCompany.TabIndex = 41;
+            this.txtCompany.Text = "txtCompany";
             // 
             // bttnAutoConnect
             // 
@@ -964,60 +1031,6 @@ namespace CognexVisionProForm
             this.tabControl1.TabIndex = 3;
             this.tabControl1.SelectedIndexChanged += new System.EventHandler(this.tabControl1_SelectedIndexChanged);
             // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(9, 257);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(85, 13);
-            this.label5.TabIndex = 40;
-            this.label5.Text = "Company Name:";
-            // 
-            // txtCompany
-            // 
-            this.txtCompany.AutoSize = true;
-            this.txtCompany.Location = new System.Drawing.Point(93, 257);
-            this.txtCompany.Name = "txtCompany";
-            this.txtCompany.Size = new System.Drawing.Size(62, 13);
-            this.txtCompany.TabIndex = 41;
-            this.txtCompany.Text = "txtCompany";
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(9, 279);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(70, 13);
-            this.label6.TabIndex = 42;
-            this.label6.Text = "Model Name:";
-            // 
-            // txtModel
-            // 
-            this.txtModel.AutoSize = true;
-            this.txtModel.Location = new System.Drawing.Point(93, 279);
-            this.txtModel.Name = "txtModel";
-            this.txtModel.Size = new System.Drawing.Size(47, 13);
-            this.txtModel.TabIndex = 43;
-            this.txtModel.Text = "txtModel";
-            // 
-            // label7
-            // 
-            this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(9, 301);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(56, 13);
-            this.label7.TabIndex = 44;
-            this.label7.Text = "Vic Name:";
-            // 
-            // txtVicName
-            // 
-            this.txtVicName.AutoSize = true;
-            this.txtVicName.Location = new System.Drawing.Point(93, 301);
-            this.txtVicName.Name = "txtVicName";
-            this.txtVicName.Size = new System.Drawing.Size(61, 13);
-            this.txtVicName.TabIndex = 45;
-            this.txtVicName.Text = "txtVicName";
-            // 
             // CognexVisionProForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1144,6 +1157,7 @@ namespace CognexVisionProForm
         private System.Windows.Forms.Label txtModel;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Label txtVicName;
+        private System.Windows.Forms.Button bttnSaveJob;
     }
 }
 

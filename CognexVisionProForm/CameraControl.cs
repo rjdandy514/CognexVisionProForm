@@ -113,7 +113,9 @@ namespace CognexVisionProForm
             bttnCameraAbort.Enabled = !camera.ArchiveImageActive;
             bttnCameraLog.Enabled = !camera.ArchiveImageActive;
 
-            if(camera.ServerType == DalsaImage.ServerCategory.ServerAcq) 
+            numToolSelect.Maximum = _form.toolCount;
+
+            if (camera.ServerType == DalsaImage.ServerCategory.ServerAcq) 
             {
                 if (camera.IsMaster != 0) { bttnEncoderPhase.Visible = true; }
                 else { bttnEncoderPhase.Visible = false; }

@@ -505,7 +505,7 @@ namespace CognexVisionProForm
                 {
                     if (CameraAcqArray[cam].Connected)
                     {
-                        controlData[j] = Convert.ToDouble(MainPLC.PlcToPcControlData[j + cam * controlData.Length]) / 100;
+                        controlData[j] = Convert.ToDouble(MainPLC.PlcToPcControlData[j + cam * controlData.Length]) / 10000;
                     }
                     else
                     {
@@ -586,7 +586,7 @@ namespace CognexVisionProForm
                         if (dataTypeName == "Double")
                         {
                             double dData = Convert.ToDouble(tool.ToolOutput[j].Value);
-                            int iData = Convert.ToInt32(dData * 100);
+                            int iData = Convert.ToInt32(dData * 10000);
 
                             MainPLC.PcToPlcStatusData[(i * dataLength) + j] = iData;
                         }
@@ -699,7 +699,7 @@ namespace CognexVisionProForm
             {
                 computerName = "OP45/55 Computer";
                 cameraCount = 2;
-                toolCount = 4;
+                toolCount = 8;
             }
             else if (iP == OP70_IP)
             {

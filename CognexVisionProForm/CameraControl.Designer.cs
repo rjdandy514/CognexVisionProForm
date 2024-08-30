@@ -40,6 +40,7 @@
             this.cbImageReady = new System.Windows.Forms.CheckBox();
             this.cbArchiveImageActive = new System.Windows.Forms.CheckBox();
             this.plControl = new System.Windows.Forms.Panel();
+            this.lbToolInput = new System.Windows.Forms.ListBox();
             this.button1 = new System.Windows.Forms.Button();
             this.bttnGrab = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
@@ -53,7 +54,6 @@
             this.lbToolName = new System.Windows.Forms.Label();
             this.lbToolData = new System.Windows.Forms.ListBox();
             this.recordDisplay = new Cognex.VisionPro.CogRecordDisplay();
-            this.lbToolInput = new System.Windows.Forms.ListBox();
             this.plControl.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numRecordSelect)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numToolSelect)).BeginInit();
@@ -193,6 +193,14 @@
             this.plControl.Size = new System.Drawing.Size(158, 535);
             this.plControl.TabIndex = 18;
             // 
+            // lbToolInput
+            // 
+            this.lbToolInput.FormattingEnabled = true;
+            this.lbToolInput.Location = new System.Drawing.Point(3, 183);
+            this.lbToolInput.Name = "lbToolInput";
+            this.lbToolInput.Size = new System.Drawing.Size(149, 17);
+            this.lbToolInput.TabIndex = 38;
+            // 
             // button1
             // 
             this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
@@ -279,7 +287,7 @@
             this.numToolSelect.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.numToolSelect.Location = new System.Drawing.Point(99, 318);
             this.numToolSelect.Maximum = new decimal(new int[] {
-            4,
+            5,
             0,
             0,
             0});
@@ -340,14 +348,6 @@
             this.recordDisplay.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("recordDisplay.OcxState")));
             this.recordDisplay.Size = new System.Drawing.Size(307, 293);
             this.recordDisplay.TabIndex = 19;
-            // 
-            // lbToolInput
-            // 
-            this.lbToolInput.FormattingEnabled = true;
-            this.lbToolInput.Location = new System.Drawing.Point(3, 183);
-            this.lbToolInput.Name = "lbToolInput";
-            this.lbToolInput.Size = new System.Drawing.Size(149, 17);
-            this.lbToolInput.TabIndex = 38;
             // 
             // CameraControl
             // 

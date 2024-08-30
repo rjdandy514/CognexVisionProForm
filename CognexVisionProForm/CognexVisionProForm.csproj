@@ -170,6 +170,7 @@
     <Compile Include="ToolBlock.cs" />
     <EmbeddedResource Include="CameraControl.resx">
       <DependentUpon>CameraControl.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="CognexVisionProForm.resx">
       <DependentUpon>CognexVisionProForm.cs</DependentUpon>

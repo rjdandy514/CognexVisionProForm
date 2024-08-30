@@ -159,6 +159,10 @@ namespace CognexVisionProForm
                 toolFile = "";
             }
         }
+        public void SaveVisionProject()
+        {
+            if (toolFile != "") { CogSerializer.SaveObjectToFile(cogToolBlock, toolFile); }
+        }
         public void InitJobManager()
         {
             try
@@ -226,11 +230,7 @@ namespace CognexVisionProForm
             toolOutput = new CogToolBlockTerminal[toolOutputCount];
             for(int i = 0; i < toolOutput.Length;i++)
             {
-                if (cogToolBlock.RunStatus.Result == CogToolResultConstants.Accept)
-                {
                     toolOutput[i] = cogToolBlock.Outputs[i];
-                }
-                else { toolOutput[i] = failedTool; }
             }
 
             toolReady = true;
@@ -248,7 +248,7 @@ namespace CognexVisionProForm
             //clean up for vision pro
             if (cogToolBlock != null)
             {
-                if (toolFile != "") { CogSerializer.SaveObjectToFile(cogToolBlock, toolFile); }
+                SaveVisionProject();
                 
                 cogToolBlock.Dispose();
                 cogToolBlock.Ran -= new EventHandler(Subject_Ran);
