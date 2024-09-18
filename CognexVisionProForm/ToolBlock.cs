@@ -5,6 +5,7 @@ using Cognex.VisionPro;
 using System.Windows.Forms;
 using Cognex.VisionPro.ToolBlock;
 using Cognex.VisionPro.QuickBuild.Implementation.Internal;
+using System.Runtime.Serialization.Formatters.Binary;
 
 
 namespace CognexVisionProForm
@@ -27,6 +28,7 @@ namespace CognexVisionProForm
         double[] toolInput;
 
         public CogToolBlock cogToolBlock;
+        public CogToolBlock cogPreProcessBlock;
         CognexVisionProForm form = new CognexVisionProForm();
         public ToolBlock(CognexVisionProForm Form)
         {
@@ -161,7 +163,9 @@ namespace CognexVisionProForm
         }
         public void SaveVisionProject()
         {
-            if (toolFile != "") { CogSerializer.SaveObjectToFile(cogToolBlock, toolFile); }
+            if (toolFile != "") { CogSerializer.SaveObjectToFile(cogToolBlock, toolFile, typeof(System.Runtime.Serialization.Formatters.Binary.BinaryFormatter), 0); }
+
+            
         }
         public void InitJobManager()
         {
@@ -169,10 +173,15 @@ namespace CognexVisionProForm
             {
                 if (filePresent)
                 {
+
+                    
                     cogToolBlock = CogSerializer.LoadObjectFromFile(toolFile) as CogToolBlock;
+                    
                     cogToolBlock.Ran += new EventHandler(Subject_Ran);
                     cogToolBlock.Running += new EventHandler(Subject_Running);
                     cogToolBlock.Name = toolName;
+                    if (cogToolBlock.Inputs.Count > 1) { toolInput = new double[cogToolBlock.Inputs.Count - 1]; }
+                    if (cogToolBlock.Outputs.Count > 1) { toolOutput = new CogToolBlockTerminal[cogToolBlock.Outputs.Count]; }
 
                     toolReady = true;
 
@@ -194,15 +203,15 @@ namespace CognexVisionProForm
             {
                 cogToolBlock.Inputs[0].Value = InputImage;
 
-                for(int i = 1; i < cogToolBlock.Inputs.Count; i++)
+                for(int i = 1; i < cogToolBlock.Inputs.Count +1; i++)
                 {
-                    if (toolInput != null && toolInput.Length > i)
+                    if (toolInput != null && toolInput.Length >= i)
                     {
-                        cogToolBlock.Inputs[i].Value = toolInput[i - 1];
+                        cogToolBlock.Inputs[i].Value = toolInput[i - 1];                       
                         Utilities.LoggingStatment($"{toolName}: input # {i} = {cogToolBlock.Inputs[i].Value}");
                     }
-                }
-
+                } 
+                                   
                 cogToolBlock.Run();
                 Utilities.LoggingStatment($"{toolName}: Job Triggered");
             }

@@ -126,8 +126,8 @@ namespace CognexVisionProForm
         }
         private void bttnCameraSnap_Click(object sender, EventArgs e)
         {
-            camera.Trigger = true;
             lbAcqTime.Text = $"Aquisition: --- ms";
+            camera.Trigger = true;
             UpdateButton();
         }
         private void bttnCameraAbort_Click(object sender, EventArgs e)
@@ -195,9 +195,6 @@ namespace CognexVisionProForm
             }
             lbToolData.EndUpdate();
             lbToolData.Height = lbToolData.PreferredHeight;
-
-
-
 
             UpdateImageRecord();
 

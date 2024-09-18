@@ -114,7 +114,7 @@ public class DalsaImage
     public string Vicname { get => vicName; }
     public string Name
     {
-        get { return cameraName; }
+        get { return cameraName; }  
         set
         {
             cameraName = value;
@@ -141,9 +141,7 @@ public class DalsaImage
         get { return trigger; }
         set
         {
-
             trigger = value;
-
 
             if (Connected && trigger && !triggerMem)
             {
@@ -158,7 +156,6 @@ public class DalsaImage
             }
 
             triggerMem = trigger;
-
         }
     }
     public bool TriggerGrab

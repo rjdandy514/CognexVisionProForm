@@ -41,6 +41,7 @@ namespace CognexVisionProForm
         private int[] desiredTool;
         private int[] plcTool;
         private ToolBlock[,] toolblockArray;
+        private ToolBlock[] preProcess;
 
         private PlcComms MainPLC;
 
@@ -49,6 +50,7 @@ namespace CognexVisionProForm
         int cameraCount;
         public int toolCount;
         string computerName;
+        bool preProcessRequired;
 
         string ServerNotFound = "No Server Found";
 
@@ -106,6 +108,7 @@ namespace CognexVisionProForm
             txtLogFile.Text = LogDir + "Log.log";
 
             CameraAcqArray = new DalsaImage[cameraCount];
+            preProcess = new ToolBlock[cameraCount];
             toolblockArray = new ToolBlock[cameraCount, toolCount];
             desiredTool = new int[cameraCount];
             plcTool = new int[cameraCount];
@@ -251,6 +254,11 @@ namespace CognexVisionProForm
                 else { cbToolBlock.Items.Add($"Empty{i}"); }
             }
             cbToolBlock.SelectedIndex = 0;
+
+            cbPreProcessFileFound.Checked = preProcess[cbCameraIdSelected.SelectedIndex].FilePresent;
+            cbPreProcessEnabled.Checked = preProcess[cbCameraIdSelected.SelectedIndex].ToolReady;
+            tbPreProcessName.Text = preProcess[cbCameraIdSelected.SelectedIndex].Name;
+
         }
         private void tbCamersDesc_Leave(object sender, EventArgs e)
         {
@@ -301,6 +309,8 @@ namespace CognexVisionProForm
             {
                 bttnConnectCamera.Text = "Connect";
             }
+
+            SaveSettings();
         }
         private void cbCameraSelected_DropDown(object sender, EventArgs e)
         {
@@ -362,7 +372,7 @@ namespace CognexVisionProForm
                 cbToolBlock.Items[toolSelected] = toolNameUpdated;
             }
 
-
+            SaveSettings();
         }
         private void bttnAutoConnect_Click(object sender, EventArgs e)
         {
@@ -376,9 +386,20 @@ namespace CognexVisionProForm
                 }
 
             }
-
+            SaveSettings();
             this.WindowState = FormWindowState.Maximized;
             tabControl1.SelectedIndex = 0;
+        }
+        private void bttnPreProcessFileSelect_Click(object sender, EventArgs e)
+        {
+            string preProcessNameUpdated = tbPreProcessNameEdit.Text.ToString();
+
+            preProcess[cbCameraIdSelected.SelectedIndex].Name = preProcessNameUpdated;
+            preProcess[cbCameraIdSelected.SelectedIndex].LoadvisionProject();
+            preProcess[cbCameraIdSelected.SelectedIndex].InitJobManager();
+
+            SaveSettings();
+
         }
         //*********************************************************************
         //lICENSE CHECK
@@ -430,10 +451,11 @@ namespace CognexVisionProForm
                 cogToolBlockEditV21.Subject = toolblockArray[cameraSelected, toolSelected].cogToolBlock;
             }
 
-            if (cogToolBlockEditV21.Subject != null)
-            {
-                cogToolBlockEditV21.Subject.Inputs[0].Value = toolblockArray[cameraSelected, toolSelected].cogToolBlock.Inputs[0].Value;
-                cogToolBlockEditV21.Subject.Run();
+            if (cogToolBlockEditV21.Subject != null && toolblockArray[cameraSelected, toolSelected].ToolReady)
+            {          
+                    cogToolBlockEditV21.Subject.Inputs[0].Value = toolblockArray[cameraSelected, toolSelected].cogToolBlock.Inputs[0].Value;
+                    cogToolBlockEditV21.Subject.Run();
+                
             }
         }
         private void bttnUpdateImage_Click(object sender, EventArgs e)

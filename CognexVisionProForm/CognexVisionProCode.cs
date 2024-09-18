@@ -62,6 +62,11 @@ namespace CognexVisionProForm
                 CameraAcqArray[j].Id = j;
                 cameraControl[j] = new CameraControl(this, CameraAcqArray[j]);
 
+                preProcess[j] = new ToolBlock(this);
+                preProcess[j].Id = 0;
+                preProcess[j].CameraId = j;
+
+
                 for (int i = 0; i < toolCount; i++)
                 {
                     toolblockArray[j, i] = new ToolBlock(this);
@@ -78,12 +83,20 @@ namespace CognexVisionProForm
         {
             splashScreen.UpdateProgress("Initialize JobManager", 10);
 
-            for(int cam = 0; cam <cameraCount; cam++)
+            for (int cam = 0; cam <cameraCount; cam++)
             {
+
+                if(preProcess[cam].FilePresent)
+                {
+                    splashScreen.UpdateProgress($"Initialize JobManager: {CameraAcqArray[cam].Name} - {preProcess[cam].Name} Toolblock", 1);
+                    preProcess[cam].InitJobManager();
+                }
+
                 for (int i = 0; i < toolblockArray.GetLength(1); i++)
                 {
                     if (toolblockArray[cam, i].FilePresent)
-                    {
+                    { 
+                        splashScreen.UpdateProgress($"Initialize JobManager: {CameraAcqArray[cam].Name} - {toolblockArray[cam, i].Name} Toolblock", 1);
                         toolblockArray[cam, i].InitJobManager();
                     }
                 }
@@ -260,15 +273,36 @@ namespace CognexVisionProForm
         }
         
         public void ToolBlockTrigger()
-        {          
+        {
+            CogImage8Grey processedImage;
+            double inputFiducial;
+            double outputFiducial;
 
             for (int j = 0; j < cameraCount; j++)
             {
+                inputFiducial = 0;
+                outputFiducial = 1;
+
                 if (!toolTrigger[j] && cameraSnapComplete[j] && toolblockArray[j, desiredTool[j]].ToolReady)
                 {
                     toolTrigger[j] = true;
-                    toolblockArray[j, desiredTool[j]].ToolRun(CameraAcqArray[j].Image as CogImage8Grey);
-                    
+
+                    if (preProcess[j].ToolReady && preProcessRequired)
+                    {
+                        preProcess[j].ToolRun(CameraAcqArray[j].Image as CogImage8Grey);
+                        
+                        while (inputFiducial != outputFiducial)
+                        {
+                            inputFiducial = preProcess[j].ToolInput[0];
+                            outputFiducial = Convert.ToDouble(preProcess[j].ToolOutput[1].Value);
+                        }
+                        
+                        processedImage = preProcess[j].ToolOutput[0].Value as CogImage8Grey;
+                    }
+                    else { processedImage = CameraAcqArray[j].Image as CogImage8Grey; }
+
+                    toolblockArray[j, desiredTool[j]].ToolRun(processedImage as CogImage8Grey);
+
 
                 }
             }
@@ -479,7 +513,6 @@ namespace CognexVisionProForm
         public void PlcRead()
         {
 
-
             //GENERAL COMMANDS
             int index = 0;
             PlcAutoMode = (MainPLC.PlcToPcControl[index] & (1 << 0)) != 0;
@@ -499,9 +532,12 @@ namespace CognexVisionProForm
         public void PlcReadData()
         {
             double[] controlData = new double[dataLength];
+            double[] preProcessData = new double[1];
             for (int cam = 0; cam < cameraCount; cam++)
             {
-                for (int j = 0; j < controlData.Length; j++)
+                preProcessData[0] = Convert.ToDouble(MainPLC.PlcToPcControlData[cam * controlData.Length]) / 1000;
+
+                for (int j = 1; j < controlData.Length; j++)
                 {
                     if (CameraAcqArray[cam].Connected)
                     {
@@ -513,6 +549,7 @@ namespace CognexVisionProForm
                     }
                 }
 
+                preProcess[cam].ToolInput = preProcessData;
                 toolblockArray[cam, desiredTool[cam]].ToolInput = controlData;
 
             }
@@ -549,6 +586,8 @@ namespace CognexVisionProForm
                 tempTag |= ((CameraAcqArray[cam].Acquiring ? 1 : 0) << 9);
                 tempTag |= ((toolTrigger.All(x => x == false) ? 1 : 0) << 10);
                 tempTag |= ((toolTriggerComplete.All(x => x == false) ? 1 : 0) << 11);
+                tempTag |= ((cameraSnap.All(x => x == false) ? 1 : 0) << 12);
+                tempTag |= ((cameraSnapComplete.All(x => x == false) ? 1 : 0) << 13);
 
                 tempTag |= desiredTool[cam] << 16;
 
@@ -564,8 +603,7 @@ namespace CognexVisionProForm
             string dataTypeName;
 
             //Add Tool Data to String Array to send to PLC
-            //Limit each tool to 4 data points
-            //Limit Doubles to 2 decimal places
+            //Limit Doubles to 4 decimal places
             for (int i = 0; i < cameraCount; i++)
             {
 
@@ -592,7 +630,7 @@ namespace CognexVisionProForm
                         }
                         else if (dataTypeName == "Int32")
                         {
-                            MainPLC.PcToPlcStatusData[(i * dataLength) + j] = Convert.ToInt32(tool.ToolOutput[j].Value) * 100;
+                            MainPLC.PcToPlcStatusData[(i * dataLength) + j] = Convert.ToInt32(tool.ToolOutput[j].Value) * 10000;
                         }
 
                     }
@@ -613,6 +651,9 @@ namespace CognexVisionProForm
                 RegKey.SetValue($"Camera{i}_Server", CameraAcqArray[i].LoadServerSelect);
                 RegKey.SetValue($"Camera{i}_Resource", CameraAcqArray[i].LoadResourceIndex);
                 RegKey.SetValue($"Camera{i}CongfigFile", CameraAcqArray[i].ConfigFile);
+
+                // Pre-Processing Data
+                RegKey.SetValue($"PreProcess{i}_ToolBlock", preProcess[i].Name);
 
                 for (int j = 0; j < toolCount; j++)
                 {
@@ -645,6 +686,9 @@ namespace CognexVisionProForm
                     CameraAcqArray[i].LoadResourceIndex = (int)RegKey.GetValue($"Camera{i}_Resource", 0);
                     CameraAcqArray[i].ConfigFile = RegKey.GetValue($"Camera{i}CongfigFile", "").ToString();
                     CameraAcqArray[i].ConfigFilePresent = System.IO.File.Exists(CameraAcqArray[i].ConfigFile);
+
+                    // Pre-Processing Data
+                    preProcess[i].Name = (RegKey.GetValue($"PreProcess{i}_ToolBlock", "").ToString());
 
                     for (int j = 0; j < toolCount; j++)
                     {
@@ -694,30 +738,35 @@ namespace CognexVisionProForm
                 computerName = "OP15 Computer";
                 cameraCount = 2;
                 toolCount = 4;
+                preProcessRequired = false;
             }
             else if(iP == OP45_55_IP)
             {
                 computerName = "OP45/55 Computer";
                 cameraCount = 2;
                 toolCount = 8;
+                preProcessRequired = true;
             }
             else if (iP == OP70_IP)
             {
                 computerName = "OP70 Computer";
                 cameraCount = 6;
                 toolCount = 4;
+                preProcessRequired = false;
             }
             else if (iP == OP90_IP)
             {
                 computerName = "OP90 Computer";
                 cameraCount = 6;
                 toolCount = 4;
+                preProcessRequired = false;
             }
             else
             {
                 computerName = "Unknown Computer";
                 cameraCount = 6;
                 toolCount = 4;
+                preProcessRequired = false;
             }
         }
 
