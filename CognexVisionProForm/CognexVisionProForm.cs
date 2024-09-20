@@ -379,8 +379,20 @@ namespace CognexVisionProForm
 
             for (int i = cameraCount - 1; i >= 0; i--)
             {
+
                 if (!CameraAcqArray[i].Connected && CameraAcqArray[i].LoadServerSelect != null && CameraAcqArray[i].LoadResourceIndex != -1)
                 {
+
+                    //get serial number of pr
+                    SapLocation serverLocation = new SapLocation(CameraAcqArray[i].LoadServerSelect, CameraAcqArray[i].LoadResourceIndex);
+
+                    string serialNumberCheck = SapManager.GetSerialNumber(serverLocation);
+
+                    if (CameraAcqArray[i].SerialNumber != serialNumberCheck) 
+                    {
+                        MessageBox.Show($"{CameraAcqArray[i].Name} did not connect: Serial number stored{CameraAcqArray[i].SerialNumber} does not match current selection {serialNumberCheck}");
+                        continue; 
+                    }
                     CameraAcqArray[i].CreateCamera();
                     if (!CameraAcqArray[i].Connected) { return; }
                 }

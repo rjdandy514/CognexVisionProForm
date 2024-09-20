@@ -120,6 +120,7 @@ namespace CognexVisionProForm
                 bool bAcqDevice =(acqDeviceCount > 0 && acqCount == 0);
 
                 //Add all servers to the combobox list
+
                 if (bAcq) { cbServerList.Items.Add(SapManager.GetServerName(i)); }
                 else if (bAcqDevice) { cbServerList.Items.Add(SapManager.GetServerName(i)); }
             }
@@ -526,27 +527,39 @@ namespace CognexVisionProForm
                 if((MainPLC.PlcToPcControl[index + cam] & (1 << 1)) != 0){ CameraAbort(cam); }
 
                 plcTool[cam] = MainPLC.PlcToPcControl[index + cam] >> 16;
+
                 ToolNumberUpdate(cam);
             }
         }
         public void PlcReadData()
         {
-            double[] controlData = new double[dataLength];
+            int controlDataLoop;
             double[] preProcessData = new double[1];
+            double[] controlData;
+            
+            if (preProcessRequired) 
+            { 
+                controlData = new double[dataLength - 1];
+                controlDataLoop = 1;
+            }
+            else 
+            { 
+                controlData = new double[dataLength];
+                controlDataLoop = 0;
+            }
+            
+            
             for (int cam = 0; cam < cameraCount; cam++)
             {
-                preProcessData[0] = Convert.ToDouble(MainPLC.PlcToPcControlData[cam * controlData.Length]) / 1000;
+                preProcessData[0] = Convert.ToDouble(MainPLC.PlcToPcControlData[cam * controlData.Length]) / 10000;
 
-                for (int j = 1; j < controlData.Length; j++)
+                for (int j = 0; j < controlData.Length; j++)
                 {
                     if (CameraAcqArray[cam].Connected)
                     {
-                        controlData[j] = Convert.ToDouble(MainPLC.PlcToPcControlData[j + cam * controlData.Length]) / 10000;
+                        controlData[j] = Convert.ToDouble(MainPLC.PlcToPcControlData[controlDataLoop + j + cam * dataLength]) / 10000;
                     }
-                    else
-                    {
-                        controlData[j] = 0;
-                    }
+                    else { controlData[j] = 0; }
                 }
 
                 preProcess[cam].ToolInput = preProcessData;
@@ -651,6 +664,7 @@ namespace CognexVisionProForm
                 RegKey.SetValue($"Camera{i}_Server", CameraAcqArray[i].LoadServerSelect);
                 RegKey.SetValue($"Camera{i}_Resource", CameraAcqArray[i].LoadResourceIndex);
                 RegKey.SetValue($"Camera{i}CongfigFile", CameraAcqArray[i].ConfigFile);
+                RegKey.SetValue($"Camera{i}SerialNumber", CameraAcqArray[i].SerialNumber);
 
                 // Pre-Processing Data
                 RegKey.SetValue($"PreProcess{i}_ToolBlock", preProcess[i].Name);
@@ -686,6 +700,7 @@ namespace CognexVisionProForm
                     CameraAcqArray[i].LoadResourceIndex = (int)RegKey.GetValue($"Camera{i}_Resource", 0);
                     CameraAcqArray[i].ConfigFile = RegKey.GetValue($"Camera{i}CongfigFile", "").ToString();
                     CameraAcqArray[i].ConfigFilePresent = System.IO.File.Exists(CameraAcqArray[i].ConfigFile);
+                    CameraAcqArray[i].SerialNumber = RegKey.GetValue($"Camera{i}SerialNumber", "").ToString();
 
                     // Pre-Processing Data
                     preProcess[i].Name = (RegKey.GetValue($"PreProcess{i}_ToolBlock", "").ToString());

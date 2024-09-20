@@ -46,7 +46,6 @@
             this.label2 = new System.Windows.Forms.Label();
             this.numRecordSelect = new System.Windows.Forms.NumericUpDown();
             this.label1 = new System.Windows.Forms.Label();
-            this.bttnEncoderPhase = new System.Windows.Forms.Button();
             this.cbTrigger = new System.Windows.Forms.CheckBox();
             this.numToolSelect = new System.Windows.Forms.NumericUpDown();
             this.lbToolRunTime = new System.Windows.Forms.Label();
@@ -54,6 +53,8 @@
             this.lbToolName = new System.Windows.Forms.Label();
             this.lbToolData = new System.Windows.Forms.ListBox();
             this.recordDisplay = new Cognex.VisionPro.CogRecordDisplay();
+            this.cbResultsUpdated = new System.Windows.Forms.CheckBox();
+            this.lbRecordName = new System.Windows.Forms.Label();
             this.plControl.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numRecordSelect)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numToolSelect)).BeginInit();
@@ -165,13 +166,13 @@
             this.plControl.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.plControl.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.plControl.Controls.Add(this.cbResultsUpdated);
             this.plControl.Controls.Add(this.lbToolInput);
             this.plControl.Controls.Add(this.button1);
             this.plControl.Controls.Add(this.bttnGrab);
             this.plControl.Controls.Add(this.label2);
             this.plControl.Controls.Add(this.numRecordSelect);
             this.plControl.Controls.Add(this.label1);
-            this.plControl.Controls.Add(this.bttnEncoderPhase);
             this.plControl.Controls.Add(this.cbTrigger);
             this.plControl.Controls.Add(this.numToolSelect);
             this.plControl.Controls.Add(this.lbToolRunTime);
@@ -196,7 +197,7 @@
             // lbToolInput
             // 
             this.lbToolInput.FormattingEnabled = true;
-            this.lbToolInput.Location = new System.Drawing.Point(3, 183);
+            this.lbToolInput.Location = new System.Drawing.Point(3, 198);
             this.lbToolInput.Name = "lbToolInput";
             this.lbToolInput.Size = new System.Drawing.Size(149, 17);
             this.lbToolInput.TabIndex = 38;
@@ -207,7 +208,7 @@
             this.button1.BackColor = System.Drawing.SystemColors.ButtonFace;
             this.button1.FlatAppearance.BorderColor = System.Drawing.Color.Red;
             this.button1.FlatAppearance.BorderSize = 2;
-            this.button1.Location = new System.Drawing.Point(3, 253);
+            this.button1.Location = new System.Drawing.Point(3, 301);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(152, 29);
             this.button1.TabIndex = 37;
@@ -233,7 +234,7 @@
             // 
             this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(6, 294);
+            this.label2.Location = new System.Drawing.Point(6, 342);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(87, 13);
             this.label2.TabIndex = 35;
@@ -242,7 +243,7 @@
             // numRecordSelect
             // 
             this.numRecordSelect.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.numRecordSelect.Location = new System.Drawing.Point(99, 292);
+            this.numRecordSelect.Location = new System.Drawing.Point(99, 340);
             this.numRecordSelect.Name = "numRecordSelect";
             this.numRecordSelect.Size = new System.Drawing.Size(50, 20);
             this.numRecordSelect.TabIndex = 34;
@@ -252,25 +253,11 @@
             // 
             this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(6, 320);
+            this.label1.Location = new System.Drawing.Point(6, 368);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(73, 13);
             this.label1.TabIndex = 33;
             this.label1.Text = "Selected Tool";
-            // 
-            // bttnEncoderPhase
-            // 
-            this.bttnEncoderPhase.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.bttnEncoderPhase.BackColor = System.Drawing.SystemColors.ButtonFace;
-            this.bttnEncoderPhase.FlatAppearance.BorderColor = System.Drawing.Color.Red;
-            this.bttnEncoderPhase.FlatAppearance.BorderSize = 2;
-            this.bttnEncoderPhase.Location = new System.Drawing.Point(3, 342);
-            this.bttnEncoderPhase.Name = "bttnEncoderPhase";
-            this.bttnEncoderPhase.Size = new System.Drawing.Size(152, 29);
-            this.bttnEncoderPhase.TabIndex = 32;
-            this.bttnEncoderPhase.Text = "Change Encoder Phase";
-            this.bttnEncoderPhase.UseVisualStyleBackColor = false;
-            this.bttnEncoderPhase.Click += new System.EventHandler(this.bttnEncoderPhase_Click);
             // 
             // cbTrigger
             // 
@@ -285,7 +272,7 @@
             // numToolSelect
             // 
             this.numToolSelect.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.numToolSelect.Location = new System.Drawing.Point(99, 318);
+            this.numToolSelect.Location = new System.Drawing.Point(99, 366);
             this.numToolSelect.Maximum = new decimal(new int[] {
             5,
             0,
@@ -327,7 +314,7 @@
             // lbToolData
             // 
             this.lbToolData.FormattingEnabled = true;
-            this.lbToolData.Location = new System.Drawing.Point(3, 206);
+            this.lbToolData.Location = new System.Drawing.Point(3, 221);
             this.lbToolData.Name = "lbToolData";
             this.lbToolData.Size = new System.Drawing.Size(149, 17);
             this.lbToolData.TabIndex = 26;
@@ -349,6 +336,26 @@
             this.recordDisplay.Size = new System.Drawing.Size(307, 293);
             this.recordDisplay.TabIndex = 19;
             // 
+            // cbResultsUpdated
+            // 
+            this.cbResultsUpdated.AutoSize = true;
+            this.cbResultsUpdated.Location = new System.Drawing.Point(3, 179);
+            this.cbResultsUpdated.Name = "cbResultsUpdated";
+            this.cbResultsUpdated.Size = new System.Drawing.Size(103, 17);
+            this.cbResultsUpdated.TabIndex = 39;
+            this.cbResultsUpdated.Text = "Results updated";
+            this.cbResultsUpdated.UseVisualStyleBackColor = true;
+            // 
+            // lbRecordName
+            // 
+            this.lbRecordName.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.lbRecordName.AutoSize = true;
+            this.lbRecordName.Location = new System.Drawing.Point(8, 527);
+            this.lbRecordName.Name = "lbRecordName";
+            this.lbRecordName.Size = new System.Drawing.Size(73, 13);
+            this.lbRecordName.TabIndex = 40;
+            this.lbRecordName.Text = "Record Name";
+            // 
             // CameraControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -356,6 +363,7 @@
             this.BackColor = System.Drawing.SystemColors.ControlDarkDark;
             this.ClientSize = new System.Drawing.Size(713, 543);
             this.ControlBox = false;
+            this.Controls.Add(this.lbRecordName);
             this.Controls.Add(this.recordDisplay);
             this.Controls.Add(this.plControl);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
@@ -371,6 +379,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.numToolSelect)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.recordDisplay)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -392,12 +401,13 @@
         private System.Windows.Forms.Label lbToolRunTime;
         private System.Windows.Forms.NumericUpDown numToolSelect;
         private System.Windows.Forms.CheckBox cbTrigger;
-        private System.Windows.Forms.Button bttnEncoderPhase;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.NumericUpDown numRecordSelect;
         private System.Windows.Forms.Button bttnGrab;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.ListBox lbToolInput;
+        private System.Windows.Forms.CheckBox cbResultsUpdated;
+        private System.Windows.Forms.Label lbRecordName;
     }
 }

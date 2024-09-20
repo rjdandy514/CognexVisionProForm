@@ -55,7 +55,7 @@
             // 
             this.lbLoadProgress.AutoSize = true;
             this.lbLoadProgress.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lbLoadProgress.Location = new System.Drawing.Point(337, 331);
+            this.lbLoadProgress.Location = new System.Drawing.Point(38, 331);
             this.lbLoadProgress.Name = "lbLoadProgress";
             this.lbLoadProgress.Size = new System.Drawing.Size(139, 15);
             this.lbLoadProgress.TabIndex = 15;

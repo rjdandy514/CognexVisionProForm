@@ -115,14 +115,6 @@ namespace CognexVisionProForm
 
             numToolSelect.Maximum = _form.toolCount;
 
-            if (camera.ServerType == DalsaImage.ServerCategory.ServerAcq) 
-            {
-                if (camera.IsMaster != 0) { bttnEncoderPhase.Visible = true; }
-                else { bttnEncoderPhase.Visible = false; }
-            }
-            else { bttnEncoderPhase.Visible = false; }
-
-
         }
         private void bttnCameraSnap_Click(object sender, EventArgs e)
         {
@@ -167,6 +159,8 @@ namespace CognexVisionProForm
             lbAcqTime.Text = $"Aquisition: {camera.AcqTime} ms";
             lbToolRunTime.Text = $"Tool Time: {tool.RunStatus.TotalTime} ms";
             cbToolPassed.Checked = tool.Result;
+            cbResultsUpdated.Checked = tool.ResultUpdated;
+
 
             lbToolInput.Items.Clear();
             lbToolInput.BeginUpdate();
@@ -214,6 +208,7 @@ namespace CognexVisionProForm
 
                 int selectedRecord = Convert.ToInt32(numRecordSelect.Value);
                 recordDisplay.Record = record.SubRecords[selectedRecord];
+                lbRecordName.Text = record.SubRecords[selectedRecord].Annotation;
                 //MessageBox.Show(recordDisplay.Record.RecordKey);
 
             }
@@ -289,13 +284,6 @@ namespace CognexVisionProForm
             bttnCameraAbort.Enabled = false;
         }
 
-        private void bttnEncoderPhase_Click(object sender, EventArgs e)
-        {
-            int encoderPhase = camera.EncoderPhase();
-
-            bttnEncoderPhase.Text = $"Current Phase - {encoderPhase}";
-        }
-
         private void numToolSelect_ValueChanged(object sender, EventArgs e)
         {
             toolSelect = Convert.ToInt32(numToolSelect.Value);
@@ -309,7 +297,8 @@ namespace CognexVisionProForm
 
         private void button1_Click(object sender, EventArgs e)
         {
-            camera.GetConfigFileInfo();
+            if (camera.Trigger) { camera.Trigger = false; }
+            else { camera.Trigger = true; }
 
         }
         
@@ -320,7 +309,6 @@ namespace CognexVisionProForm
             
             UpdateImageRecord();
 
-                
         }
     }
 }

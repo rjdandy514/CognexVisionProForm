@@ -49,6 +49,8 @@ public class DalsaImage
     string companyName;
     string modelName;
     string vicName;
+    string deviceUserID;
+    string serialNumber;
 
     SapFormat imageFormat;
     int imageWidth;
@@ -123,6 +125,11 @@ public class DalsaImage
     }
     public string Description
     { get; set; }
+    public string SerialNumber 
+    {
+        get { return serialNumber; }
+        set { serialNumber = value; }
+    }
     public int Id
     {
         get; set;
@@ -142,7 +149,6 @@ public class DalsaImage
         set
         {
             trigger = value;
-
             if (Connected && trigger && !triggerMem)
             {
                 SnapPicture();
@@ -376,7 +382,7 @@ public class DalsaImage
         Utilities.LoggingStatment($"{cameraName}: Create Camera from {LoadServerSelect}  {LoadResourceIndex} ");
 
         serverLocation = new SapLocation(LoadServerSelect, LoadResourceIndex);
-
+        serialNumber = SapManager.GetSerialNumber(serverLocation);
         bool acq0SupportSG = SapBuffer.IsBufferTypeSupported(serverLocation, SapBuffer.MemoryType.ScatterGather);
         bool acq0SupportSGP = SapBuffer.IsBufferTypeSupported(serverLocation, SapBuffer.MemoryType.ScatterGatherPhysical);
 

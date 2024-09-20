@@ -59,7 +59,7 @@ namespace CognexVisionProForm
                 
                 toolFileLocation = Utilities.ExeFilePath + "\\Camera" + CameraId.ToString("00") + "\\" + toolName + "_" + toolFileType + toolFileExtension;
                 
-                if (File.Exists(toolFileLocation))
+                if (toolName !="" && File.Exists(toolFileLocation))
                 {
                     filePresent = true;
                     toolFile = toolFileLocation;
@@ -203,14 +203,14 @@ namespace CognexVisionProForm
             {
                 cogToolBlock.Inputs[0].Value = InputImage;
 
-                for(int i = 1; i < cogToolBlock.Inputs.Count +1; i++)
+                if (cogToolBlock.Inputs.Count > 1)
                 {
-                    if (toolInput != null && toolInput.Length >= i)
+                    for (int i = 1; i < cogToolBlock.Inputs.Count; i++)
                     {
-                        cogToolBlock.Inputs[i].Value = toolInput[i - 1];                       
+                        cogToolBlock.Inputs[i].Value = toolInput[i - 1];
                         Utilities.LoggingStatment($"{toolName}: input # {i} = {cogToolBlock.Inputs[i].Value}");
                     }
-                } 
+                }
                                    
                 cogToolBlock.Run();
                 Utilities.LoggingStatment($"{toolName}: Job Triggered");
@@ -232,14 +232,22 @@ namespace CognexVisionProForm
         }
         private void GetInfoFromTool()
         {
-            CogToolBlockTerminal failedTool = new CogToolBlockTerminal("ToolFailed",99);
+            CogToolBlockTerminal failedTool = new CogToolBlockTerminal("ToolFailed",0);
 
             int toolOutputCount = cogToolBlock.Outputs.Count;
 
             toolOutput = new CogToolBlockTerminal[toolOutputCount];
             for(int i = 0; i < toolOutput.Length;i++)
             {
+                if(cogToolBlock.RunStatus.Result == CogToolResultConstants.Accept)
+                {
                     toolOutput[i] = cogToolBlock.Outputs[i];
+                }
+                else
+                {
+                    toolOutput[i] = failedTool;
+                }
+                    
             }
 
             toolReady = true;
