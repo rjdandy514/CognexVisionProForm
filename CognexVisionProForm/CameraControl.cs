@@ -125,6 +125,7 @@ namespace CognexVisionProForm
         private void bttnCameraAbort_Click(object sender, EventArgs e)
         {
             camera.TriggerGrab = false;
+            camera.Trigger = false;
             _form.CameraAbort(camera.Id);
             
         }
@@ -164,23 +165,25 @@ namespace CognexVisionProForm
 
             lbToolInput.Items.Clear();
             lbToolInput.BeginUpdate();
+            
             for (int i = 1; i < tool.cogToolBlock.Inputs.Count; i++)
             {
-                if (tool.cogToolBlock.Inputs[i] != null)
+                if (tool.cogToolBlock.Inputs[i] != null && tool.cogToolBlock.Inputs[i].ValueType.Name == "Double")
                 {
                     string toolInput = tool.cogToolBlock.Inputs[i].Name + ": " + Math.Round(Convert.ToDouble(tool.cogToolBlock.Inputs[i].Value), 2).ToString();
                     lbToolInput.Items.Add(toolInput);
                 }
             }
+            
             lbToolInput.EndUpdate();
             lbToolInput.Height = lbToolInput.PreferredHeight;
 
             lbToolData.Items.Clear();
             lbToolData.BeginUpdate();
             lbToolData.Location = new Point(lbToolData.Location.X,lbToolInput.Location.Y + lbToolInput.Height + 5);
-            for (int i = 0; i < tool.ToolOutput.Length; i++)
+            for (int i = 0; i < tool.ToolOutput.Count; i++)
             {
-                if (tool.ToolOutput[i] != null) 
+                if (tool.ToolOutput[i] != null && tool.ToolOutput[i].ValueType.Name == "Double") 
                 {
                     string tooldata =   tool.ToolOutput[i].Name + ": " + 
                                         Math.Round(Convert.ToDouble(tool.ToolOutput[i].Value), 2).ToString(); 

@@ -15,6 +15,7 @@ using Cognex.VisionPro.QuickBuild.Implementation.Internal;
 using System.Xml.Linq;
 using System.Net.NetworkInformation;
 using Cognex.Vision.Meta;
+using Cognex.VisionPro.ToolBlock;
 
 namespace CognexVisionProForm
 {
@@ -221,7 +222,7 @@ namespace CognexVisionProForm
             toolTrigger[i] = false;
             toolTriggerComplete[i] = false;
             CameraAcqArray[i].AbortTrigger = true;
-            //CameraAcqArray[i].AbortTrigger = false;
+            CameraAcqArray[i].AbortTrigger = false;
             CameraUpdate();
         }
         public void CameraUpdate()
@@ -276,13 +277,9 @@ namespace CognexVisionProForm
         public void ToolBlockTrigger()
         {
             CogImage8Grey processedImage;
-            double inputFiducial;
-            double outputFiducial;
 
             for (int j = 0; j < cameraCount; j++)
             {
-                inputFiducial = 0;
-                outputFiducial = 1;
 
                 if (!toolTrigger[j] && cameraSnapComplete[j] && toolblockArray[j, desiredTool[j]].ToolReady)
                 {
@@ -290,15 +287,15 @@ namespace CognexVisionProForm
 
                     if (preProcess[j].ToolReady && preProcessRequired)
                     {
+                        preProcess[j].ToolInput[1].Value = 7;
                         preProcess[j].ToolRun(CameraAcqArray[j].Image as CogImage8Grey);
                         
-                        while (inputFiducial != outputFiducial)
-                        {
-                            inputFiducial = preProcess[j].ToolInput[0];
-                            outputFiducial = Convert.ToDouble(preProcess[j].ToolOutput[1].Value);
-                        }
-                        
+                       
                         processedImage = preProcess[j].ToolOutput[0].Value as CogImage8Grey;
+                        toolblockArray[j, desiredTool[j]].Input_temp[0] = preProcess[j].ToolOutput[2];
+
+
+
                     }
                     else { processedImage = CameraAcqArray[j].Image as CogImage8Grey; }
 
@@ -534,37 +531,52 @@ namespace CognexVisionProForm
         public void PlcReadData()
         {
             int controlDataLoop;
-            double[] preProcessData = new double[1];
-            double[] controlData;
-            
-            if (preProcessRequired) 
-            { 
-                controlData = new double[dataLength - 1];
-                controlDataLoop = 1;
-            }
-            else 
-            { 
-                controlData = new double[dataLength];
-                controlDataLoop = 0;
-            }
             
             
             for (int cam = 0; cam < cameraCount; cam++)
             {
-                preProcessData[0] = Convert.ToDouble(MainPLC.PlcToPcControlData[cam * controlData.Length]) / 10000;
 
-                for (int j = 0; j < controlData.Length; j++)
+                if (preProcessRequired && preProcess[cam].ToolReady)
                 {
+                    CogToolBlockTerminalCollection preProcessData = preProcess[cam].ToolInput;
+                    preProcessData[1].Value = MainPLC.PlcToPcControlData[cam * dataLength] / 10000;
+                    preProcess[cam].ToolInput = preProcessData;
+
+                    controlDataLoop = 1;
+                }
+                else { controlDataLoop = 0; }
+
+                int toolIndex = 0;
+                
+                if (toolblockArray[cam, desiredTool[cam]].ToolReady == false) { continue; }
+
+                for (int i = controlDataLoop; i < dataLength; i ++)
+                {
+                    double temp = 0;
                     if (CameraAcqArray[cam].Connected)
                     {
-                        controlData[j] = Convert.ToDouble(MainPLC.PlcToPcControlData[controlDataLoop + j + cam * dataLength]) / 10000;
+                        temp = Convert.ToDouble(MainPLC.PlcToPcControlData[i + cam * dataLength])/10000;
                     }
-                    else { controlData[j] = 0; }
+                    
+                    
+
+                    while (toolIndex < toolblockArray[cam, desiredTool[cam]].ToolInput.Count && toolblockArray[cam, desiredTool[cam]].ToolInput[toolIndex].ValueType.Name != "Double")
+                    {
+                        toolIndex++;
+                    }
+
+                    if(toolblockArray[cam, desiredTool[cam]].ToolInput[toolIndex].ValueType.Name == "Double")
+                    {
+                        toolblockArray[cam, desiredTool[cam]].ToolInput[toolIndex].Value = temp;
+                        toolIndex++;
+                    }
+                    if(toolIndex >= toolblockArray[cam, desiredTool[cam]].ToolInput.Count)
+                    {
+                        break;
+                    }
+                    
+
                 }
-
-                preProcess[cam].ToolInput = preProcessData;
-                toolblockArray[cam, desiredTool[cam]].ToolInput = controlData;
-
             }
         }
         public void PlcWrite()
@@ -627,12 +639,12 @@ namespace CognexVisionProForm
                     tool.ResultUpdated_Mem = tool.ResultUpdated;
 
                     Array.Clear(MainPLC.PcToPlcStatusData, i * dataLength, dataLength);
-                    for (int j = 0; j < Math.Min(tool.ToolOutput.Length, dataLength); j++)
+                    for (int j = 0; j < Math.Min(tool.ToolOutput.Count, dataLength); j++)
                     {
 
                         if (tool.ToolOutput[j] == null) { break; }
 
-                        dataTypeName = tool.ToolOutput[j].Value.GetType().Name;
+                        dataTypeName = tool.ToolOutput[j].ValueType.Name;
 
                         if (dataTypeName == "Double")
                         {

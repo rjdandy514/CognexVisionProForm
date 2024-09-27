@@ -515,7 +515,7 @@ public class DalsaImage
             if (acqDeviceXfer.Snap())
             {
                 snapTime = acqTimeWatch.ElapsedMilliseconds;
-                acqDeviceXfer.Wait(5000);
+                acqDeviceXfer.Wait(500);
                 snapping = true;
             }
         }
