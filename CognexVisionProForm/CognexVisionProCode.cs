@@ -240,7 +240,7 @@ namespace CognexVisionProForm
                     {
                         if (cameraSnapComplete[i])
                         {
-                            cameraControl[i].UpdateImage();
+                            cameraControl[i].UpdateDisplayRequest = true;
                         }
                     }
                 }
@@ -287,17 +287,17 @@ namespace CognexVisionProForm
 
                     if (preProcess[j].ToolReady && preProcessRequired)
                     {
-                        preProcess[j].ToolInput[1].Value = 7;
+                        preProcess[j].ToolInput[1].Value = 2;
                         preProcess[j].ToolRun(CameraAcqArray[j].Image as CogImage8Grey);
                         
-                       
                         processedImage = preProcess[j].ToolOutput[0].Value as CogImage8Grey;
-                        toolblockArray[j, desiredTool[j]].Input_temp[0] = preProcess[j].ToolOutput[2];
-
-
-
                     }
                     else { processedImage = CameraAcqArray[j].Image as CogImage8Grey; }
+
+                    CogImage8Grey tempImage = toolblockArray[j, desiredTool[j]].cogToolBlock.Inputs[0].Value as CogImage8Grey;
+
+                   // if (tempImage.SelectedSpaceName == "") { MessageBox.Show("wtf"); }
+
 
                     toolblockArray[j, desiredTool[j]].ToolRun(processedImage as CogImage8Grey);
 
@@ -326,7 +326,7 @@ namespace CognexVisionProForm
                     {
                         cameraControl[i].Tool = toolblockArray[i, desiredTool[i]];
                         cameraControl[i].UpdateImage();
-                        cameraControl[i].UpdateToolDisplay();
+                        cameraControl[i].UpdateDisplayRequest = true;
 
                     }
                 }
@@ -791,9 +791,9 @@ namespace CognexVisionProForm
             else
             {
                 computerName = "Unknown Computer";
-                cameraCount = 6;
-                toolCount = 4;
-                preProcessRequired = false;
+                cameraCount = 1;
+                toolCount = 2;
+                preProcessRequired = true;
             }
         }
 

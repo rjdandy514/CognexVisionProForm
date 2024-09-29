@@ -150,6 +150,12 @@
     <Compile Include="CognexVisionProCode.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="ShowResultData.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ShowResultData.Designer.cs">
+      <DependentUpon>ShowResultData.cs</DependentUpon>
+    </Compile>
     <Compile Include="SplashScreen.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -184,6 +190,9 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="ShowResultData.resx">
+      <DependentUpon>ShowResultData.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="SplashScreen.resx">
       <DependentUpon>SplashScreen.cs</DependentUpon>
     </EmbeddedResource>

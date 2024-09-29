@@ -24,6 +24,7 @@ namespace CognexVisionProForm
         public ICogImage image;
         public ICogRecord record;
         private int toolSelect = 0;
+        private bool updateDisplayRequest;
         private System.Windows.Forms.Timer pollingTimer;
 
         public ToolBlock Tool
@@ -47,6 +48,15 @@ namespace CognexVisionProForm
             set
             {
                 toolSelect = value;
+            }
+        }
+        public bool UpdateDisplayRequest
+        {
+            set 
+            {
+                updateDisplayRequest = value;
+                BeginInvoke(new Set_UpdateDisplay(UpdateToolDisplay));
+
             }
         }
         public CameraControl(CognexVisionProForm Sender, DalsaImage Camera)
@@ -147,22 +157,16 @@ namespace CognexVisionProForm
         }
         private delegate void Set_UpdateDisplay();
         public void UpdateToolDisplay()
-        {
-            
-            if (this.InvokeRequired)
-            {
-                BeginInvoke(new Set_UpdateDisplay(UpdateToolDisplay));
-                return;
-            }
-
-            
+        {            
             lbToolName.Text = tool.Name;
             lbAcqTime.Text = $"Aquisition: {camera.AcqTime} ms";
             lbToolRunTime.Text = $"Tool Time: {tool.RunStatus.TotalTime} ms";
             cbToolPassed.Checked = tool.Result;
             cbResultsUpdated.Checked = tool.ResultUpdated;
 
-
+            //
+            // Update all Input data that is able to be displayed
+            //
             lbToolInput.Items.Clear();
             lbToolInput.BeginUpdate();
             
@@ -178,12 +182,15 @@ namespace CognexVisionProForm
             lbToolInput.EndUpdate();
             lbToolInput.Height = lbToolInput.PreferredHeight;
 
+            //
+            // Update all output data that is able to be displayed
+            //
             lbToolData.Items.Clear();
             lbToolData.BeginUpdate();
             lbToolData.Location = new Point(lbToolData.Location.X,lbToolInput.Location.Y + lbToolInput.Height + 5);
             for (int i = 0; i < tool.ToolOutput.Count; i++)
             {
-                if (tool.ToolOutput[i] != null && tool.ToolOutput[i].ValueType.Name == "Double") 
+                if (tool.ToolOutput[i] != null && (tool.ToolOutput[i].ValueType.Name == "Double" || tool.ToolOutput[i].ValueType.Name == "Int32")) 
                 {
                     string tooldata =   tool.ToolOutput[i].Name + ": " + 
                                         Math.Round(Convert.ToDouble(tool.ToolOutput[i].Value), 2).ToString(); 
@@ -193,7 +200,18 @@ namespace CognexVisionProForm
             lbToolData.EndUpdate();
             lbToolData.Height = lbToolData.PreferredHeight;
 
+            //
+            // Display message if tool failed
+            //
+
+            if(tool.RunStatus.Result != CogToolResultConstants.Accept)
+            {
+                ShowResultData toolFailedDisplay = new ShowResultData(this);
+                toolFailedDisplay.ShowDialog();
+            }
+
             UpdateImageRecord();
+            updateDisplayRequest = false;
 
         }
         public void UpdateImageRecord()
@@ -212,7 +230,7 @@ namespace CognexVisionProForm
                 int selectedRecord = Convert.ToInt32(numRecordSelect.Value);
                 recordDisplay.Record = record.SubRecords[selectedRecord];
                 lbRecordName.Text = record.SubRecords[selectedRecord].Annotation;
-                //MessageBox.Show(recordDisplay.Record.RecordKey);
+
 
             }
         }
@@ -300,8 +318,12 @@ namespace CognexVisionProForm
 
         private void button1_Click(object sender, EventArgs e)
         {
-            if (camera.Trigger) { camera.Trigger = false; }
-            else { camera.Trigger = true; }
+            //if (camera.Trigger) { camera.Trigger = false; }
+            //else { camera.Trigger = true; }
+
+            
+
+
 
         }
         

@@ -23,7 +23,6 @@ namespace CognexVisionProForm
         bool resultUpdated = false;
         bool resultUpdated_Mem = false;
         bool toolReady = false;
-        public CogToolBlockTerminal[] Input_temp = new CogToolBlockTerminal[1];
         CogToolBlockTerminalCollection toolOutput = new CogToolBlockTerminalCollection();
         CogToolBlockTerminalCollection toolInput = new CogToolBlockTerminalCollection();
 
@@ -163,7 +162,13 @@ namespace CognexVisionProForm
         }
         public void SaveVisionProject()
         {
-            if (toolFile != "") { CogSerializer.SaveObjectToFile(cogToolBlock, toolFile, typeof(System.Runtime.Serialization.Formatters.Binary.BinaryFormatter), 0); }
+            if (toolFile != "") 
+            {
+
+                cogToolBlock.Inputs[0].Value = null;
+                cogToolBlock.Run();
+                CogSerializer.SaveObjectToFile(cogToolBlock, toolFile, typeof(System.Runtime.Serialization.Formatters.Binary.BinaryFormatter), 0); 
+            }
 
             
         }
@@ -175,13 +180,17 @@ namespace CognexVisionProForm
                 {
 
                     
-                    cogToolBlock = CogSerializer.LoadObjectFromFile(toolFile) as CogToolBlock;
+                    cogToolBlock = CogSerializer.LoadObjectFromFile(toolFile, typeof(System.Runtime.Serialization.Formatters.Binary.BinaryFormatter), 0) as CogToolBlock;
                     
                     cogToolBlock.Ran += new EventHandler(Subject_Ran);
                     cogToolBlock.Running += new EventHandler(Subject_Running);
                     cogToolBlock.Name = toolName;
                     if (cogToolBlock.Inputs.Count >= 1) { toolInput = cogToolBlock.Inputs; }
                     if (cogToolBlock.Outputs.Count >= 1) { toolOutput = cogToolBlock.Outputs; }
+
+                    cogToolBlock.AbortRunOnToolFailure = false;
+                    cogToolBlock.GarbageCollectionEnabled = true;
+                    cogToolBlock.GarbageCollectionFrequency = 3;
 
                     toolReady = true;
 
@@ -201,21 +210,18 @@ namespace CognexVisionProForm
 
             try
             {
+              
                 cogToolBlock.Inputs[0].Value = InputImage;
 
                 if (cogToolBlock.Inputs.Count > 1)
                 {
+
                     for (int i = 1; i < cogToolBlock.Inputs.Count; i++)
                     {
                         if (i >= toolInput.Count) { break; }
-                        cogToolBlock.Inputs[i].Value = toolInput[i];
+                        cogToolBlock.Inputs[i].Value = toolInput[i].Value;
                         Utilities.LoggingStatment($"{toolName}: input # {i} = {cogToolBlock.Inputs[i].Value}");
-                    }
-                    if(cogToolBlock.Inputs.Count == 5)
-                    {
-                        cogToolBlock.Inputs[4].Value = Input_temp[0].Value;
-                    }
-                    
+                    }                   
                 }
                                    
                 cogToolBlock.Run();
@@ -245,7 +251,7 @@ namespace CognexVisionProForm
             toolOutput = cogToolBlock.Outputs;
             for(int i = 0; i < toolOutput.Count;i++)
             {
-                if(cogToolBlock.RunStatus.Result == CogToolResultConstants.Accept)
+                if(cogToolBlock.RunStatus.Result == CogToolResultConstants.Accept || true)
                 {
                     toolOutput[i] = cogToolBlock.Outputs[i];
                 }
