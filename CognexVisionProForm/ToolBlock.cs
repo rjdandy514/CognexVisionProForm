@@ -244,29 +244,18 @@ namespace CognexVisionProForm
         }
         private void GetInfoFromTool()
         {
-            CogToolBlockTerminal failedTool = new CogToolBlockTerminal("ToolFailed",0);
-
             int toolOutputCount = cogToolBlock.Outputs.Count;
 
             toolOutput = cogToolBlock.Outputs;
             for(int i = 0; i < toolOutput.Count;i++)
             {
-                if(cogToolBlock.RunStatus.Result == CogToolResultConstants.Accept || true)
-                {
                     toolOutput[i] = cogToolBlock.Outputs[i];
-                }
-                else
-                {
-                    toolOutput[i] = failedTool;
-                }
-                    
             }
 
             toolReady = true;
-
-            if (resultUpdated) { resultUpdated = false; }
-            else if (!resultUpdated) { resultUpdated = true; }
+            resultUpdated = !resultUpdated; //Toggle Value
             form.ToolBlockRunComplete = CameraId;
+
 
             Utilities.LoggingStatment($"{toolName}: Number of Outputs - {toolOutputCount}");
             Utilities.LoggingStatment($"{toolName}: Toolblock completed Run");

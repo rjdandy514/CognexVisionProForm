@@ -21,12 +21,17 @@ namespace CognexVisionProForm
         CognexVisionProForm _form;
         DalsaImage camera;
         ToolBlock tool;
+        ToolBlock preProcess;
         public ICogImage image;
         public ICogRecord record;
         private int toolSelect = 0;
         private bool updateDisplayRequest;
         private System.Windows.Forms.Timer pollingTimer;
-
+        ShowResultData toolFailedDisplay;
+        public DalsaImage Camera
+        {
+            get { return camera; }
+        }
         public ToolBlock Tool
         {
             get
@@ -38,6 +43,11 @@ namespace CognexVisionProForm
             {
                 tool = value;
             }
+        }
+        public ToolBlock PreProcess
+        {
+            get { return preProcess; }
+            set { preProcess = value; }
         }
         public int ToolSelect
         {
@@ -64,6 +74,9 @@ namespace CognexVisionProForm
             _form = new CognexVisionProForm();
             _form = Sender;
             camera = Camera;
+            toolFailedDisplay = new ShowResultData(this);
+
+
 
             InitializeComponent();
         }
@@ -77,7 +90,6 @@ namespace CognexVisionProForm
             cbImageReady.Checked = camera.ImageReady;
             numToolSelect.Value = toolSelect;
             UpdateButton();
-
             pollingTimer.Start();
         }
         private void UpdateButton()
@@ -204,10 +216,18 @@ namespace CognexVisionProForm
             // Display message if tool failed
             //
 
-            if(tool.RunStatus.Result != CogToolResultConstants.Accept)
-            {
-                ShowResultData toolFailedDisplay = new ShowResultData(this);
-                toolFailedDisplay.ShowDialog();
+            if(tool.RunStatus.Result != CogToolResultConstants.Accept || preProcess.RunStatus.Result != CogToolResultConstants.Accept)
+            {                
+                if(!toolFailedDisplay.Visible)
+                {
+                    toolFailedDisplay.ShowDialog();
+                }
+                else
+                {
+                    toolFailedDisplay.UpdateResultData();
+                }
+                
+
             }
 
             UpdateImageRecord();
@@ -318,13 +338,7 @@ namespace CognexVisionProForm
 
         private void button1_Click(object sender, EventArgs e)
         {
-            //if (camera.Trigger) { camera.Trigger = false; }
-            //else { camera.Trigger = true; }
-
-            
-
-
-
+            toolFailedDisplay.ShowDialog();
         }
         
         [DllImport("kernel32")]

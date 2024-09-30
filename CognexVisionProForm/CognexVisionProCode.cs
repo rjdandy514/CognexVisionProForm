@@ -296,9 +296,6 @@ namespace CognexVisionProForm
 
                     CogImage8Grey tempImage = toolblockArray[j, desiredTool[j]].cogToolBlock.Inputs[0].Value as CogImage8Grey;
 
-                   // if (tempImage.SelectedSpaceName == "") { MessageBox.Show("wtf"); }
-
-
                     toolblockArray[j, desiredTool[j]].ToolRun(processedImage as CogImage8Grey);
 
 
@@ -324,6 +321,7 @@ namespace CognexVisionProForm
                 {
                     if (toolTriggerComplete[i])
                     {
+                        cameraControl[i].PreProcess = preProcess[i];
                         cameraControl[i].Tool = toolblockArray[i, desiredTool[i]];
                         cameraControl[i].UpdateImage();
                         cameraControl[i].UpdateDisplayRequest = true;
