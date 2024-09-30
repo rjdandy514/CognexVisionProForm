@@ -336,10 +336,6 @@ namespace CognexVisionProForm
             UpdateButton();
         }
 
-        private void button1_Click(object sender, EventArgs e)
-        {
-            toolFailedDisplay.ShowDialog();
-        }
         
         [DllImport("kernel32")]
         private static extern int GetPrivateProfileString(string section,string key, string def, StringBuilder retVal,int size, string filePath);
@@ -348,6 +344,11 @@ namespace CognexVisionProForm
             
             UpdateImageRecord();
 
+        }
+
+        private void bttnGetToolData_Click(object sender, EventArgs e)
+        {
+            toolFailedDisplay.ShowDialog();
         }
     }
 }

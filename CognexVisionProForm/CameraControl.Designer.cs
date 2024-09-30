@@ -40,8 +40,9 @@
             this.cbImageReady = new System.Windows.Forms.CheckBox();
             this.cbArchiveImageActive = new System.Windows.Forms.CheckBox();
             this.plControl = new System.Windows.Forms.Panel();
+            this.cbResultsUpdated = new System.Windows.Forms.CheckBox();
             this.lbToolInput = new System.Windows.Forms.ListBox();
-            this.button1 = new System.Windows.Forms.Button();
+            this.bttnGetToolData = new System.Windows.Forms.Button();
             this.bttnGrab = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.numRecordSelect = new System.Windows.Forms.NumericUpDown();
@@ -53,7 +54,6 @@
             this.lbToolName = new System.Windows.Forms.Label();
             this.lbToolData = new System.Windows.Forms.ListBox();
             this.recordDisplay = new Cognex.VisionPro.CogRecordDisplay();
-            this.cbResultsUpdated = new System.Windows.Forms.CheckBox();
             this.lbRecordName = new System.Windows.Forms.Label();
             this.plControl.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numRecordSelect)).BeginInit();
@@ -168,7 +168,7 @@
             this.plControl.BackColor = System.Drawing.SystemColors.ControlLight;
             this.plControl.Controls.Add(this.cbResultsUpdated);
             this.plControl.Controls.Add(this.lbToolInput);
-            this.plControl.Controls.Add(this.button1);
+            this.plControl.Controls.Add(this.bttnGetToolData);
             this.plControl.Controls.Add(this.bttnGrab);
             this.plControl.Controls.Add(this.label2);
             this.plControl.Controls.Add(this.numRecordSelect);
@@ -194,6 +194,16 @@
             this.plControl.Size = new System.Drawing.Size(158, 535);
             this.plControl.TabIndex = 18;
             // 
+            // cbResultsUpdated
+            // 
+            this.cbResultsUpdated.AutoSize = true;
+            this.cbResultsUpdated.Location = new System.Drawing.Point(3, 179);
+            this.cbResultsUpdated.Name = "cbResultsUpdated";
+            this.cbResultsUpdated.Size = new System.Drawing.Size(103, 17);
+            this.cbResultsUpdated.TabIndex = 39;
+            this.cbResultsUpdated.Text = "Results updated";
+            this.cbResultsUpdated.UseVisualStyleBackColor = true;
+            // 
             // lbToolInput
             // 
             this.lbToolInput.FormattingEnabled = true;
@@ -202,19 +212,19 @@
             this.lbToolInput.Size = new System.Drawing.Size(149, 17);
             this.lbToolInput.TabIndex = 38;
             // 
-            // button1
+            // bttnGetToolData
             // 
-            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.button1.BackColor = System.Drawing.SystemColors.ButtonFace;
-            this.button1.FlatAppearance.BorderColor = System.Drawing.Color.Red;
-            this.button1.FlatAppearance.BorderSize = 2;
-            this.button1.Location = new System.Drawing.Point(3, 301);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(152, 29);
-            this.button1.TabIndex = 37;
-            this.button1.Text = "Test Button";
-            this.button1.UseVisualStyleBackColor = false;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.bttnGetToolData.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.bttnGetToolData.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.bttnGetToolData.FlatAppearance.BorderColor = System.Drawing.Color.Red;
+            this.bttnGetToolData.FlatAppearance.BorderSize = 2;
+            this.bttnGetToolData.Location = new System.Drawing.Point(3, 301);
+            this.bttnGetToolData.Name = "bttnGetToolData";
+            this.bttnGetToolData.Size = new System.Drawing.Size(152, 29);
+            this.bttnGetToolData.TabIndex = 37;
+            this.bttnGetToolData.Text = "Get Tool Data";
+            this.bttnGetToolData.UseVisualStyleBackColor = false;
+            this.bttnGetToolData.Click += new System.EventHandler(this.bttnGetToolData_Click);
             // 
             // bttnGrab
             // 
@@ -336,16 +346,6 @@
             this.recordDisplay.Size = new System.Drawing.Size(307, 293);
             this.recordDisplay.TabIndex = 19;
             // 
-            // cbResultsUpdated
-            // 
-            this.cbResultsUpdated.AutoSize = true;
-            this.cbResultsUpdated.Location = new System.Drawing.Point(3, 179);
-            this.cbResultsUpdated.Name = "cbResultsUpdated";
-            this.cbResultsUpdated.Size = new System.Drawing.Size(103, 17);
-            this.cbResultsUpdated.TabIndex = 39;
-            this.cbResultsUpdated.Text = "Results updated";
-            this.cbResultsUpdated.UseVisualStyleBackColor = true;
-            // 
             // lbRecordName
             // 
             this.lbRecordName.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
@@ -405,7 +405,7 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.NumericUpDown numRecordSelect;
         private System.Windows.Forms.Button bttnGrab;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button bttnGetToolData;
         private System.Windows.Forms.ListBox lbToolInput;
         private System.Windows.Forms.CheckBox cbResultsUpdated;
         private System.Windows.Forms.Label lbRecordName;
