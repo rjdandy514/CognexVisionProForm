@@ -55,6 +55,7 @@
             this.lbToolData = new System.Windows.Forms.ListBox();
             this.recordDisplay = new Cognex.VisionPro.CogRecordDisplay();
             this.lbRecordName = new System.Windows.Forms.Label();
+            this.bttnTest = new System.Windows.Forms.Button();
             this.plControl.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numRecordSelect)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numToolSelect)).BeginInit();
@@ -166,6 +167,7 @@
             this.plControl.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.plControl.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.plControl.Controls.Add(this.bttnTest);
             this.plControl.Controls.Add(this.cbResultsUpdated);
             this.plControl.Controls.Add(this.lbToolInput);
             this.plControl.Controls.Add(this.bttnGetToolData);
@@ -356,6 +358,20 @@
             this.lbRecordName.TabIndex = 40;
             this.lbRecordName.Text = "Record Name";
             // 
+            // bttnTest
+            // 
+            this.bttnTest.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.bttnTest.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.bttnTest.FlatAppearance.BorderColor = System.Drawing.Color.Red;
+            this.bttnTest.FlatAppearance.BorderSize = 2;
+            this.bttnTest.Location = new System.Drawing.Point(3, 266);
+            this.bttnTest.Name = "bttnTest";
+            this.bttnTest.Size = new System.Drawing.Size(152, 29);
+            this.bttnTest.TabIndex = 40;
+            this.bttnTest.Text = "Test Button";
+            this.bttnTest.UseVisualStyleBackColor = false;
+            this.bttnTest.Click += new System.EventHandler(this.bttnTest_Click);
+            // 
             // CameraControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -409,5 +425,6 @@
         private System.Windows.Forms.ListBox lbToolInput;
         private System.Windows.Forms.CheckBox cbResultsUpdated;
         private System.Windows.Forms.Label lbRecordName;
+        private System.Windows.Forms.Button bttnTest;
     }
 }

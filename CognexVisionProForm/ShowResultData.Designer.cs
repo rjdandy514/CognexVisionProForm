@@ -48,16 +48,16 @@
             // 
             // tbToolMessage
             // 
-            this.tbToolMessage.Location = new System.Drawing.Point(8, 296);
+            this.tbToolMessage.Location = new System.Drawing.Point(12, 296);
             this.tbToolMessage.Name = "tbToolMessage";
-            this.tbToolMessage.Size = new System.Drawing.Size(453, 96);
+            this.tbToolMessage.Size = new System.Drawing.Size(453, 47);
             this.tbToolMessage.TabIndex = 0;
             this.tbToolMessage.Text = "";
             // 
             // lbToolResultData
             // 
             this.lbToolResultData.FormattingEnabled = true;
-            this.lbToolResultData.Location = new System.Drawing.Point(8, 206);
+            this.lbToolResultData.Location = new System.Drawing.Point(12, 206);
             this.lbToolResultData.Name = "lbToolResultData";
             this.lbToolResultData.Size = new System.Drawing.Size(453, 56);
             this.lbToolResultData.TabIndex = 1;
@@ -66,7 +66,7 @@
             // 
             this.lToolBlockResult.AutoSize = true;
             this.lToolBlockResult.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lToolBlockResult.Location = new System.Drawing.Point(8, 179);
+            this.lToolBlockResult.Location = new System.Drawing.Point(12, 179);
             this.lToolBlockResult.Name = "lToolBlockResult";
             this.lToolBlockResult.Size = new System.Drawing.Size(165, 24);
             this.lToolBlockResult.TabIndex = 38;
@@ -76,7 +76,7 @@
             // 
             this.lToolBlockMessage.AutoSize = true;
             this.lToolBlockMessage.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lToolBlockMessage.Location = new System.Drawing.Point(8, 269);
+            this.lToolBlockMessage.Location = new System.Drawing.Point(12, 269);
             this.lToolBlockMessage.Name = "lToolBlockMessage";
             this.lToolBlockMessage.Size = new System.Drawing.Size(181, 24);
             this.lToolBlockMessage.TabIndex = 39;
@@ -121,7 +121,7 @@
             // lbPreprocessInput
             // 
             this.lbPreprocessInput.FormattingEnabled = true;
-            this.lbPreprocessInput.Location = new System.Drawing.Point(4, 449);
+            this.lbPreprocessInput.Location = new System.Drawing.Point(12, 384);
             this.lbPreprocessInput.Name = "lbPreprocessInput";
             this.lbPreprocessInput.Size = new System.Drawing.Size(453, 43);
             this.lbPreprocessInput.TabIndex = 44;
@@ -130,7 +130,7 @@
             // 
             this.lPreprocessInput.AutoSize = true;
             this.lPreprocessInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lPreprocessInput.Location = new System.Drawing.Point(4, 422);
+            this.lPreprocessInput.Location = new System.Drawing.Point(12, 357);
             this.lPreprocessInput.Name = "lPreprocessInput";
             this.lPreprocessInput.Size = new System.Drawing.Size(152, 24);
             this.lPreprocessInput.TabIndex = 45;
@@ -140,7 +140,7 @@
             // 
             this.lPreprocessOutput.AutoSize = true;
             this.lPreprocessOutput.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lPreprocessOutput.Location = new System.Drawing.Point(4, 495);
+            this.lPreprocessOutput.Location = new System.Drawing.Point(12, 430);
             this.lPreprocessOutput.Name = "lPreprocessOutput";
             this.lPreprocessOutput.Size = new System.Drawing.Size(167, 24);
             this.lPreprocessOutput.TabIndex = 47;
@@ -149,7 +149,7 @@
             // lbPreprocessOutput
             // 
             this.lbPreprocessOutput.FormattingEnabled = true;
-            this.lbPreprocessOutput.Location = new System.Drawing.Point(4, 522);
+            this.lbPreprocessOutput.Location = new System.Drawing.Point(12, 457);
             this.lbPreprocessOutput.Name = "lbPreprocessOutput";
             this.lbPreprocessOutput.Size = new System.Drawing.Size(453, 43);
             this.lbPreprocessOutput.TabIndex = 46;
@@ -158,7 +158,7 @@
             // 
             this.lToolBlockOutput.AutoSize = true;
             this.lToolBlockOutput.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lToolBlockOutput.Location = new System.Drawing.Point(4, 650);
+            this.lToolBlockOutput.Location = new System.Drawing.Point(12, 585);
             this.lToolBlockOutput.Name = "lToolBlockOutput";
             this.lToolBlockOutput.Size = new System.Drawing.Size(160, 24);
             this.lToolBlockOutput.TabIndex = 51;
@@ -167,7 +167,7 @@
             // lbToolBlockOutput
             // 
             this.lbToolBlockOutput.FormattingEnabled = true;
-            this.lbToolBlockOutput.Location = new System.Drawing.Point(4, 677);
+            this.lbToolBlockOutput.Location = new System.Drawing.Point(4, 612);
             this.lbToolBlockOutput.Name = "lbToolBlockOutput";
             this.lbToolBlockOutput.Size = new System.Drawing.Size(453, 43);
             this.lbToolBlockOutput.TabIndex = 50;
@@ -176,7 +176,7 @@
             // 
             this.lToolBlockInput.AutoSize = true;
             this.lToolBlockInput.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lToolBlockInput.Location = new System.Drawing.Point(4, 577);
+            this.lToolBlockInput.Location = new System.Drawing.Point(12, 512);
             this.lToolBlockInput.Name = "lToolBlockInput";
             this.lToolBlockInput.Size = new System.Drawing.Size(145, 24);
             this.lToolBlockInput.TabIndex = 49;
@@ -185,7 +185,7 @@
             // lbToolBlockInput
             // 
             this.lbToolBlockInput.FormattingEnabled = true;
-            this.lbToolBlockInput.Location = new System.Drawing.Point(4, 604);
+            this.lbToolBlockInput.Location = new System.Drawing.Point(12, 539);
             this.lbToolBlockInput.Name = "lbToolBlockInput";
             this.lbToolBlockInput.Size = new System.Drawing.Size(453, 43);
             this.lbToolBlockInput.TabIndex = 48;
@@ -194,7 +194,8 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1105, 827);
+            this.AutoScroll = true;
+            this.ClientSize = new System.Drawing.Size(729, 685);
             this.Controls.Add(this.lToolBlockOutput);
             this.Controls.Add(this.lbToolBlockOutput);
             this.Controls.Add(this.lToolBlockInput);

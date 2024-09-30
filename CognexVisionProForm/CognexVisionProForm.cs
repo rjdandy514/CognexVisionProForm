@@ -3,6 +3,7 @@ using Cognex.VisionPro.ToolBlock;
 using DALSA.SaperaLT.SapClassBasic;
 using System;
 using System.Collections;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Net;
 using System.Net.NetworkInformation;
@@ -37,6 +38,9 @@ namespace CognexVisionProForm
         private int ExpireCount = 0;
 
         private bool ExpireError = false;
+
+        TypeConverter convertToString = TypeDescriptor.GetConverter(typeof(String));
+        TypeConverter convertToDouble = TypeDescriptor.GetConverter(typeof(double));
 
         private int[] desiredTool;
         private int[] plcTool;

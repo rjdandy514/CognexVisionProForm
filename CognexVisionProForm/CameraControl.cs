@@ -169,7 +169,9 @@ namespace CognexVisionProForm
         }
         private delegate void Set_UpdateDisplay();
         public void UpdateToolDisplay()
-        {            
+        {
+            TypeConverter converter = TypeDescriptor.GetConverter(typeof(string));
+
             lbToolName.Text = tool.Name;
             lbAcqTime.Text = $"Aquisition: {camera.AcqTime} ms";
             lbToolRunTime.Text = $"Tool Time: {tool.RunStatus.TotalTime} ms";
@@ -184,7 +186,7 @@ namespace CognexVisionProForm
             
             for (int i = 1; i < tool.cogToolBlock.Inputs.Count; i++)
             {
-                if (tool.cogToolBlock.Inputs[i] != null && tool.cogToolBlock.Inputs[i].ValueType.Name == "Double")
+                if (tool.cogToolBlock.Inputs[i] != null && converter.IsValid(tool.cogToolBlock.Inputs[i].Value.ToString()))
                 {
                     string toolInput = tool.cogToolBlock.Inputs[i].Name + ": " + Math.Round(Convert.ToDouble(tool.cogToolBlock.Inputs[i].Value), 2).ToString();
                     lbToolInput.Items.Add(toolInput);
@@ -202,11 +204,13 @@ namespace CognexVisionProForm
             lbToolData.Location = new Point(lbToolData.Location.X,lbToolInput.Location.Y + lbToolInput.Height + 5);
             for (int i = 0; i < tool.ToolOutput.Count; i++)
             {
-                if (tool.ToolOutput[i] != null && (tool.ToolOutput[i].ValueType.Name == "Double" || tool.ToolOutput[i].ValueType.Name == "Int32")) 
+                if (tool.cogToolBlock.Outputs[i].Value != null && converter.IsValid(tool.cogToolBlock.Outputs[i].Value.ToString())) 
                 {
+                    
                     string tooldata =   tool.ToolOutput[i].Name + ": " + 
                                         Math.Round(Convert.ToDouble(tool.ToolOutput[i].Value), 2).ToString(); 
                     lbToolData.Items.Add(tooldata);
+                    
                 }
             }
             lbToolData.EndUpdate();
@@ -216,7 +220,7 @@ namespace CognexVisionProForm
             // Display message if tool failed
             //
 
-            if(tool.RunStatus.Result != CogToolResultConstants.Accept || preProcess.RunStatus.Result != CogToolResultConstants.Accept)
+            if(tool.RunStatus.Result != CogToolResultConstants.Accept ||( preProcess.ToolReady && preProcess.RunStatus.Result != CogToolResultConstants.Accept))
             {                
                 if(!toolFailedDisplay.Visible)
                 {
@@ -226,8 +230,6 @@ namespace CognexVisionProForm
                 {
                     toolFailedDisplay.UpdateResultData();
                 }
-                
-
             }
 
             UpdateImageRecord();
@@ -349,6 +351,11 @@ namespace CognexVisionProForm
         private void bttnGetToolData_Click(object sender, EventArgs e)
         {
             toolFailedDisplay.ShowDialog();
+        }
+
+        private void bttnTest_Click(object sender, EventArgs e)
+        {
+            camera.Trigger = !camera.Trigger;
         }
     }
 }

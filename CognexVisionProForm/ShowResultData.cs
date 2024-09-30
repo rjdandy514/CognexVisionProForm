@@ -43,9 +43,16 @@ namespace CognexVisionProForm
             this.Height = cameraData.Height - 10;
 
             //Update information for Preprocess
+            
+
+            
+            lbPreprocessResultdata.Top = lPrepocessResult.Bottom + 5;
             lbPreprocessResultdata.Items.Clear();
-            lbPreprocessResultdata.Items.Add($"Results - {cameraData.PreProcess.cogToolBlock.RunStatus.Result}");
-            lbPreprocessResultdata.Items.Add($"TotalTime - {cameraData.PreProcess.cogToolBlock.RunStatus.TotalTime.ToString()}");
+            if (cameraData.PreProcess.ToolReady)
+            {
+                lbPreprocessResultdata.Items.Add($"Results - {cameraData.PreProcess.cogToolBlock.RunStatus.Result}");
+                lbPreprocessResultdata.Items.Add($"TotalTime - {cameraData.PreProcess.cogToolBlock.RunStatus.TotalTime.ToString()}");
+            }
             lbPreprocessResultdata.Height = lbPreprocessResultdata.PreferredHeight;
 
             lProcessMessage.Top = lbPreprocessResultdata.Bottom + 10;
@@ -53,9 +60,11 @@ namespace CognexVisionProForm
 
             tbPreprocessMessage.Top = lProcessMessage.Bottom + 5;
             tbPreprocessMessage.Visible = true;
-            tbPreprocessMessage.Enabled = false;
+            tbPreprocessMessage.Enabled = true;
+            tbPreprocessMessage.ReadOnly = true;
             tbPreprocessMessage.Clear();
-            if(cameraData.PreProcess.cogToolBlock.RunStatus.Result == Cognex.VisionPro.CogToolResultConstants.Accept)
+
+            if(!cameraData.PreProcess.ToolReady || cameraData.PreProcess.cogToolBlock.RunStatus.Result == Cognex.VisionPro.CogToolResultConstants.Accept)
             {
                 tbPreprocessMessage.Text = "No Messages";
             }
@@ -63,8 +72,9 @@ namespace CognexVisionProForm
             {
                 tbPreprocessMessage.Text = cameraData.PreProcess.cogToolBlock.RunStatus.Message;
             }
-            
-            tbPreprocessMessage.Height = lbPreprocessResultdata.PreferredHeight;
+
+            tbPreprocessMessage.Height = tbPreprocessMessage.PreferredHeight;
+
 
             //Update information for selected tool
             lToolBlockResult.Top = tbPreprocessMessage.Bottom + 10;
@@ -73,24 +83,50 @@ namespace CognexVisionProForm
             lbToolResultData.Items.Add($"Results - {cameraData.Tool.cogToolBlock.RunStatus.Result}");
             lbToolResultData.Items.Add($"TotalTime - {cameraData.Tool.cogToolBlock.RunStatus.TotalTime.ToString()}");
             lbToolResultData.Height = lbToolResultData.PreferredHeight;
-            tbToolMessage.Clear();
-
-
             lToolBlockMessage.Top = lbToolResultData.Bottom + 10;
             lToolBlockMessage.Visible = true;
             
+            tbToolMessage.Clear();
             tbToolMessage.Visible = true;
-            tbToolMessage.Enabled = false;
+            tbToolMessage.Enabled = true;
+            tbToolMessage.ReadOnly = true;
             tbToolMessage.Top = lToolBlockMessage.Bottom + 5;
-            if(cameraData.Tool.cogToolBlock.RunStatus.Result == Cognex.VisionPro.CogToolResultConstants.Accept)
+            tbToolMessage.Width = this.Width - 50;
+
+            if (cameraData.Tool.cogToolBlock.RunStatus.Result == Cognex.VisionPro.CogToolResultConstants.Accept)
             {
                 tbToolMessage.Text = "No Messages";
             }
             else
             {
-                tbToolMessage.Text = cameraData.Tool.cogToolBlock.RunStatus.Message;
+                int stringIndex = 0;
+                int stringLength = tbToolMessage.Width / tbToolMessage.Font.Height;
+                string initialMessage = cameraData.Tool.cogToolBlock.RunStatus.Message;
+                string[] stringSplit = new string[1+(initialMessage.Length/ stringLength)];
+                
+
+
+                while (initialMessage != "")
+                {
+                    int remainingString = initialMessage.Length;
+
+                    if (remainingString < stringLength)
+                    {
+                        stringLength = remainingString;
+                    }
+
+                    stringSplit[stringIndex] = initialMessage.Substring(0, stringLength);
+                    initialMessage = initialMessage.Remove(0, stringLength);
+                    stringIndex++;
+                }
+                
+                tbToolMessage.Lines = stringSplit;
+                Size sizetemp = tbToolMessage.PreferredSize;
             }
-            tbToolMessage.Height = tbToolMessage.PreferredHeight;
+            
+            tbToolMessage.Height = tbToolMessage.PreferredSize.Height;
+            tbToolMessage.Width = tbToolMessage.PreferredSize.Width;
+
 
             //
             // Preprocess Input
@@ -124,7 +160,7 @@ namespace CognexVisionProForm
                 var toolBlockInputValue = toolBlockInput.Value;
 
 
-                if (converter.IsValid(toolBlockInputValue.ToString()))
+                if (toolBlockInput.Value != null && converter.IsValid(toolBlockInputValue.ToString()))
                 {
                     toolBlockInputString = toolBlockInputString + " - " + toolBlockInputValue.ToString();
                 }
@@ -152,7 +188,7 @@ namespace CognexVisionProForm
                 string toolBlockOutputString = toolBlockOutput.Name;
                 var toolBlockOutputValue = toolBlockOutput.Value;
 
-                if (converter.IsValid(toolBlockOutputValue.ToString()))
+                if (toolBlockOutput.Value != null && converter.IsValid(toolBlockOutputValue.ToString()))
                 {
                     toolBlockOutputString = toolBlockOutputString + " - " + toolBlockOutputValue.ToString();
                 }
@@ -165,6 +201,10 @@ namespace CognexVisionProForm
             }
 
             lbToolBlockOutput.Height = lbToolBlockOutput.PreferredHeight;
+
+
+
+            this.Width = this.PreferredSize.Width;
 
 
         }

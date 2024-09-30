@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http.Headers;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
@@ -184,6 +185,29 @@ namespace CognexVisionProForm
             }
             return "255.255.255.255";
             throw new Exception("No network adapters with an IPv4 address in the system!");
+        }
+        public static bool IsNumeric(string inputVariable)
+        {
+
+            string variableType = inputVariable;
+            bool isNumeric = false;
+
+            switch(variableType)
+            {
+                case "Int32":
+                    isNumeric = true;
+                    break;
+                case "Double":
+                    isNumeric = true;
+                    break;
+
+                default:
+                    isNumeric = false;
+                    break;
+            }
+            
+
+            return isNumeric;
         }
     }
 }

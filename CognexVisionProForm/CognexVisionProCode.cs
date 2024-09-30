@@ -555,23 +555,26 @@ namespace CognexVisionProForm
                     {
                         temp = Convert.ToDouble(MainPLC.PlcToPcControlData[i + cam * dataLength])/10000;
                     }
-                    
-                    
 
-                    while (toolIndex < toolblockArray[cam, desiredTool[cam]].ToolInput.Count && toolblockArray[cam, desiredTool[cam]].ToolInput[toolIndex].ValueType.Name != "Double")
+                    while (toolIndex < toolblockArray[cam, desiredTool[cam]].ToolInput.Count && !Utilities.IsNumeric( toolblockArray[cam, desiredTool[cam]].ToolInput[toolIndex].ValueType.Name))
                     {
                         toolIndex++;
                     }
-
-                    if(toolblockArray[cam, desiredTool[cam]].ToolInput[toolIndex].ValueType.Name == "Double")
+                    if (toolIndex >= toolblockArray[cam, desiredTool[cam]].ToolInput.Count)
+                    {
+                        break;
+                    }
+                    if (toolblockArray[cam, desiredTool[cam]].ToolInput[toolIndex].ValueType.Name == "Double")
                     {
                         toolblockArray[cam, desiredTool[cam]].ToolInput[toolIndex].Value = temp;
                         toolIndex++;
                     }
-                    if(toolIndex >= toolblockArray[cam, desiredTool[cam]].ToolInput.Count)
+                    else if (toolblockArray[cam, desiredTool[cam]].ToolInput[toolIndex].ValueType.Name == "Int32")
                     {
-                        break;
+                        toolblockArray[cam, desiredTool[cam]].ToolInput[toolIndex].Value = temp;
+                        toolIndex++;
                     }
+                    
                     
 
                 }
