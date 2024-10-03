@@ -40,8 +40,8 @@
             this.cbImageReady = new System.Windows.Forms.CheckBox();
             this.cbArchiveImageActive = new System.Windows.Forms.CheckBox();
             this.plControl = new System.Windows.Forms.Panel();
+            this.bttnTest = new System.Windows.Forms.Button();
             this.cbResultsUpdated = new System.Windows.Forms.CheckBox();
-            this.lbToolInput = new System.Windows.Forms.ListBox();
             this.bttnGetToolData = new System.Windows.Forms.Button();
             this.bttnGrab = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
@@ -52,10 +52,8 @@
             this.lbToolRunTime = new System.Windows.Forms.Label();
             this.cbToolPassed = new System.Windows.Forms.CheckBox();
             this.lbToolName = new System.Windows.Forms.Label();
-            this.lbToolData = new System.Windows.Forms.ListBox();
             this.recordDisplay = new Cognex.VisionPro.CogRecordDisplay();
             this.lbRecordName = new System.Windows.Forms.Label();
-            this.bttnTest = new System.Windows.Forms.Button();
             this.plControl.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numRecordSelect)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numToolSelect)).BeginInit();
@@ -169,7 +167,6 @@
             this.plControl.BackColor = System.Drawing.SystemColors.ControlLight;
             this.plControl.Controls.Add(this.bttnTest);
             this.plControl.Controls.Add(this.cbResultsUpdated);
-            this.plControl.Controls.Add(this.lbToolInput);
             this.plControl.Controls.Add(this.bttnGetToolData);
             this.plControl.Controls.Add(this.bttnGrab);
             this.plControl.Controls.Add(this.label2);
@@ -180,7 +177,6 @@
             this.plControl.Controls.Add(this.lbToolRunTime);
             this.plControl.Controls.Add(this.cbToolPassed);
             this.plControl.Controls.Add(this.lbToolName);
-            this.plControl.Controls.Add(this.lbToolData);
             this.plControl.Controls.Add(this.cbArchiveImageActive);
             this.plControl.Controls.Add(this.cbImageReady);
             this.plControl.Controls.Add(this.cbCameraConnected);
@@ -196,6 +192,20 @@
             this.plControl.Size = new System.Drawing.Size(158, 535);
             this.plControl.TabIndex = 18;
             // 
+            // bttnTest
+            // 
+            this.bttnTest.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.bttnTest.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.bttnTest.FlatAppearance.BorderColor = System.Drawing.Color.Red;
+            this.bttnTest.FlatAppearance.BorderSize = 2;
+            this.bttnTest.Location = new System.Drawing.Point(3, 266);
+            this.bttnTest.Name = "bttnTest";
+            this.bttnTest.Size = new System.Drawing.Size(152, 29);
+            this.bttnTest.TabIndex = 40;
+            this.bttnTest.Text = "Test Button";
+            this.bttnTest.UseVisualStyleBackColor = false;
+            this.bttnTest.Click += new System.EventHandler(this.bttnTest_Click);
+            // 
             // cbResultsUpdated
             // 
             this.cbResultsUpdated.AutoSize = true;
@@ -205,14 +215,6 @@
             this.cbResultsUpdated.TabIndex = 39;
             this.cbResultsUpdated.Text = "Results updated";
             this.cbResultsUpdated.UseVisualStyleBackColor = true;
-            // 
-            // lbToolInput
-            // 
-            this.lbToolInput.FormattingEnabled = true;
-            this.lbToolInput.Location = new System.Drawing.Point(3, 198);
-            this.lbToolInput.Name = "lbToolInput";
-            this.lbToolInput.Size = new System.Drawing.Size(149, 17);
-            this.lbToolInput.TabIndex = 38;
             // 
             // bttnGetToolData
             // 
@@ -323,14 +325,6 @@
             this.lbToolName.TabIndex = 27;
             this.lbToolName.Text = "Tool Name";
             // 
-            // lbToolData
-            // 
-            this.lbToolData.FormattingEnabled = true;
-            this.lbToolData.Location = new System.Drawing.Point(3, 221);
-            this.lbToolData.Name = "lbToolData";
-            this.lbToolData.Size = new System.Drawing.Size(149, 17);
-            this.lbToolData.TabIndex = 26;
-            // 
             // recordDisplay
             // 
             this.recordDisplay.ColorMapLowerClipColor = System.Drawing.Color.Black;
@@ -357,20 +351,6 @@
             this.lbRecordName.Size = new System.Drawing.Size(73, 13);
             this.lbRecordName.TabIndex = 40;
             this.lbRecordName.Text = "Record Name";
-            // 
-            // bttnTest
-            // 
-            this.bttnTest.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.bttnTest.BackColor = System.Drawing.SystemColors.ButtonFace;
-            this.bttnTest.FlatAppearance.BorderColor = System.Drawing.Color.Red;
-            this.bttnTest.FlatAppearance.BorderSize = 2;
-            this.bttnTest.Location = new System.Drawing.Point(3, 266);
-            this.bttnTest.Name = "bttnTest";
-            this.bttnTest.Size = new System.Drawing.Size(152, 29);
-            this.bttnTest.TabIndex = 40;
-            this.bttnTest.Text = "Test Button";
-            this.bttnTest.UseVisualStyleBackColor = false;
-            this.bttnTest.Click += new System.EventHandler(this.bttnTest_Click);
             // 
             // CameraControl
             // 
@@ -410,7 +390,6 @@
         private System.Windows.Forms.CheckBox cbImageReady;
         private System.Windows.Forms.CheckBox cbArchiveImageActive;
         private System.Windows.Forms.Panel plControl;
-        private System.Windows.Forms.ListBox lbToolData;
         private System.Windows.Forms.Label lbToolName;
         private Cognex.VisionPro.CogRecordDisplay recordDisplay;
         private System.Windows.Forms.CheckBox cbToolPassed;
@@ -422,7 +401,6 @@
         private System.Windows.Forms.NumericUpDown numRecordSelect;
         private System.Windows.Forms.Button bttnGrab;
         private System.Windows.Forms.Button bttnGetToolData;
-        private System.Windows.Forms.ListBox lbToolInput;
         private System.Windows.Forms.CheckBox cbResultsUpdated;
         private System.Windows.Forms.Label lbRecordName;
         private System.Windows.Forms.Button bttnTest;

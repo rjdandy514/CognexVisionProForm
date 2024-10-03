@@ -16,6 +16,7 @@ using System.Xml.Linq;
 using System.Net.NetworkInformation;
 using Cognex.Vision.Meta;
 using Cognex.VisionPro.ToolBlock;
+using Cognex.Vision;
 
 namespace CognexVisionProForm
 {
@@ -64,19 +65,18 @@ namespace CognexVisionProForm
                 cameraControl[j] = new CameraControl(this, CameraAcqArray[j]);
 
                 preProcess[j] = new ToolBlock(this);
-                preProcess[j].Id = 0;
                 preProcess[j].CameraId = j;
 
 
                 for (int i = 0; i < toolCount; i++)
                 {
                     toolblockArray[j, i] = new ToolBlock(this);
-                    toolblockArray[j, i].Id = i;
                     toolblockArray[j, i].CameraId = j;
                 }
             }
 
             MainPLC = new PlcComms(this);
+            dataLength = MainPLC.PlcToPcControlData.Length / cameraCount;
 
             Utilities.LoggingStatment($"InitializeAcquisition Complete");
         }
@@ -287,14 +287,14 @@ namespace CognexVisionProForm
 
                     if (preProcess[j].ToolReady && preProcessRequired)
                     {
-                        preProcess[j].ToolInput[1].Value = 2;
+                        preProcess[j].Inputs[1].Value = 2;
                         preProcess[j].ToolRun(CameraAcqArray[j].Image as CogImage8Grey);
                         
-                        processedImage = preProcess[j].ToolOutput[0].Value as CogImage8Grey;
+                        processedImage = preProcess[j].Outputs[0].Value as CogImage8Grey;
                     }
                     else { processedImage = CameraAcqArray[j].Image as CogImage8Grey; }
 
-                    CogImage8Grey tempImage = toolblockArray[j, desiredTool[j]].cogToolBlock.Inputs[0].Value as CogImage8Grey;
+                    CogImage8Grey tempImage = toolblockArray[j, desiredTool[j]].toolBlock.Inputs[0].Value as CogImage8Grey;
 
                     toolblockArray[j, desiredTool[j]].ToolRun(processedImage as CogImage8Grey);
 
@@ -529,55 +529,50 @@ namespace CognexVisionProForm
         public void PlcReadData()
         {
             int controlDataLoop;
-            
-            
+            double dataInput;
+            ToolBlock tool;
+
+
+
             for (int cam = 0; cam < cameraCount; cam++)
             {
 
-                if (preProcessRequired && preProcess[cam].ToolReady)
+                if (preProcessRequired)
                 {
-                    CogToolBlockTerminalCollection preProcessData = preProcess[cam].ToolInput;
-                    preProcessData[1].Value = MainPLC.PlcToPcControlData[cam * dataLength] / 10000;
-                    preProcess[cam].ToolInput = preProcessData;
-
                     controlDataLoop = 1;
+                    if (preProcess[cam].ToolReady) { preProcess[cam].Inputs[1].Value = MainPLC.PlcToPcControlData[cam * dataLength] / 10000; }                   
+                    
                 }
                 else { controlDataLoop = 0; }
 
                 int toolIndex = 0;
+                tool = toolblockArray[cam, desiredTool[cam]];
                 
-                if (toolblockArray[cam, desiredTool[cam]].ToolReady == false) { continue; }
+                if (tool.ToolReady == false) { continue; }
 
-                for (int i = controlDataLoop; i < dataLength; i ++)
+                for (int j = controlDataLoop; j < Math.Min(tool.Inputs.Count, dataLength); j++)
                 {
-                    double temp = 0;
-                    if (CameraAcqArray[cam].Connected)
-                    {
-                        temp = Convert.ToDouble(MainPLC.PlcToPcControlData[i + cam * dataLength])/10000;
-                    }
+                    dataInput = Convert.ToDouble(MainPLC.PlcToPcControlData[j + cam * dataLength])/10000;
 
-                    while (toolIndex < toolblockArray[cam, desiredTool[cam]].ToolInput.Count && !Utilities.IsNumeric( toolblockArray[cam, desiredTool[cam]].ToolInput[toolIndex].ValueType.Name))
-                    {
-                        toolIndex++;
-                    }
-                    if (toolIndex >= toolblockArray[cam, desiredTool[cam]].ToolInput.Count)
-                    {
-                        break;
-                    }
-                    if (toolblockArray[cam, desiredTool[cam]].ToolInput[toolIndex].ValueType.Name == "Double")
-                    {
-                        toolblockArray[cam, desiredTool[cam]].ToolInput[toolIndex].Value = temp;
-                        toolIndex++;
-                    }
-                    else if (toolblockArray[cam, desiredTool[cam]].ToolInput[toolIndex].ValueType.Name == "Int32")
-                    {
-                        toolblockArray[cam, desiredTool[cam]].ToolInput[toolIndex].Value = temp;
-                        toolIndex++;
-                    }
-                    
-                    
 
+                    while (toolIndex < tool.Inputs.Count && !Utilities.IsNumeric( tool.Inputs[toolIndex].ValueType.Name))
+                    {
+                        toolIndex++;
+                    }
+                    if (toolIndex >= toolblockArray[cam, desiredTool[cam]].Inputs.Count) { break; }
+                    
+                    if (tool.Inputs[toolIndex].ValueType.Name == "Double")
+                    {
+                        tool.Inputs[toolIndex].Value = dataInput;
+                        toolIndex++;
+                    }
+                    else if (tool.Inputs[toolIndex].ValueType.Name == "Int32")
+                    {
+                        tool.Inputs[toolIndex].Value = dataInput;
+                        toolIndex++;
+                    }
                 }
+                tool.Inputs = toolblockArray[cam, desiredTool[cam]].Inputs;
             }
         }
         public void PlcWrite()
@@ -627,38 +622,40 @@ namespace CognexVisionProForm
         {
 
             string dataTypeName;
+            double dData;
+            int iData;
+            ToolBlock tool;
 
             //Add Tool Data to String Array to send to PLC
             //Limit Doubles to 4 decimal places
             for (int i = 0; i < cameraCount; i++)
             {
-
-                ToolBlock tool = toolblockArray[i, desiredTool[i]];
+                tool = toolblockArray[i, desiredTool[i]];
 
                 if (tool.ResultUpdated != tool.ResultUpdated_Mem)
                 {
                     tool.ResultUpdated_Mem = tool.ResultUpdated;
 
                     Array.Clear(MainPLC.PcToPlcStatusData, i * dataLength, dataLength);
-                    for (int j = 0; j < Math.Min(tool.ToolOutput.Count, dataLength); j++)
+                    int writeIndex = 0;
+                    for (int j = 0; j < Math.Min(tool.Outputs.Count, dataLength); j++)
                     {
+                        if (tool.Outputs[j] == null) { break; }
 
-                        if (tool.ToolOutput[j] == null) { break; }
-
-                        dataTypeName = tool.ToolOutput[j].ValueType.Name;
-
+                        dataTypeName = tool.Outputs[j].ValueType.Name;
+                        if (!Utilities.IsNumeric(dataTypeName)) { continue; }
                         if (dataTypeName == "Double")
                         {
-                            double dData = Convert.ToDouble(tool.ToolOutput[j].Value);
-                            int iData = Convert.ToInt32(dData * 10000);
+                            dData = Convert.ToDouble(tool.Outputs[j].Value);
+                            iData = Convert.ToInt32(dData * 10000);
 
-                            MainPLC.PcToPlcStatusData[(i * dataLength) + j] = iData;
+                            MainPLC.PcToPlcStatusData[(i * dataLength) + writeIndex] = iData;
                         }
                         else if (dataTypeName == "Int32")
                         {
-                            MainPLC.PcToPlcStatusData[(i * dataLength) + j] = Convert.ToInt32(tool.ToolOutput[j].Value) * 10000;
+                            MainPLC.PcToPlcStatusData[(i * dataLength) + j] = Convert.ToInt32(tool.Outputs[j].Value) * 10000;
                         }
-
+                        writeIndex++;
                     }
                 }
             }

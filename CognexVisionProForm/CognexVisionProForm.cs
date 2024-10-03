@@ -25,7 +25,7 @@ namespace CognexVisionProForm
 
         int selectedCameraId;
         int cameraConnectCount;
-        int dataLength = 8;
+        int dataLength;
         public DalsaImage[] CameraAcqArray;
         bool[] cameraSnap;
         bool[] cameraSnapComplete;
@@ -124,6 +124,8 @@ namespace CognexVisionProForm
             toolTriggerComplete = new bool[cameraCount];
 
             
+
+
 
             splashScreen.UpdateProgress("Initialize Classes", 10);
             InitClasses();
@@ -464,12 +466,12 @@ namespace CognexVisionProForm
 
             if (toolblockArray[cameraSelected, toolSelected].ToolReady)
             {
-                cogToolBlockEditV21.Subject = toolblockArray[cameraSelected, toolSelected].cogToolBlock;
+                cogToolBlockEditV21.Subject = toolblockArray[cameraSelected, toolSelected].toolBlock;
             }
 
             if (cogToolBlockEditV21.Subject != null && toolblockArray[cameraSelected, toolSelected].ToolReady)
             {          
-                    cogToolBlockEditV21.Subject.Inputs[0].Value = toolblockArray[cameraSelected, toolSelected].cogToolBlock.Inputs[0].Value;
+                    cogToolBlockEditV21.Subject.Inputs[0].Value = toolblockArray[cameraSelected, toolSelected].toolBlock.Inputs[0].Value;
                     cogToolBlockEditV21.Subject.Run();
                 
             }
