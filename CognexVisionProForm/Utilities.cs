@@ -209,5 +209,19 @@ namespace CognexVisionProForm
 
             return isNumeric;
         }
+        public static void LoadForm(object Panel, object Form)
+        {
+            Panel p = Panel as Panel;
+            if (p.Controls.Count > 0)
+            {
+                p.Controls.RemoveAt(0);
+            }
+            Form f = Form as Form;
+            f.TopLevel = false;
+            f.Dock = DockStyle.Fill;
+            p.Controls.Add(f);
+            p.Tag = f;
+            f.Show();
+        }
     }
 }

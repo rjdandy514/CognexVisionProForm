@@ -54,6 +54,7 @@
             this.lbToolName = new System.Windows.Forms.Label();
             this.recordDisplay = new Cognex.VisionPro.CogRecordDisplay();
             this.lbRecordName = new System.Windows.Forms.Label();
+            this.plToolData = new System.Windows.Forms.Panel();
             this.plControl.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numRecordSelect)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numToolSelect)).BeginInit();
@@ -352,6 +353,13 @@
             this.lbRecordName.TabIndex = 40;
             this.lbRecordName.Text = "Record Name";
             // 
+            // plToolData
+            // 
+            this.plToolData.Location = new System.Drawing.Point(289, 345);
+            this.plToolData.Name = "plToolData";
+            this.plToolData.Size = new System.Drawing.Size(174, 169);
+            this.plToolData.TabIndex = 41;
+            // 
             // CameraControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -359,6 +367,7 @@
             this.BackColor = System.Drawing.SystemColors.ControlDarkDark;
             this.ClientSize = new System.Drawing.Size(713, 543);
             this.ControlBox = false;
+            this.Controls.Add(this.plToolData);
             this.Controls.Add(this.lbRecordName);
             this.Controls.Add(this.recordDisplay);
             this.Controls.Add(this.plControl);
@@ -404,5 +413,6 @@
         private System.Windows.Forms.CheckBox cbResultsUpdated;
         private System.Windows.Forms.Label lbRecordName;
         private System.Windows.Forms.Button bttnTest;
+        private System.Windows.Forms.Panel plToolData;
     }
 }

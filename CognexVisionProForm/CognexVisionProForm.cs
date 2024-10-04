@@ -193,7 +193,7 @@ namespace CognexVisionProForm
                 {
                     if (CameraAcqArray[i].Connected || CameraAcqArray[i].ArchiveImageActive)
                     {
-                        LoadForm(allPanels[cameraConnectCount], cameraControl[i]);
+                        Utilities.LoadForm(allPanels[cameraConnectCount], cameraControl[i]);
                         cameraConnectCount++;
                     }
                 }

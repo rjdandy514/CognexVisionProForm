@@ -179,12 +179,14 @@ namespace CognexVisionProForm
 
 
             // Display message if tool failed
-            if (!tool.Result ||( preProcess.ToolReady && !preProcess.Result))
+            if (!tool.Result || (preProcess.ToolReady && !preProcess.Result))
             {
-                if (!toolFailedDisplay.Visible) { toolFailedDisplay.ShowDialog(); }
-                else { toolFailedDisplay.UpdateResultData(); }
+                Utilities.LoadForm(plToolData, toolFailedDisplay);
+                plToolData.Visible = true;
+                resizeToolData();
+                toolFailedDisplay.UpdateResultData();
             }
-            
+
             updateDisplayRequest = false;
         }
         public void UpdateImageRecord()
@@ -300,12 +302,29 @@ namespace CognexVisionProForm
 
         private void bttnGetToolData_Click(object sender, EventArgs e)
         {
-            toolFailedDisplay.ShowDialog();
+
+            if (!plToolData.Visible)
+            {
+                resizeToolData();
+                toolFailedDisplay.UpdateResultData();
+            }
+            plToolData.Visible = !plToolData.Visible;
+
+
         }
 
         private void bttnTest_Click(object sender, EventArgs e)
         {
             camera.Trigger = !camera.Trigger;
+            
+        }
+
+        private void resizeToolData()
+        {
+            plToolData.Left = 5;
+            plToolData.Top = 5;
+            plToolData.Width = this.plControl.Left - 5;
+            plToolData.Height = this.Height - 5;
         }
     }
 }

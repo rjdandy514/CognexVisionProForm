@@ -17,6 +17,7 @@ namespace CognexVisionProForm
     public partial class ShowResultData : Form
     {
         CameraControl cameraData;
+
         public ShowResultData(CameraControl Sender)
         {
             cameraData = Sender;
@@ -31,20 +32,12 @@ namespace CognexVisionProForm
         public void UpdateResultData()
         {
 
-
+            int boxWidth = 50;
 
             this.Text = cameraData.Camera.Name + " Tool Data";
 
             Control control = (Control)cameraData;
             Point cameraDataLocation = control.PointToScreen(cameraData.Location);
-
-
-            this.Left = cameraDataLocation.X + 5;
-            this.Top = cameraDataLocation.Y + 5;
-
-            this.Width = cameraData.Width - 10;
-            this.Height = cameraData.Height - 10;
-
 
             lPrepocessResult.Left = 5;
             lProcessMessage.Left = 5;
@@ -58,21 +51,21 @@ namespace CognexVisionProForm
 
             //Update information for Preprocess
             lbPreprocessResultdata.Top = lPrepocessResult.Bottom + 5;
-
             setupResults(lbPreprocessResultdata, cameraData.PreProcess);
+            lbPreprocessResultdata.Width = this.Width - boxWidth;
 
             lProcessMessage.Top = lbPreprocessResultdata.Bottom + 10;
 
+            tbPreprocessMessage.Top = lProcessMessage.Bottom + 5;
             setupMessages(tbPreprocessMessage, cameraData.PreProcess);
-
-
+            
 
             //Update information for selected tool
             lToolBlockResult.Top = tbPreprocessMessage.Bottom + 10;
+            
             lbToolResultData.Top = lToolBlockResult.Bottom + 5;
-
+            lbToolResultData.Width = this.Width - boxWidth;
             setupResults(lbToolResultData, cameraData.Tool);
-
             lbToolResultData.Height = lbToolResultData.PreferredHeight;
 
 
@@ -88,6 +81,7 @@ namespace CognexVisionProForm
             lbPreprocessInput.Top = lPreprocessInput.Bottom + 5;
 
             setupIO(lbPreprocessInput, cameraData.PreProcess.Inputs);
+            lbPreprocessInput.Width = this.Width - boxWidth;
             lbPreprocessInput.Height = lbPreprocessInput.PreferredHeight;
 
             //
@@ -97,6 +91,7 @@ namespace CognexVisionProForm
             lbPreprocessOutput.Top = lPreprocessOutput.Bottom + 5;
 
             setupIO(lbPreprocessOutput, cameraData.PreProcess.Outputs);
+            lbPreprocessOutput.Width = this.Width - boxWidth;
             lbPreprocessOutput.Height = lbPreprocessOutput.PreferredHeight;
             //
             // Tool Block Input
@@ -105,6 +100,7 @@ namespace CognexVisionProForm
             lbToolBlockInput.Top = lToolBlockInput.Bottom + 5;
 
             setupIO(lbToolBlockInput, cameraData.Tool.Inputs);
+            lbToolBlockInput.Width = this.Width - boxWidth;
 
             //
             // Tool Block Output
@@ -113,10 +109,7 @@ namespace CognexVisionProForm
             lbToolBlockOutput.Top = lToolBlockOutput.Bottom + 5;
 
             setupIO(lbToolBlockOutput, cameraData.Tool.Outputs);
-
-            this.Width = this.PreferredSize.Width;
-
-
+            lbToolBlockOutput.Width = this.Width - boxWidth;
         }
 
         public void setupResults(ListBox box, ToolBlock tool)
@@ -129,6 +122,7 @@ namespace CognexVisionProForm
                 box.Items.Add($"TotalTime - {tool.toolBlock.RunStatus.TotalTime.ToString()}");
             }
             box.Height = box.PreferredHeight;
+            box.Update();
         }
         public void setupMessages(RichTextBox box, ToolBlock tool)
         {
@@ -146,10 +140,10 @@ namespace CognexVisionProForm
             box.Clear();
 
             if (tool.Result) { box.Text = "No Messages"; }
-            else
+            else if(tool.ToolReady)
             {
                 stringIndex = 0;
-                stringLength = box.Width / box.Font.Height;
+                stringLength = box.Width / (box.Font.Height/2);
                 initialMessage = tool.toolBlock.RunStatus.Message;
                 stringSplit = new string[1 + (initialMessage.Length / stringLength)];
 
@@ -170,7 +164,7 @@ namespace CognexVisionProForm
             }
 
             box.Height = box.PreferredSize.Height;
-            box.Width = box.PreferredSize.Width;
+            box.Update();
         }
         public void setupIO(ListBox box, CogToolBlockTerminalCollection data)
         {
@@ -179,8 +173,7 @@ namespace CognexVisionProForm
 
             box.Left = 5;
             box.Items.Clear();
-
-            for (int i = 0; i < data.Count; i++)
+                for (int i = 0; i < data.Count; i++)
             {
 
                 toolBlockOutputString = data[i].Name;
@@ -195,6 +188,7 @@ namespace CognexVisionProForm
             }
 
             box.Height = box.PreferredHeight;
+            box.Update();
         }
     }
 }

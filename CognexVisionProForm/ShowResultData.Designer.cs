@@ -196,6 +196,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoScroll = true;
             this.ClientSize = new System.Drawing.Size(729, 685);
+            this.ControlBox = false;
             this.Controls.Add(this.lToolBlockOutput);
             this.Controls.Add(this.lbToolBlockOutput);
             this.Controls.Add(this.lToolBlockInput);
