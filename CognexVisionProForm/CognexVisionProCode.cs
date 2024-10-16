@@ -735,6 +735,19 @@ namespace CognexVisionProForm
 
             }
         }
+        public static bool CloseCancel()
+        {
+            const string message = "Are you sure that you would like to Close the Vision Application?";
+            const string caption = "Close Vision Application";
+            var result = MessageBox.Show(message, caption,
+                                         MessageBoxButtons.YesNo,
+                                         MessageBoxIcon.Question);
+
+            if (result == DialogResult.Yes)
+                return true;
+            else
+                return false;
+        }
         public void ComputerSetup()
         {
             string OP15_IP = "10.10.30.87";
@@ -755,7 +768,7 @@ namespace CognexVisionProForm
             {
                 computerName = "OP45/55 Computer";
                 cameraCount = 2;
-                toolCount = 8;
+                toolCount = 9;
                 preProcessRequired = true;
             }
             else if (iP == OP70_IP)

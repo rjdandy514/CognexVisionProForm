@@ -160,6 +160,12 @@ namespace CognexVisionProForm
         }
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
+            if (CloseCancel() == false)
+            {
+                e.Cancel = true;
+                return;
+            }
+
             SaveSettings();
 
             for (int j = 0; j < cameraCount; j++)

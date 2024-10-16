@@ -213,7 +213,10 @@
             this.Controls.Add(this.lToolBlockResult);
             this.Controls.Add(this.lbToolResultData);
             this.Controls.Add(this.tbToolMessage);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "ShowResultData";
+            this.ShowIcon = false;
+            this.ShowInTaskbar = false;
             this.Text = "x";
             this.Load += new System.EventHandler(this.ShowResultData_Load);
             this.ResumeLayout(false);

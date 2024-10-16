@@ -121,6 +121,10 @@ namespace CognexVisionProForm
                 if (camera.LimitReached) { bttnCameraLog.Text = "Log Images - Full"; }
                 else { bttnCameraLog.Text = "Log Images"; }
             }
+
+            if (plToolData.Visible) { bttnGetToolData.Text = "Hide Tool Data"; }
+            else { bttnGetToolData.Text = "Show Tool Data"; }
+
         }
         private void CameraControl_Load(object sender, EventArgs e)
         {
@@ -325,6 +329,7 @@ namespace CognexVisionProForm
             plToolData.Top = 5;
             plToolData.Width = this.plControl.Left - 5;
             plToolData.Height = this.Height - 5;
+            
         }
     }
 }
