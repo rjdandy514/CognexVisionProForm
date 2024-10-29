@@ -340,7 +340,7 @@
             this.recordDisplay.MouseWheelSensitivity = 1D;
             this.recordDisplay.Name = "recordDisplay";
             this.recordDisplay.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("recordDisplay.OcxState")));
-            this.recordDisplay.Size = new System.Drawing.Size(307, 293);
+            this.recordDisplay.Size = new System.Drawing.Size(62, 70);
             this.recordDisplay.TabIndex = 19;
             // 
             // lbRecordName
@@ -355,9 +355,9 @@
             // 
             // plToolData
             // 
-            this.plToolData.Location = new System.Drawing.Point(289, 345);
+            this.plToolData.Location = new System.Drawing.Point(5, 83);
             this.plToolData.Name = "plToolData";
-            this.plToolData.Size = new System.Drawing.Size(174, 169);
+            this.plToolData.Size = new System.Drawing.Size(43, 46);
             this.plToolData.TabIndex = 41;
             // 
             // CameraControl

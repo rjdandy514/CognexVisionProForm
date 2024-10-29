@@ -1,4 +1,5 @@
 ﻿using Cognex.VisionPro;
+using Cognex.VisionPro.Exceptions;
 using Cognex.VisionPro.ToolBlock;
 using System;
 using System.Collections.Generic;
@@ -17,6 +18,15 @@ namespace CognexVisionProForm
     public partial class ShowResultData : Form
     {
         CameraControl cameraData;
+        bool autoDisplayShow;
+        bool loaded;
+        public bool AutoDisplayShow
+        {
+            get { return autoDisplayShow; }
+        }
+        public bool Loaded
+        { get { return loaded; } }
+          
 
         public ShowResultData(CameraControl Sender)
         {
@@ -26,6 +36,7 @@ namespace CognexVisionProForm
 
         private void ShowResultData_Load(object sender, EventArgs e)
         {
+            loaded = true;
             UpdateResultData();
         }
 
@@ -48,6 +59,8 @@ namespace CognexVisionProForm
             lToolBlockMessage.Left = 5;
             lToolBlockInput.Left = 5;
             lToolBlockOutput.Left = 5;
+
+
 
             //Update information for Preprocess
             lbPreprocessResultdata.Top = lPrepocessResult.Bottom + 5;
@@ -137,6 +150,7 @@ namespace CognexVisionProForm
             box.Enabled = true;
             box.ReadOnly = true;
             box.Width = this.Width - 50;
+            if (box.Width == 0) { return; }
             box.Clear();
 
             if (tool.Result) { box.Text = "No Messages"; }
@@ -189,6 +203,12 @@ namespace CognexVisionProForm
 
             box.Height = box.PreferredHeight;
             box.Update();
+        }
+
+        private void cbAutoDisplay_CheckedChanged(object sender, EventArgs e)
+        {
+
+            autoDisplayShow = cbAutoDisplay.Checked;
         }
     }
 }

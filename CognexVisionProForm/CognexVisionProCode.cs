@@ -222,7 +222,7 @@ namespace CognexVisionProForm
             toolTrigger[i] = false;
             toolTriggerComplete[i] = false;
             CameraAcqArray[i].AbortTrigger = true;
-            CameraAcqArray[i].AbortTrigger = false;
+            //CameraAcqArray[i].AbortTrigger = false;
             CameraUpdate();
         }
         public void CameraUpdate()
@@ -287,7 +287,6 @@ namespace CognexVisionProForm
 
                     if (preProcess[j].ToolReady && preProcessRequired)
                     {
-                        preProcess[j].Inputs[1].Value = 2;
                         preProcess[j].ToolRun(CameraAcqArray[j].Image as CogImage8Grey);
                         
                         processedImage = preProcess[j].Outputs[0].Value as CogImage8Grey;
@@ -776,7 +775,7 @@ namespace CognexVisionProForm
                 computerName = "OP70 Computer";
                 cameraCount = 6;
                 toolCount = 4;
-                preProcessRequired = false;
+                preProcessRequired = true;
             }
             else if (iP == OP90_IP)
             {

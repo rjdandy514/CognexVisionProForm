@@ -69,6 +69,10 @@ namespace CognexVisionProForm
 
             }
         }
+        public bool AutoDisplay
+        {
+            get;set;
+        }
         public CameraControl(CognexVisionProForm Sender, DalsaImage Camera)
         {
             _form = new CognexVisionProForm();
@@ -125,6 +129,17 @@ namespace CognexVisionProForm
             if (plToolData.Visible) { bttnGetToolData.Text = "Hide Tool Data"; }
             else { bttnGetToolData.Text = "Show Tool Data"; }
 
+            if (tool == null)
+            {
+                numRecordSelect.Visible = false;
+                bttnGetToolData.Visible = false;
+            }
+            else
+            {
+                numRecordSelect.Visible = true;
+                bttnGetToolData.Visible = true;
+            }
+
         }
         private void CameraControl_Load(object sender, EventArgs e)
         {
@@ -153,6 +168,7 @@ namespace CognexVisionProForm
             camera.TriggerGrab = false;
             camera.Trigger = false;
             _form.CameraAbort(camera.Id);
+            Camera.AbortTrigger = false;
             
         }
         private void bttnCameraLog_Click(object sender, EventArgs e)
@@ -181,14 +197,20 @@ namespace CognexVisionProForm
             cbResultsUpdated.Checked = tool.ResultUpdated;
             UpdateImageRecord();
 
-
             // Display message if tool failed
-            if (!tool.Result || (preProcess.ToolReady && !preProcess.Result))
+            if ((!tool.Result || (preProcess.ToolReady && !preProcess.Result)) && WindowState != FormWindowState.Minimized && toolFailedDisplay.AutoDisplayShow)
             {
-                Utilities.LoadForm(plToolData, toolFailedDisplay);
-                plToolData.Visible = true;
                 resizeToolData();
-                toolFailedDisplay.UpdateResultData();
+
+                if (toolFailedDisplay.Loaded)
+                {
+                    Utilities.LoadForm(plToolData, toolFailedDisplay);
+                    plToolData.Visible = true;
+                }
+                else
+                {
+                    toolFailedDisplay.UpdateResultData();
+                }
             }
 
             updateDisplayRequest = false;
@@ -229,45 +251,22 @@ namespace CognexVisionProForm
                 BeginInvoke(new Set_UpdateImage(UpdateImage));
                 return;
             }
-
-            double zoomRequired = 0;
-            double zoomWidth;
-            double zoomHeight;
-            int reqHeight;
-            int reqWidth;
            
             image = camera.Image;
-
-            if (image == null) 
-            { 
-                return; 
-            }
+            if (image == null) { return; }
+            //Do not try to resize if App is Minimized
+            if (_form.WindowState == FormWindowState.Minimized) { return; }
 
             recordDisplay.Image = image;
             //*********************************************
-            //determine the zoom factor to use full window
             //update cogdisplay
             //*********************************************
             int cogWidth = plControl.Location.X - recordDisplay.Location.X - 5;
             int cogHeight = this.Size.Height - 10;
 
-            //Do not try to resize if App is Minimized
-            if (_form.WindowState == FormWindowState.Minimized) { return; }
-            
-            //determine the correct zoom factor to fill Window
-            zoomWidth = Convert.ToDouble(cogWidth) / Convert.ToDouble(image.Width);
-            zoomHeight = Convert.ToDouble(cogHeight) / Convert.ToDouble(image.Height);
-            if (zoomWidth < zoomHeight) { zoomRequired = zoomWidth; }
-            else{ zoomRequired = zoomHeight; }
+            recordDisplay.Width = cogWidth;
+            recordDisplay.Height = cogHeight;
 
-            //Update Display Width and Height - if needed
-            reqWidth = Convert.ToInt16(Convert.ToDouble(image.Width) * zoomRequired);
-            reqHeight = Convert.ToInt16(Convert.ToDouble(image.Height) * zoomRequired);
-            if(recordDisplay.Width != reqWidth && recordDisplay.Height != reqHeight)
-            {
-                recordDisplay.Width = Convert.ToInt16(Convert.ToDouble(image.Width) * zoomRequired);
-                recordDisplay.Height = Convert.ToInt16(Convert.ToDouble(image.Height) * zoomRequired);
-            }
             // Fit Image to Display
             recordDisplay.Fit();
         }
@@ -306,20 +305,29 @@ namespace CognexVisionProForm
 
         private void bttnGetToolData_Click(object sender, EventArgs e)
         {
-
-            if (!plToolData.Visible)
+            try
             {
-                resizeToolData();
-                toolFailedDisplay.UpdateResultData();
+                if (!plToolData.Visible && tool.ToolReady)
+                {
+                    Utilities.LoadForm(plToolData, toolFailedDisplay);
+                    resizeToolData();
+                    toolFailedDisplay.UpdateResultData();
+                }
+                plToolData.Visible = !plToolData.Visible;
             }
-            plToolData.Visible = !plToolData.Visible;
+            catch 
+            { 
+            }
+            
 
 
         }
 
         private void bttnTest_Click(object sender, EventArgs e)
         {
-            camera.Trigger = !camera.Trigger;
+            //camera.Trigger = !camera.Trigger;
+
+            camera.CheckLineScanFeatures();
             
         }
 

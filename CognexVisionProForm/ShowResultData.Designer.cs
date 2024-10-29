@@ -44,6 +44,7 @@
             this.lbToolBlockOutput = new System.Windows.Forms.ListBox();
             this.lToolBlockInput = new System.Windows.Forms.Label();
             this.lbToolBlockInput = new System.Windows.Forms.ListBox();
+            this.cbAutoDisplay = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // tbToolMessage
@@ -190,6 +191,17 @@
             this.lbToolBlockInput.Size = new System.Drawing.Size(453, 43);
             this.lbToolBlockInput.TabIndex = 48;
             // 
+            // cbAutoDisplay
+            // 
+            this.cbAutoDisplay.AutoSize = true;
+            this.cbAutoDisplay.Location = new System.Drawing.Point(190, 16);
+            this.cbAutoDisplay.Name = "cbAutoDisplay";
+            this.cbAutoDisplay.Size = new System.Drawing.Size(94, 17);
+            this.cbAutoDisplay.TabIndex = 52;
+            this.cbAutoDisplay.Text = "cbAutoDisplay";
+            this.cbAutoDisplay.UseVisualStyleBackColor = true;
+            this.cbAutoDisplay.CheckedChanged += new System.EventHandler(this.cbAutoDisplay_CheckedChanged);
+            // 
             // ShowResultData
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -197,6 +209,7 @@
             this.AutoScroll = true;
             this.ClientSize = new System.Drawing.Size(729, 685);
             this.ControlBox = false;
+            this.Controls.Add(this.cbAutoDisplay);
             this.Controls.Add(this.lToolBlockOutput);
             this.Controls.Add(this.lbToolBlockOutput);
             this.Controls.Add(this.lToolBlockInput);
@@ -242,5 +255,6 @@
         private System.Windows.Forms.ListBox lbToolBlockOutput;
         private System.Windows.Forms.Label lToolBlockInput;
         private System.Windows.Forms.ListBox lbToolBlockInput;
+        private System.Windows.Forms.CheckBox cbAutoDisplay;
     }
 }

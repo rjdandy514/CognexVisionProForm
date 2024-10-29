@@ -196,7 +196,6 @@ public class DalsaImage
         set
         {
             abort = value;
-            AbortTriggerAck = abort;
             if (abort && !abortMem)
             {
                 Abort();
@@ -206,7 +205,11 @@ public class DalsaImage
     }
     public bool AbortTriggerAck
     {
-        get; set;
+        get
+        {
+            return abort;
+        }
+
     }
     public bool ConfigFilePresent
     {
@@ -399,6 +402,7 @@ public class DalsaImage
             ServerType = ServerCategory.ServerAcq;
 
             acquisition = new SapAcquisition(serverLocation, configFile);
+            
             acqDeviceData = new SapAcqDevice(serverLocation, "");
 
             if (acq0SupportSG)
@@ -460,6 +464,13 @@ public class DalsaImage
                 return;
             }
         }
+        bool prmResult = false;
+        //prmResult = acquisition.SetParameter(SapAcquisition.Prm.CROP_WIDTH, 5300, false);
+        //prmResult = acquisition.SetParameter(SapAcquisition.Prm.CROP_LEFT, 1400, false);
+        //prmResult = acquisition.SetParameter(SapAcquisition.Prm.FLIP,SapAcquisition.Val.FLIP_HORZ,true);
+
+
+
         if (acqDevice != null && !acqDevice.Initialized)
         {
             
@@ -777,6 +788,9 @@ public class DalsaImage
         string triggerMode = "TriggerMode";
         string userSetSave = "UserSetSave";
 
+        string width = "Width";
+        string offsetX = "OffsetX";
+
 
         if (deviceFeature == null) { deviceFeature = new SapFeature(serverLocation); }
         if (deviceFeature != null && !deviceFeature.Initialized) { deviceFeature.Create(); }
@@ -814,9 +828,10 @@ public class DalsaImage
             //Set TriggerMode to External
             //Save Values to UserSet1
             setFeatureValueResult = acqDeviceData.SetFeatureValue(triggerMode, 1);
-            setFeatureValueResult = acqDeviceData.SetFeatureValue(userSetSave, true);
+            
         }
 
+        acquisition.SaveParameters(ConfigFile);
     }
     public void CheckAreaCameraFeatures()
     {
