@@ -83,8 +83,9 @@ public class DalsaImage
 
     bool limitReached = false;
 
-    string cameraName;
+    int isMaster;
 
+    string cameraName;
 
     CognexVisionProForm.CognexVisionProForm form = new CognexVisionProForm.CognexVisionProForm();
     public DalsaImage(CognexVisionProForm.CognexVisionProForm Form)
@@ -103,7 +104,6 @@ public class DalsaImage
             return acqTime;
         }
     }
-
     public string ConfigFile
     {
         get; set;
@@ -240,8 +240,14 @@ public class DalsaImage
         get
         {
             int returnGetParm = 0;
-            bool returngetResult = acquisition.GetParameter(SapAcquisition.Prm.BOARD_SYNC_OUTPUT1_SOURCE, out returnGetParm);
-            return returnGetParm;
+
+            if (acquisition != null)
+            {
+                bool returngetResult = acquisition.GetParameter(SapAcquisition.Prm.BOARD_SYNC_OUTPUT1_SOURCE, out returnGetParm);
+                isMaster = returnGetParm;
+            }
+            else { isMaster = 0; }
+            return isMaster;
         }
     }
     public enum ServerCategory
@@ -581,6 +587,10 @@ public class DalsaImage
         grabbing = false;
         acquiring = false;
         ImageReady = true;
+
+        if (IsMaster == 1) { ToggleEncoderPhase(); }
+
+        form.SystemReset();
     }
     public void SaveImageBMP()
     {
@@ -742,7 +752,7 @@ public class DalsaImage
             return NewImage24Color;
         }
     }
-    public int EncoderPhase()
+    public int ToggleEncoderPhase()
     {
         bool getResult;
         bool setResult;
@@ -760,13 +770,20 @@ public class DalsaImage
 
         if (getResult && (returnGetParm == phaseA || returnGetParm == phaseB))
         {
-            if (returnGetParm == phaseA)
+            switch(returnGetParm)
             {
-                setResult = acquisition.SetParameter(SapAcquisition.Prm.EXT_LINE_TRIGGER_SOURCE, phaseB, true);
-            }
-            if (returnGetParm == phaseB)
-            {
-                setResult = acquisition.SetParameter(SapAcquisition.Prm.EXT_LINE_TRIGGER_SOURCE, phaseA, true);
+                case 1:
+                    setResult = acquisition.SetParameter(SapAcquisition.Prm.EXT_LINE_TRIGGER_SOURCE, phaseB, true);
+                    break;
+
+                case 2:
+                    setResult = acquisition.SetParameter(SapAcquisition.Prm.EXT_LINE_TRIGGER_SOURCE, phaseA, true);
+                    break;
+
+                default:
+                    setResult = acquisition.SetParameter(SapAcquisition.Prm.EXT_LINE_TRIGGER_SOURCE, phaseB, true);
+                    break;
+
             }
         }
         
@@ -787,9 +804,6 @@ public class DalsaImage
         string userSetLoad = "UserSetLoad";
         string triggerMode = "TriggerMode";
         string userSetSave = "UserSetSave";
-
-        string width = "Width";
-        string offsetX = "OffsetX";
 
 
         if (deviceFeature == null) { deviceFeature = new SapFeature(serverLocation); }

@@ -225,6 +225,13 @@ namespace CognexVisionProForm
             //CameraAcqArray[i].AbortTrigger = false;
             CameraUpdate();
         }
+        public void SystemReset()
+        {
+            Array.Clear(toolTrigger, 0, toolTrigger.Length);
+            Array.Clear(toolTriggerComplete, 0, toolTriggerComplete.Length);
+            Array.Clear(cameraSnap, 0, cameraSnap.Length);
+            Array.Clear(cameraSnapComplete, 0, cameraSnapComplete.Length);
+        }
         public void CameraUpdate()
         {
             // Run ToolBlocks that are enabled
@@ -281,25 +288,24 @@ namespace CognexVisionProForm
             for (int j = 0; j < cameraCount; j++)
             {
 
-                if (!toolTrigger[j] && cameraSnapComplete[j] && toolblockArray[j, desiredTool[j]].ToolReady)
+                if (cameraSnapComplete[j] && preProcess[j].ToolReady && preProcessRequired)
                 {
-                    toolTrigger[j] = true;
-
-                    if (preProcess[j].ToolReady && preProcessRequired)
-                    {
-                        preProcess[j].ToolRun(CameraAcqArray[j].Image as CogImage8Grey);
-                        
-                        processedImage = preProcess[j].Outputs[0].Value as CogImage8Grey;
-                    }
-                    else { processedImage = CameraAcqArray[j].Image as CogImage8Grey; }
-
-                    CogImage8Grey tempImage = toolblockArray[j, desiredTool[j]].toolBlock.Inputs[0].Value as CogImage8Grey;
-
-                    toolblockArray[j, desiredTool[j]].ToolRun(processedImage as CogImage8Grey);
-
-
+                    preProcess[j].ToolRun(CameraAcqArray[j].Image as CogImage8Grey);
                 }
             }
+
+            for(int i = 0; i < cameraCount;i++)
+            {
+                if (preProcessRequired) { processedImage = preProcess[i].Outputs[0].Value as CogImage8Grey; }
+                else { processedImage = CameraAcqArray[i].Image as CogImage8Grey; }
+
+                if (!toolTrigger[i] && cameraSnapComplete[i] && toolblockArray[i, desiredTool[i]].ToolReady)
+                {
+                    toolTrigger[i] = true;
+                    toolblockArray[i, desiredTool[i]].ToolRun(processedImage as CogImage8Grey);
+                }
+            }
+            
             Array.Clear(cameraSnap, 0, cameraSnap.Length);
             Array.Clear(cameraSnapComplete,0, cameraSnapComplete.Length);
 
@@ -322,7 +328,6 @@ namespace CognexVisionProForm
                     {
                         cameraControl[i].PreProcess = preProcess[i];
                         cameraControl[i].Tool = toolblockArray[i, desiredTool[i]];
-                        cameraControl[i].UpdateImage();
                         cameraControl[i].UpdateDisplayRequest = true;
 
                     }
@@ -333,6 +338,15 @@ namespace CognexVisionProForm
             }
         }
         private delegate void Set_UpdateImageTab();
+        public void RetryToolBlock()
+        {
+            for(int i = 0; i< cameraCount;i++)
+            {
+                if (CameraAcqArray[i].Image != null) { cameraSnapComplete[i] = true; }
+            }
+
+            ToolBlockTrigger();
+        }
         public void UpdateFrameGrabberTab()
         {
             cbConfigFileFound.Checked = CameraAcqArray[selectedCameraId].ConfigFilePresent;

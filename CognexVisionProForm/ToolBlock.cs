@@ -108,6 +108,13 @@ namespace CognexVisionProForm
             get { return filePresent; }
             
         }
+        public bool Trigger
+        {
+            set
+            {
+
+            }
+        }
         public CogToolBlockTerminalCollection Outputs
         {
             get 
@@ -173,8 +180,6 @@ namespace CognexVisionProForm
             {
                 if (filePresent)
                 {
-
-                    
                     toolBlock = CogSerializer.LoadObjectFromFile(toolFile, typeof(System.Runtime.Serialization.Formatters.Binary.BinaryFormatter), 0) as CogToolBlock;
                     
                     toolBlock.Ran += new EventHandler(Subject_Ran);

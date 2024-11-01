@@ -12,6 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Cognex.VisionPro;
+using Cognex.VisionPro.Implementation;
 using Cognex.VisionPro.ToolBlock;
 
 namespace CognexVisionProForm
@@ -65,6 +66,7 @@ namespace CognexVisionProForm
             set 
             {
                 updateDisplayRequest = value;
+                BeginInvoke(new Set_UpdateImage(UpdateImage));
                 BeginInvoke(new Set_UpdateDisplay(UpdateToolDisplay));
 
             }
@@ -188,6 +190,7 @@ namespace CognexVisionProForm
             }
         }
         private delegate void Set_UpdateDisplay();
+        private delegate void Set_UpdateImage();
         public void UpdateToolDisplay()
         {
             lbToolName.Text = tool.Name;
@@ -207,10 +210,7 @@ namespace CognexVisionProForm
                     Utilities.LoadForm(plToolData, toolFailedDisplay);
                     plToolData.Visible = true;
                 }
-                else
-                {
-                    toolFailedDisplay.UpdateResultData();
-                }
+                else { toolFailedDisplay.UpdateResultData(); }
             }
 
             updateDisplayRequest = false;
@@ -234,16 +234,6 @@ namespace CognexVisionProForm
 
             }
         }
-        private void bttnCameraSnap_MouseUp(object sender, MouseEventArgs e)
-        {
-                camera.Trigger = false;
-        }
-        private void CameraControl_Resize(object sender, EventArgs e)
-        {
-            UpdateImage();
-        }
-        
-        private delegate void Set_UpdateImage();
         public void UpdateImage()
         {
             if (this.InvokeRequired)
@@ -251,7 +241,7 @@ namespace CognexVisionProForm
                 BeginInvoke(new Set_UpdateImage(UpdateImage));
                 return;
             }
-           
+
             image = camera.Image;
             if (image == null) { return; }
             //Do not try to resize if App is Minimized
@@ -270,7 +260,15 @@ namespace CognexVisionProForm
             // Fit Image to Display
             recordDisplay.Fit();
         }
-
+        private void bttnCameraSnap_MouseUp(object sender, MouseEventArgs e)
+        {
+                camera.Trigger = false;
+        }
+        private void CameraControl_Resize(object sender, EventArgs e)
+        {
+            plToolData.Visible = false;
+            UpdateImage();
+        }
         public void EnableCameraControl()
         {
             bttnCameraSnap.Enabled = true;
@@ -281,19 +279,15 @@ namespace CognexVisionProForm
             bttnCameraSnap.Enabled = false;
             bttnCameraAbort.Enabled = false;
         }
-
         private void numToolSelect_ValueChanged(object sender, EventArgs e)
         {
             toolSelect = Convert.ToInt32(numToolSelect.Value);
         }
-
         private void bttnGrab_Click(object sender, EventArgs e)
         {
             camera.TriggerGrab = true;
             UpdateButton();
         }
-
-        
         [DllImport("kernel32")]
         private static extern int GetPrivateProfileString(string section,string key, string def, StringBuilder retVal,int size, string filePath);
         private void numRecordSelect_ValueChanged(object sender, EventArgs e)
@@ -325,10 +319,9 @@ namespace CognexVisionProForm
 
         private void bttnTest_Click(object sender, EventArgs e)
         {
-            //camera.Trigger = !camera.Trigger;
 
-            camera.CheckLineScanFeatures();
-            
+            _form.RetryToolBlock();
+            //camera.Abort();
         }
 
         private void resizeToolData()
