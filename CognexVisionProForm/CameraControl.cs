@@ -169,8 +169,7 @@ namespace CognexVisionProForm
         {
             camera.TriggerGrab = false;
             camera.Trigger = false;
-            _form.CameraAbort(camera.Id);
-            Camera.AbortTrigger = false;
+            _form.CameraAbort();
             
         }
         private void bttnCameraLog_Click(object sender, EventArgs e)

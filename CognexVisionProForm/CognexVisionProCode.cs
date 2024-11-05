@@ -34,6 +34,7 @@ namespace CognexVisionProForm
         {
             set
             {
+                systemBusy = true;
                 cameraSnapComplete[value] = true;
                 CameraUpdate();
             }
@@ -215,15 +216,18 @@ namespace CognexVisionProForm
             }
             
         }
-        public void CameraAbort(int i)
+        public void CameraAbort()
         {
-            cameraSnap[i] = false;
-            cameraSnapComplete[i] = false;
-            toolTrigger[i] = false;
-            toolTriggerComplete[i] = false;
-            CameraAcqArray[i].AbortTrigger = true;
-            //CameraAcqArray[i].AbortTrigger = false;
-            CameraUpdate();
+            for(int i = 0; i < cameraCount;i++)
+            {
+                cameraSnap[i] = false;
+                cameraSnapComplete[i] = false;
+                toolTrigger[i] = false;
+                toolTriggerComplete[i] = false;
+                CameraAcqArray[i].Abort();
+            }
+            
+
         }
         public void SystemReset()
         {
@@ -290,7 +294,8 @@ namespace CognexVisionProForm
 
                 if (cameraSnapComplete[j] && preProcess[j].ToolReady && preProcessRequired)
                 {
-                    preProcess[j].ToolRun(CameraAcqArray[j].Image as CogImage8Grey);
+                    preProcess[j].Inputs[0].Value = CameraAcqArray[j].Image;
+                    preProcess[j].Run = true;
                 }
             }
 
@@ -302,7 +307,8 @@ namespace CognexVisionProForm
                 if (!toolTrigger[i] && cameraSnapComplete[i] && toolblockArray[i, desiredTool[i]].ToolReady)
                 {
                     toolTrigger[i] = true;
-                    toolblockArray[i, desiredTool[i]].ToolRun(processedImage as CogImage8Grey);
+                    toolblockArray[i, desiredTool[i]].Inputs[0].Value = processedImage;
+                    toolblockArray[i, desiredTool[i]].Run = true;
                 }
             }
             
@@ -319,8 +325,8 @@ namespace CognexVisionProForm
                 BeginInvoke(new Set_ToolBlockUpdate(ToolBlockUpdate));
                 return;
             }
-
-            if(toolTrigger.SequenceEqual(toolTriggerComplete))
+            bool toolComplete = toolTrigger.SequenceEqual(toolTriggerComplete) & !toolTriggerComplete.All(x => x == false);
+            if (toolComplete)
             {
                 for (int i = 0; i < cameraCount; i++)
                 {
@@ -530,9 +536,9 @@ namespace CognexVisionProForm
             index = 1;
             for (int cam = 0; cam < cameraCount; cam++)
             {
-                CameraAcqArray[cam].Trigger = (MainPLC.PlcToPcControl[index + cam] & (1 << 0)) != 0;
+                CameraAcqArray[cam].Trigger = true & ((MainPLC.PlcToPcControl[index + cam] & (1 << 0)) != 0);
                 
-                if((MainPLC.PlcToPcControl[index + cam] & (1 << 1)) != 0){ CameraAbort(cam); }
+                if((MainPLC.PlcToPcControl[index + cam] & (1 << 1)) != 0){ CameraAbort(); }
 
                 plcTool[cam] = MainPLC.PlcToPcControl[index + cam] >> 16;
 

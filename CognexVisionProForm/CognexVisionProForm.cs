@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Runtime.CompilerServices;
@@ -31,6 +32,7 @@ namespace CognexVisionProForm
         bool[] cameraSnapComplete;
         bool[] toolTrigger;
         bool[] toolTriggerComplete;
+        bool systemBusy;
         public CameraControl[] cameraControl;
 
         SplashScreen splashScreen;
@@ -70,8 +72,16 @@ namespace CognexVisionProForm
             pollingTimer.Stop();
 
             heartBeat = !heartBeat;
-
             cbHeartbeat.Checked = heartBeat;
+
+            bool systemIdle = true;
+            systemIdle &= toolTrigger.All(x => x == false);
+            systemIdle &= toolTriggerComplete.All(x => x == false);
+            systemIdle &= cameraSnap.All(x => x == false);
+            systemIdle &= cameraSnapComplete.All(x => x == false);
+
+            if (systemIdle) { systemBusy = false; }
+
 
             if (MainPLC.InitialCheck.Status == IPStatus.Success)
             {

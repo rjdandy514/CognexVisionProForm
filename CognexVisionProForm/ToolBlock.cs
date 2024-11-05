@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using Cognex.VisionPro.ToolBlock;
 using Cognex.VisionPro.QuickBuild.Implementation.Internal;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Threading.Tasks;
 
 
 namespace CognexVisionProForm
@@ -108,11 +109,11 @@ namespace CognexVisionProForm
             get { return filePresent; }
             
         }
-        public bool Trigger
+        public bool Run
         {
             set
             {
-
+                ToolRun();
             }
         }
         public CogToolBlockTerminalCollection Outputs
@@ -205,25 +206,21 @@ namespace CognexVisionProForm
             }
             catch (Exception ex) { Utilities.LoggingStatment(ex.Message); }
         }
-        public void ToolRun(CogImage8Grey InputImage)
+        public void ToolRun()
         {
             toolReady = false;
-
             try
             {
-                toolBlock.Inputs[0].Value = InputImage;
-
                 if (toolBlock.Inputs.Count > 1)
                 {
-
-                    for (int i = 1; i < toolBlock.Inputs.Count; i++)
+                    for (int i = 0; i < toolBlock.Inputs.Count; i++)
                     {
                         if (i >= inputs.Count) { break; }
                         toolBlock.Inputs[i].Value = inputs[i].Value;
                         Utilities.LoggingStatment($"{toolName}: input # {i} = {toolBlock.Inputs[i].Value}");
                     }                   
                 }
-                                   
+
                 toolBlock.Run();
                 Utilities.LoggingStatment($"{toolName}: Job Triggered");
             }
