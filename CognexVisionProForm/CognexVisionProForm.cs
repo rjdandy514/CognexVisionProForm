@@ -73,16 +73,7 @@ namespace CognexVisionProForm
             pollingTimer.Stop();
 
             heartBeat = !heartBeat;
-            cbHeartbeat.Checked = heartBeat;
-
-            bool systemIdle = true;
-            systemIdle &= toolTrigger.All(x => x == false);
-            systemIdle &= toolTriggerComplete.All(x => x == false);
-            systemIdle &= cameraSnap.All(x => x == false);
-            systemIdle &= cameraSnapComplete.All(x => x == false);
-
-            if (systemIdle) { systemBusy = false; }
-
+            cbHeartbeat.Checked = systemIdle;
 
             if (MainPLC.InitialCheck.Status == IPStatus.Success)
             {

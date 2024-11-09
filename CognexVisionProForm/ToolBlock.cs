@@ -225,9 +225,11 @@ namespace CognexVisionProForm
                 }
 
                 toolBlock.Run();
+
                 Utilities.LoggingStatment($"{toolName}: Job Triggered");
 
         }
+
         void Subject_Ran(object sender, EventArgs e)
         {
             GetInfoFromTool();
@@ -248,7 +250,6 @@ namespace CognexVisionProForm
 
             toolReady = true;
             resultUpdated = !resultUpdated; //Toggle Value
-            if (Preprocess){ form.ToolBlockRunComplete = CameraId; }
             
 
             Utilities.LoggingStatment($"{toolName}: Number of Outputs - {toolOutputCount}");

@@ -38,13 +38,6 @@ namespace CognexVisionProForm
                 CameraUpdate();
             }
         }
-        public int ToolBlockRunComplete
-        {
-            set
-            {
-                toolTrigger[value] = false;
-            }
-        }
         public bool PlcCommsActive
         {
             get;set;
@@ -281,18 +274,17 @@ namespace CognexVisionProForm
                 cameraControl[cam].Tool = toolblockArray[cam, desiredTool[cam]];
 
         }
-
         public void ToolBlockTrigger()
         {
             CogImage8Grey processedImage;
 
             for (int j = 0; j < cameraCount; j++)
             {
-
                 if (cameraSnapComplete[j] && preProcess[j].ToolReady && preProcessRequired)
                 {
+                    toolTrigger[j] = true;
                     preProcess[j].Inputs[0].Value = CameraAcqArray[j].Image;
-                    preProcess[j].Run = true;
+                    preProcess[j].ToolRun();
                 }
             }
 
@@ -301,11 +293,11 @@ namespace CognexVisionProForm
                 if (preProcessRequired) { processedImage = preProcess[i].Outputs[0].Value as CogImage8Grey; }
                 else { processedImage = CameraAcqArray[i].Image as CogImage8Grey; }
 
-                if (!toolTrigger[i] && cameraSnapComplete[i] && toolblockArray[i, desiredTool[i]].ToolReady)
+                if (toolTrigger[i] && cameraSnapComplete[i] && toolblockArray[i, desiredTool[i]].ToolReady)
                 {
-                    toolTrigger[i] = true;
                     toolblockArray[i, desiredTool[i]].Inputs[0].Value = processedImage;
                     toolblockArray[i, desiredTool[i]].ToolRun();
+                    toolTrigger[i] = false;
                 }
             }
             Array.Clear(cameraSnap, 0, cameraSnap.Length);
