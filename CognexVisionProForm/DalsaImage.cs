@@ -152,6 +152,7 @@ public class DalsaImage
 
             if(trigger && !triggerMem)
             {
+                ImageReady = false;
                 if (Connected)
                 {
                     SnapPicture();
@@ -529,7 +530,6 @@ public class DalsaImage
     }
     public void SnapPicture()
     {
-        ImageReady = false;
         acqTimeWatch.Restart();
 
         if (acqDeviceXfer != null && acqDeviceXfer.Connected)
