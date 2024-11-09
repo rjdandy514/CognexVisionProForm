@@ -27,6 +27,7 @@ namespace CognexVisionProForm
         public ICogRecord record;
         private int toolSelect = 0;
         private bool updateDisplayRequest;
+        private bool Result_Update_Mem;
         private System.Windows.Forms.Timer pollingTimer;
         ShowResultData toolFailedDisplay;
         public DalsaImage Camera
@@ -66,8 +67,8 @@ namespace CognexVisionProForm
             set 
             {
                 updateDisplayRequest = value;
-                BeginInvoke(new Set_UpdateImage(UpdateImage));
-                BeginInvoke(new Set_UpdateDisplay(UpdateToolDisplay));
+                //BeginInvoke(new Set_UpdateImage(UpdateImage));
+                //BeginInvoke(new Set_UpdateDisplay(UpdateToolDisplay));
 
             }
         }
@@ -89,13 +90,22 @@ namespace CognexVisionProForm
         private void pollingTimer_Tick(object sender, EventArgs e)
         {
             pollingTimer.Stop();
-
+            
             cbCameraConnected.Checked = camera.Connected;
             cbTrigger.Checked = camera.Trigger;
             cbArchiveImageActive.Checked = camera.ArchiveImageActive;
             cbImageReady.Checked = camera.ImageReady;
             numToolSelect.Value = toolSelect;
             UpdateButton();
+
+            if(tool.ResultUpdated != Result_Update_Mem)
+            {
+                UpdateImage();
+                UpdateToolDisplay();
+                UpdateImageRecord();
+                Result_Update_Mem = tool.ResultUpdated;
+            }
+      
             pollingTimer.Start();
         }
         private void UpdateButton()
@@ -197,7 +207,7 @@ namespace CognexVisionProForm
             lbToolRunTime.Text = $"Tool Time: {tool.RunStatus.TotalTime} ms";
             cbToolPassed.Checked = tool.Result;
             cbResultsUpdated.Checked = tool.ResultUpdated;
-            UpdateImageRecord();
+            
 
             // Display message if tool failed
             if ((!tool.Result || (preProcess.ToolReady && !preProcess.Result)) && WindowState != FormWindowState.Minimized && toolFailedDisplay.AutoDisplayShow)
@@ -281,6 +291,7 @@ namespace CognexVisionProForm
         private void numToolSelect_ValueChanged(object sender, EventArgs e)
         {
             toolSelect = Convert.ToInt32(numToolSelect.Value);
+            _form.ToolNumberUpdate(camera.Id);
         }
         private void bttnGrab_Click(object sender, EventArgs e)
         {

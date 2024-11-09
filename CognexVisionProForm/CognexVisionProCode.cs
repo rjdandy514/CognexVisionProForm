@@ -27,7 +27,6 @@ namespace CognexVisionProForm
             set
             {
                 cameraSnap[value] = true;
-                ToolNumberUpdate(value);
             }
         }
         public int CameraSnapComplete
@@ -43,8 +42,7 @@ namespace CognexVisionProForm
         {
             set
             {
-                toolTriggerComplete[value] = true;
-                BeginInvoke(new Set_ToolBlockUpdate(ToolBlockUpdate));
+                toolTrigger[value] = false;
             }
         }
         public bool PlcCommsActive
@@ -55,7 +53,7 @@ namespace CognexVisionProForm
         {
             pollingTimer = new Timer();
             pollingTimer.Tick += new EventHandler(pollingTimer_Tick);
-            pollingTimer.Interval = 200; // in miliseconds
+            pollingTimer.Interval = 50; // in miliseconds
 
 
             for (int j = 0; j < cameraCount; j++)
@@ -63,17 +61,23 @@ namespace CognexVisionProForm
                 splashScreen.UpdateProgress($"Initialize Camera {j}", 5);
                 CameraAcqArray[j] = new DalsaImage(this);
                 CameraAcqArray[j].Id = j;
-                cameraControl[j] = new CameraControl(this, CameraAcqArray[j]);
 
                 preProcess[j] = new ToolBlock(this);
                 preProcess[j].CameraId = j;
+                preProcess[j].Preprocess = true;
 
+                
 
                 for (int i = 0; i < toolCount; i++)
                 {
                     toolblockArray[j, i] = new ToolBlock(this);
                     toolblockArray[j, i].CameraId = j;
+                    toolblockArray[j, i].Preprocess = false;
                 }
+
+                cameraControl[j] = new CameraControl(this, CameraAcqArray[j]);
+                cameraControl[j].PreProcess = preProcess[j];
+                cameraControl[j].Tool = toolblockArray[j, 0];
             }
 
             MainPLC = new PlcComms(this);
@@ -242,49 +246,42 @@ namespace CognexVisionProForm
             if (cameraSnap.SequenceEqual(cameraSnapComplete)) 
             {
                 Array.Clear(toolTrigger, 0, toolTrigger.Length);
-                Array.Clear(toolTriggerComplete, 0, toolTriggerComplete.Length);
                 //if the cognex license is present, trigger Toolblock
                 if (cogLicenseOk) { ToolBlockTrigger(); }
-                else
-                {
-                    for (int i = 0; i < cameraCount; i++)
-                    {
-                        if (cameraSnapComplete[i])
-                        {
-                            cameraControl[i].UpdateDisplayRequest = true;
-                        }
-                    }
-                }
+
             }
 
         }
         public void ToolNumberUpdate(int cam)
         {
-                if (MainPLC.InitialCheck != null && MainPLC.InitialCheck.Status == IPStatus.Success && PlcCommsActive)
+            if (MainPLC.InitialCheck != null && MainPLC.InitialCheck.Status == IPStatus.Success && PlcCommsActive)
+            {
+                if (desiredTool[cam] == plcTool[cam]) { return; };
+                if (Enumerable.Range(0, toolCount).Contains(plcTool[cam]) && toolblockArray[cam, plcTool[cam]].ToolReady)
                 {
-                    if (Enumerable.Range(0, toolCount).Contains(plcTool[cam]))
-                    {
-                        desiredTool[cam] = plcTool[cam];
-                    }
-                    else { desiredTool[cam] = 0; }
+                    desiredTool[cam] = plcTool[cam];
+                }
+                else { desiredTool[cam] = 0; }
+            }
 
-                    cameraControl[cam].ToolSelect = desiredTool[cam];
+            else
+            {
+                if (desiredTool[cam] == cameraControl[cam].ToolSelect) { return; };
+                if (Enumerable.Range(0, toolCount).Contains(cameraControl[cam].ToolSelect) && toolblockArray[cam, cameraControl[cam].ToolSelect].ToolReady)
+                {
+                    desiredTool[cam] = cameraControl[cam].ToolSelect;
                 }
                 else
                 {
-                    if (Enumerable.Range(0, toolCount).Contains(cameraControl[cam].ToolSelect))
-                    {
-                        desiredTool[cam] = cameraControl[cam].ToolSelect;
-                    }
-                    else
-                    {
-                        cameraControl[cam].ToolSelect = 0;
-                        desiredTool[cam] = 0;
-                    }
+                    cameraControl[cam].ToolSelect = 0;
+                    desiredTool[cam] = 0;
                 }
+            }
+                toolblockArray[cam, desiredTool[cam]].ResultUpdated = false;
+                cameraControl[cam].Tool = toolblockArray[cam, desiredTool[cam]];
 
         }
-        
+
         public void ToolBlockTrigger()
         {
             CogImage8Grey processedImage;
@@ -308,42 +305,13 @@ namespace CognexVisionProForm
                 {
                     toolTrigger[i] = true;
                     toolblockArray[i, desiredTool[i]].Inputs[0].Value = processedImage;
-                    toolblockArray[i, desiredTool[i]].Run = true;
+                    toolblockArray[i, desiredTool[i]].ToolRun();
                 }
             }
-            
             Array.Clear(cameraSnap, 0, cameraSnap.Length);
             Array.Clear(cameraSnapComplete,0, cameraSnapComplete.Length);
 
         }
-        private delegate void Set_ToolBlockUpdate();
-        public void ToolBlockUpdate()
-        {
-            
-            if (this.InvokeRequired)
-            {
-                BeginInvoke(new Set_ToolBlockUpdate(ToolBlockUpdate));
-                return;
-            }
-            bool toolComplete = toolTrigger.SequenceEqual(toolTriggerComplete) & !toolTriggerComplete.All(x => x == false);
-            if (toolComplete)
-            {
-                for (int i = 0; i < cameraCount; i++)
-                {
-                    if (toolTriggerComplete[i])
-                    {
-                        cameraControl[i].PreProcess = preProcess[i];
-                        cameraControl[i].Tool = toolblockArray[i, desiredTool[i]];
-                        cameraControl[i].UpdateDisplayRequest = true;
-
-                    }
-                }
-
-                Array.Clear(toolTrigger,0, toolTrigger.Length);
-                Array.Clear(toolTriggerComplete,0, toolTriggerComplete.Length);
-            }
-        }
-        private delegate void Set_UpdateImageTab();
         public void RetryToolBlock()
         {
             for(int i = 0; i< cameraCount;i++)
@@ -532,17 +500,26 @@ namespace CognexVisionProForm
             int index = 0;
             PlcAutoMode = (MainPLC.PlcToPcControl[index] & (1 << 0)) != 0;
 
+            systemIdle = true;
+            systemIdle &= toolTrigger.All(x => x == false);
+            systemIdle &= toolTriggerComplete.All(x => x == false);
+            systemIdle &= cameraSnap.All(x => x == false);
+            systemIdle &= cameraSnapComplete.All(x => x == false);
+
             //CAMERA COMMANDS
             index = 1;
             for (int cam = 0; cam < cameraCount; cam++)
             {
-                CameraAcqArray[cam].Trigger = true & ((MainPLC.PlcToPcControl[index + cam] & (1 << 0)) != 0);
+                if (systemIdle)
+                {
+                    CameraAcqArray[cam].Trigger =((MainPLC.PlcToPcControl[index + cam] & (1 << 0)) != 0);
+                }
                 
                 if((MainPLC.PlcToPcControl[index + cam] & (1 << 1)) != 0){ CameraAbort(); }
 
                 plcTool[cam] = MainPLC.PlcToPcControl[index + cam] >> 16;
-
                 ToolNumberUpdate(cam);
+
             }
         }
         public void PlcReadData()
@@ -602,6 +579,7 @@ namespace CognexVisionProForm
             //Camera Status: info related to camera and general system         
             tempTag |= ((heartBeat ? 1 : 0 )<< 0);
             tempTag |= ((cogLicenseOk ? 1:0 ) << 1);
+            tempTag |= ((!systemIdle ? 1 : 0) << 2);
 
             MainPLC.PcToPlcStatus[index] = tempTag;
             index++;
@@ -624,17 +602,12 @@ namespace CognexVisionProForm
                 tempTag |= ((toolblockArray[cam, desiredTool[cam]].FilePresent ? 1 : 0) << 7);
                 tempTag |= ((CameraAcqArray[cam].Snapping ? 1 : 0) << 8);
                 tempTag |= ((CameraAcqArray[cam].Acquiring ? 1 : 0) << 9);
-                tempTag |= ((toolTrigger.All(x => x == false) ? 1 : 0) << 10);
-                tempTag |= ((toolTriggerComplete.All(x => x == false) ? 1 : 0) << 11);
-                tempTag |= ((cameraSnap.All(x => x == false) ? 1 : 0) << 12);
-                tempTag |= ((cameraSnapComplete.All(x => x == false) ? 1 : 0) << 13);
 
                 tempTag |= desiredTool[cam] << 16;
 
                 MainPLC.PcToPlcStatus[index] = tempTag;
                 index++;
             }
-            bool temp = Array.TrueForAll(toolTrigger, value => { return value; });
             
         }
         public void PlcWriteData()

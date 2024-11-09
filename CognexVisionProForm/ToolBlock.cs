@@ -75,6 +75,10 @@ namespace CognexVisionProForm
                 else { return false; }
             }
         }
+        public bool Preprocess
+        {
+            get;set;
+        }
         public ICogRunStatus RunStatus
         {
             get
@@ -209,8 +213,7 @@ namespace CognexVisionProForm
         public void ToolRun()
         {
             toolReady = false;
-            try
-            {
+
                 if (toolBlock.Inputs.Count > 1)
                 {
                     for (int i = 0; i < toolBlock.Inputs.Count; i++)
@@ -223,12 +226,6 @@ namespace CognexVisionProForm
 
                 toolBlock.Run();
                 Utilities.LoggingStatment($"{toolName}: Job Triggered");
-            }
-            catch (Exception ex) 
-            {
-                toolReady = true;
-                Utilities.LoggingStatment(ex.Message); 
-            }
 
         }
         void Subject_Ran(object sender, EventArgs e)
@@ -251,8 +248,8 @@ namespace CognexVisionProForm
 
             toolReady = true;
             resultUpdated = !resultUpdated; //Toggle Value
-            form.ToolBlockRunComplete = CameraId;
-
+            if (Preprocess){ form.ToolBlockRunComplete = CameraId; }
+            
 
             Utilities.LoggingStatment($"{toolName}: Number of Outputs - {toolOutputCount}");
             Utilities.LoggingStatment($"{toolName}: Toolblock completed Run");

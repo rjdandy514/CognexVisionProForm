@@ -23,6 +23,7 @@ namespace CognexVisionProForm
 
         private CogStringCollection LicenseCheck;
         private bool cogLicenseOk;
+        private bool systemIdle;
 
         int selectedCameraId;
         int cameraConnectCount;
