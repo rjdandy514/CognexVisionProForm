@@ -33,7 +33,6 @@ namespace CognexVisionProForm
         {
             set
             {
-                systemBusy = true;
                 cameraSnapComplete[value] = true;
                 CameraUpdate();
             }
@@ -220,7 +219,6 @@ namespace CognexVisionProForm
                 cameraSnap[i] = false;
                 cameraSnapComplete[i] = false;
                 toolTrigger[i] = false;
-                toolTriggerComplete[i] = false;
                 CameraAcqArray[i].Abort();
             }
             
@@ -283,6 +281,8 @@ namespace CognexVisionProForm
                 if (cameraSnapComplete[j] && preProcess[j].ToolReady && preProcessRequired)
                 {
                     toolTrigger[j] = true;
+                    cameraSnap[j] = false;
+                    cameraSnapComplete[j] = false;
                     preProcess[j].Inputs[0].Value = CameraAcqArray[j].Image;
                     preProcess[j].ToolRun();
                 }
@@ -293,15 +293,22 @@ namespace CognexVisionProForm
                 if (preProcessRequired) { processedImage = preProcess[i].Outputs[0].Value as CogImage8Grey; }
                 else { processedImage = CameraAcqArray[i].Image as CogImage8Grey; }
 
-                if (toolTrigger[i] && cameraSnapComplete[i] && toolblockArray[i, desiredTool[i]].ToolReady)
+                if (toolTrigger[i])
                 {
+                    if(!toolblockArray[i, desiredTool[i]].ToolReady)
+                    {
+                        MessageBox.Show("HELP");
+                    }
+
+
                     toolblockArray[i, desiredTool[i]].Inputs[0].Value = processedImage;
                     toolblockArray[i, desiredTool[i]].ToolRun();
                     toolTrigger[i] = false;
                 }
+
+
             }
             Array.Clear(cameraSnap, 0, cameraSnap.Length);
-            Array.Clear(cameraSnapComplete,0, cameraSnapComplete.Length);
 
         }
         public void RetryToolBlock()
@@ -494,7 +501,6 @@ namespace CognexVisionProForm
 
             systemIdle = true;
             systemIdle &= toolTrigger.All(x => x == false);
-            systemIdle &= toolTriggerComplete.All(x => x == false);
             systemIdle &= cameraSnap.All(x => x == false);
             systemIdle &= cameraSnapComplete.All(x => x == false);
 

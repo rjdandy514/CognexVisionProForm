@@ -152,17 +152,17 @@ public class DalsaImage
 
             if(trigger && !triggerMem)
             {
+                form.CameraSnap = Id;
                 ImageReady = false;
                 if (Connected)
                 {
                     SnapPicture();
-                    form.CameraSnap = Id;
+                    
                 }
                 else if (ArchiveImageActive)
                 {
                     CreateBufferFromFile();
                     ArchiveImageIndex++;
-                    form.CameraSnap = Id;
                 }
             }
 

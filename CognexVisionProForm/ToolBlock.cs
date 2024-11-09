@@ -226,7 +226,7 @@ namespace CognexVisionProForm
 
                 toolBlock.Run();
 
-                Utilities.LoggingStatment($"{toolName}: Job Triggered");
+            Utilities.LoggingStatment($"{toolName}: Job Triggered");
 
         }
 
@@ -241,16 +241,19 @@ namespace CognexVisionProForm
         private void GetInfoFromTool()
         {
             int toolOutputCount = toolBlock.Outputs.Count;
-
+            
+            
             outputs = toolBlock.Outputs;
             for(int i = 0; i < outputs.Count;i++)
             {
                     outputs[i] = toolBlock.Outputs[i];
             }
 
-            toolReady = true;
-            resultUpdated = !resultUpdated; //Toggle Value
+            if (resultUpdated) { resultUpdated = false; }
+            else { resultUpdated = true; }
             
+            toolReady = true;
+
 
             Utilities.LoggingStatment($"{toolName}: Number of Outputs - {toolOutputCount}");
             Utilities.LoggingStatment($"{toolName}: Toolblock completed Run");
