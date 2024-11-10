@@ -214,23 +214,17 @@ namespace CognexVisionProForm
         }
         public void CameraAbort()
         {
-            for(int i = 0; i < cameraCount;i++)
-            {
-                cameraSnap[i] = false;
-                cameraSnapComplete[i] = false;
-                toolTrigger[i] = false;
-                CameraAcqArray[i].Abort();
-            }
-            
-
-        }
-        public void SystemReset()
-        {
             Array.Clear(toolTrigger, 0, toolTrigger.Length);
             Array.Clear(toolTriggerComplete, 0, toolTriggerComplete.Length);
             Array.Clear(cameraSnap, 0, cameraSnap.Length);
             Array.Clear(cameraSnapComplete, 0, cameraSnapComplete.Length);
+
+            for (int i = 0; i < cameraCount;i++)
+            {
+                CameraAcqArray[i].Abort();
+            }
         }
+
         public void CameraUpdate()
         {
             // Run ToolBlocks that are enabled
@@ -498,6 +492,7 @@ namespace CognexVisionProForm
             //GENERAL COMMANDS
             int index = 0;
             PlcAutoMode = (MainPLC.PlcToPcControl[index] & (1 << 0)) != 0;
+
 
             systemIdle = true;
             systemIdle &= toolTrigger.All(x => x == false);

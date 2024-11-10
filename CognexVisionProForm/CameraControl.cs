@@ -30,21 +30,16 @@ namespace CognexVisionProForm
         private bool Result_Update_Mem;
         private System.Windows.Forms.Timer pollingTimer;
         ShowResultData toolFailedDisplay;
+
         public DalsaImage Camera
         {
             get { return camera; }
         }
         public ToolBlock Tool
         {
-            get
-            {
-                return tool; 
-            }
+            get { return tool; }
 
-            set
-            {
-                tool = value;
-            }
+            set { tool = value; }
         }
         public ToolBlock PreProcess
         {
@@ -53,24 +48,8 @@ namespace CognexVisionProForm
         }
         public int ToolSelect
         {
-            get
-            {
-                return toolSelect;
-            }
-            set
-            {
-                toolSelect = value;
-            }
-        }
-        public bool UpdateDisplayRequest
-        {
-            set 
-            {
-                updateDisplayRequest = value;
-                //BeginInvoke(new Set_UpdateImage(UpdateImage));
-                //BeginInvoke(new Set_UpdateDisplay(UpdateToolDisplay));
-
-            }
+            get { return toolSelect; }
+            set { toolSelect = value; }
         }
         public bool AutoDisplay
         {
@@ -83,75 +62,7 @@ namespace CognexVisionProForm
             camera = Camera;
             toolFailedDisplay = new ShowResultData(this);
 
-
-
             InitializeComponent();
-        }
-        private void pollingTimer_Tick(object sender, EventArgs e)
-        {
-            pollingTimer.Stop();
-            
-            cbCameraConnected.Checked = camera.Connected;
-            cbTrigger.Checked = camera.Trigger;
-            cbArchiveImageActive.Checked = camera.ArchiveImageActive;
-            cbImageReady.Checked = camera.ImageReady;
-            numToolSelect.Value = toolSelect;
-            UpdateButton();
-
-            if(tool.ResultUpdated != Result_Update_Mem)
-            {
-                UpdateImage();
-                UpdateToolDisplay();
-                UpdateImageRecord();
-                Result_Update_Mem = tool.ResultUpdated;
-            }
-      
-            pollingTimer.Start();
-        }
-        private void UpdateButton()
-        {
-            numToolSelect.Enabled = !_form.PlcCommsActive;
-
-            bool imageControl = !_form.PlcCommsActive && !(camera.Snapping || camera.Acquiring || camera.Grabbing);
-            bttnCameraSnap.Enabled = imageControl;
-            bttnGrab.Enabled = imageControl;
-
-            bttnCameraAbort.Enabled = camera.Snapping || camera.Acquiring || camera.Grabbing;
-
-
-            if (camera.Acquiring) { bttnCameraSnap.Text = " Aquiring"; }
-            else if (camera.Snapping) { bttnCameraSnap.Text = " Snapping"; }
-            else { bttnCameraSnap.Text = " Press To Snap"; }
-
-            if (camera.Grabbing) { bttnGrab.Text = "Grabbing"; }
-            else { bttnGrab.Text = "Press To Grab"; }
-
-            if (camera.SaveImageSelected)
-            {
-                if (camera.LimitReached) { bttnCameraLog.Text = "Log Images - Active/Full"; }
-                else { bttnCameraLog.Text = "Log Images - Active"; }
-
-            }
-            else if(!camera.SaveImageSelected)
-            {
-                if (camera.LimitReached) { bttnCameraLog.Text = "Log Images - Full"; }
-                else { bttnCameraLog.Text = "Log Images"; }
-            }
-
-            if (plToolData.Visible) { bttnGetToolData.Text = "Hide Tool Data"; }
-            else { bttnGetToolData.Text = "Show Tool Data"; }
-
-            if (tool == null)
-            {
-                numRecordSelect.Visible = false;
-                bttnGetToolData.Visible = false;
-            }
-            else
-            {
-                numRecordSelect.Visible = true;
-                bttnGetToolData.Visible = true;
-            }
-
         }
         private void CameraControl_Load(object sender, EventArgs e)
         {
@@ -168,6 +79,36 @@ namespace CognexVisionProForm
 
             numToolSelect.Maximum = _form.toolCount;
 
+        }
+        private void CameraControl_Resize(object sender, EventArgs e)
+        {
+            plToolData.Visible = false;
+            UpdateImage();
+        }
+        private void pollingTimer_Tick(object sender, EventArgs e)
+        {
+            pollingTimer.Stop();
+
+            cbCameraConnected.Checked = camera.Connected;
+            cbTrigger.Checked = camera.Trigger;
+            cbArchiveImageActive.Checked = camera.ArchiveImageActive;
+            cbImageReady.Checked = camera.ImageReady;
+            numToolSelect.Value = toolSelect;
+            UpdateButton();
+
+            if (tool.ResultUpdated != Result_Update_Mem)
+            {
+                UpdateImage();
+                UpdateToolDisplay();
+                UpdateImageRecord();
+                Result_Update_Mem = tool.ResultUpdated;
+            }
+
+            pollingTimer.Start();
+        }
+        private void bttnCameraSnap_MouseUp(object sender, MouseEventArgs e)
+        {
+            camera.Trigger = false;
         }
         private void bttnCameraSnap_Click(object sender, EventArgs e)
         {
@@ -198,8 +139,47 @@ namespace CognexVisionProForm
                 else { bttnCameraLog.Text = "Log Images - Active"; }
             }
         }
-        private delegate void Set_UpdateDisplay();
-        private delegate void Set_UpdateImage();
+        private void numRecordSelect_ValueChanged(object sender, EventArgs e)
+        {
+
+            UpdateImageRecord();
+
+        }
+        private void bttnGetToolData_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (!plToolData.Visible && tool.ToolReady)
+                {
+                    Utilities.LoadForm(plToolData, toolFailedDisplay);
+                    resizeToolData();
+                    toolFailedDisplay.UpdateResultData();
+                }
+                plToolData.Visible = !plToolData.Visible;
+            }
+            catch
+            {
+            }
+
+
+
+        }
+        private void bttnTest_Click(object sender, EventArgs e)
+        {
+
+            _form.RetryToolBlock();
+            //camera.Abort();
+        }
+        private void numToolSelect_ValueChanged(object sender, EventArgs e)
+        {
+            toolSelect = Convert.ToInt32(numToolSelect.Value);
+            _form.ToolNumberUpdate(camera.Id);
+        }
+        private void bttnGrab_Click(object sender, EventArgs e)
+        {
+            camera.TriggerGrab = true;
+            UpdateButton();
+        }
         public void UpdateToolDisplay()
         {
             lbToolName.Text = tool.Name;
@@ -243,6 +223,7 @@ namespace CognexVisionProForm
 
             }
         }
+        private delegate void Set_UpdateImage();
         public void UpdateImage()
         {
             if (this.InvokeRequired)
@@ -269,14 +250,50 @@ namespace CognexVisionProForm
             // Fit Image to Display
             recordDisplay.Fit();
         }
-        private void bttnCameraSnap_MouseUp(object sender, MouseEventArgs e)
+        private void UpdateButton()
         {
-                camera.Trigger = false;
-        }
-        private void CameraControl_Resize(object sender, EventArgs e)
-        {
-            plToolData.Visible = false;
-            UpdateImage();
+            numToolSelect.Enabled = !_form.PlcCommsActive;
+
+            bool imageControl = !_form.PlcCommsActive && !(camera.Snapping || camera.Acquiring || camera.Grabbing);
+            bttnCameraSnap.Enabled = imageControl;
+            bttnGrab.Enabled = imageControl;
+
+            bttnCameraAbort.Enabled = camera.Snapping || camera.Acquiring || camera.Grabbing;
+
+
+            if (camera.Acquiring) { bttnCameraSnap.Text = " Aquiring"; }
+            else if (camera.Snapping) { bttnCameraSnap.Text = " Snapping"; }
+            else { bttnCameraSnap.Text = " Press To Snap"; }
+
+            if (camera.Grabbing) { bttnGrab.Text = "Grabbing"; }
+            else { bttnGrab.Text = "Press To Grab"; }
+
+            if (camera.SaveImageSelected)
+            {
+                if (camera.LimitReached) { bttnCameraLog.Text = "Log Images - Active/Full"; }
+                else { bttnCameraLog.Text = "Log Images - Active"; }
+
+            }
+            else if (!camera.SaveImageSelected)
+            {
+                if (camera.LimitReached) { bttnCameraLog.Text = "Log Images - Full"; }
+                else { bttnCameraLog.Text = "Log Images"; }
+            }
+
+            if (plToolData.Visible) { bttnGetToolData.Text = "Hide Tool Data"; }
+            else { bttnGetToolData.Text = "Show Tool Data"; }
+
+            if (tool == null)
+            {
+                numRecordSelect.Visible = false;
+                bttnGetToolData.Visible = false;
+            }
+            else
+            {
+                numRecordSelect.Visible = true;
+                bttnGetToolData.Visible = true;
+            }
+
         }
         public void EnableCameraControl()
         {
@@ -288,52 +305,6 @@ namespace CognexVisionProForm
             bttnCameraSnap.Enabled = false;
             bttnCameraAbort.Enabled = false;
         }
-        private void numToolSelect_ValueChanged(object sender, EventArgs e)
-        {
-            toolSelect = Convert.ToInt32(numToolSelect.Value);
-            _form.ToolNumberUpdate(camera.Id);
-        }
-        private void bttnGrab_Click(object sender, EventArgs e)
-        {
-            camera.TriggerGrab = true;
-            UpdateButton();
-        }
-        [DllImport("kernel32")]
-        private static extern int GetPrivateProfileString(string section,string key, string def, StringBuilder retVal,int size, string filePath);
-        private void numRecordSelect_ValueChanged(object sender, EventArgs e)
-        {
-            
-            UpdateImageRecord();
-
-        }
-
-        private void bttnGetToolData_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                if (!plToolData.Visible && tool.ToolReady)
-                {
-                    Utilities.LoadForm(plToolData, toolFailedDisplay);
-                    resizeToolData();
-                    toolFailedDisplay.UpdateResultData();
-                }
-                plToolData.Visible = !plToolData.Visible;
-            }
-            catch 
-            { 
-            }
-            
-
-
-        }
-
-        private void bttnTest_Click(object sender, EventArgs e)
-        {
-
-            _form.RetryToolBlock();
-            //camera.Abort();
-        }
-
         private void resizeToolData()
         {
             plToolData.Left = 5;

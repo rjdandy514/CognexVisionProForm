@@ -589,8 +589,6 @@ public class DalsaImage
         ImageReady = true;
 
         if (IsMaster == 1) { ToggleEncoderPhase(); }
-
-        form.SystemReset();
     }
     public void SaveImageBMP()
     {

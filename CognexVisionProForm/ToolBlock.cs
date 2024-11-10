@@ -229,7 +229,6 @@ namespace CognexVisionProForm
             Utilities.LoggingStatment($"{toolName}: Job Triggered");
 
         }
-
         void Subject_Ran(object sender, EventArgs e)
         {
             GetInfoFromTool();
