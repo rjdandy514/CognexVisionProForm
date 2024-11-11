@@ -470,11 +470,14 @@ public class DalsaImage
                 Destroy();
                 return;
             }
+            
+            bool prmResult = false;
+            //prmResult = acquisition.SetParameter(SapAcquisition.Prm.CROP_WIDTH, 5300, false);
+            //prmResult = acquisition.SetParameter(SapAcquisition.Prm.CROP_LEFT, 1400, false);
+            //prmResult = acquisition.SetParameter(SapAcquisition.Prm.FLIP,SapAcquisition.Val.FLIP_HORZ,true);
+
         }
-        bool prmResult = false;
-        //prmResult = acquisition.SetParameter(SapAcquisition.Prm.CROP_WIDTH, 5300, false);
-        //prmResult = acquisition.SetParameter(SapAcquisition.Prm.CROP_LEFT, 1400, false);
-        //prmResult = acquisition.SetParameter(SapAcquisition.Prm.FLIP,SapAcquisition.Val.FLIP_HORZ,true);
+
 
 
 
