@@ -130,6 +130,12 @@ public class DalsaImage
         get { return serialNumber; }
         set { serialNumber = value; }
     }
+    public int CropLeft
+    { get; set; }
+    public int CropWidth
+    { get; set; }
+    public int Flip
+    { get; set; }
     public int Id
     {
         get; set;
@@ -470,12 +476,12 @@ public class DalsaImage
                 Destroy();
                 return;
             }
+
             
             bool prmResult = false;
-            //prmResult = acquisition.SetParameter(SapAcquisition.Prm.CROP_WIDTH, 5300, false);
-            //prmResult = acquisition.SetParameter(SapAcquisition.Prm.CROP_LEFT, 1400, false);
-            //prmResult = acquisition.SetParameter(SapAcquisition.Prm.FLIP,SapAcquisition.Val.FLIP_HORZ,true);
-
+            prmResult = acquisition.SetParameter(SapAcquisition.Prm.CROP_WIDTH, CropWidth, false);
+            prmResult = acquisition.SetParameter(SapAcquisition.Prm.CROP_LEFT, CropLeft, false);
+            prmResult = acquisition.SetParameter(SapAcquisition.Prm.FLIP, Flip, true);
         }
 
 
@@ -483,7 +489,6 @@ public class DalsaImage
 
         if (acqDevice != null && !acqDevice.Initialized)
         {
-            
             if (acqDevice.Create() == false)
             {
                 Destroy();
@@ -528,8 +533,6 @@ public class DalsaImage
         {
             CheckLineScanFeatures();
         }
-        
-
     }
     public void SnapPicture()
     {
@@ -917,8 +920,4 @@ public class DalsaImage
             startOfFrameTime = acqTimeWatch.ElapsedMilliseconds;
 
     }
-
-
-
-
 }

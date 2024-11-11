@@ -27,6 +27,9 @@ namespace CognexVisionProForm
 
         int selectedCameraId;
         int cameraConnectCount;
+        int cameraCropLeft;
+        int cameraCropWidth;
+        int cameraImageFlip;
         int dataLength;
         public DalsaImage[] CameraAcqArray;
         bool[] cameraSnap;

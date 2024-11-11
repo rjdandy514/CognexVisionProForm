@@ -52,6 +52,9 @@ namespace CognexVisionProForm
             {
                 splashScreen.UpdateProgress($"Initialize Camera {j}", 5);
                 CameraAcqArray[j] = new DalsaImage(this);
+                CameraAcqArray[j].CropLeft = cameraCropLeft;
+                CameraAcqArray[j].CropWidth = cameraCropWidth;
+                CameraAcqArray[j].Flip = cameraImageFlip;
                 CameraAcqArray[j].Id = j;
 
                 preProcess[j] = new ToolBlock(this);
@@ -754,6 +757,7 @@ namespace CognexVisionProForm
                 computerName = "OP45/55 Computer";
                 cameraCount = 2;
                 toolCount = 9;
+
                 preProcessRequired = true;
             }
             else if (iP == OP70_IP)
@@ -761,6 +765,9 @@ namespace CognexVisionProForm
                 computerName = "OP70 Computer";
                 cameraCount = 6;
                 toolCount = 4;
+                cameraCropLeft = 1400;
+                cameraCropWidth = 5300;
+                cameraImageFlip = 1;
                 preProcessRequired = true;
             }
             else if (iP == OP90_IP)
@@ -768,7 +775,10 @@ namespace CognexVisionProForm
                 computerName = "OP90 Computer";
                 cameraCount = 6;
                 toolCount = 4;
-                preProcessRequired = false;
+                cameraCropLeft = 1500;
+                cameraCropWidth = 5300;
+                cameraImageFlip = 0;
+                preProcessRequired = true;
             }
             else
             {
