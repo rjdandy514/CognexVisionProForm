@@ -275,13 +275,22 @@ namespace CognexVisionProForm
 
             for (int j = 0; j < cameraCount; j++)
             {
-                if (cameraSnapComplete[j] && preProcess[j].ToolReady && preProcessRequired)
+                if(preProcessRequired)
+                {
+                    if (cameraSnapComplete[j] && preProcess[j].ToolReady)
+                    {
+                        toolTrigger[j] = true;
+                        cameraSnap[j] = false;
+                        cameraSnapComplete[j] = false;
+                        preProcess[j].Inputs[0].Value = CameraAcqArray[j].Image;
+                        preProcess[j].ToolRun();
+                    }
+                }
+                else
                 {
                     toolTrigger[j] = true;
                     cameraSnap[j] = false;
                     cameraSnapComplete[j] = false;
-                    preProcess[j].Inputs[0].Value = CameraAcqArray[j].Image;
-                    preProcess[j].ToolRun();
                 }
             }
 
@@ -292,18 +301,10 @@ namespace CognexVisionProForm
 
                 if (toolTrigger[i])
                 {
-                    if(!toolblockArray[i, desiredTool[i]].ToolReady)
-                    {
-                        MessageBox.Show("HELP");
-                    }
-
-
                     toolblockArray[i, desiredTool[i]].Inputs[0].Value = processedImage;
                     toolblockArray[i, desiredTool[i]].ToolRun();
                     toolTrigger[i] = false;
                 }
-
-
             }
             Array.Clear(cameraSnap, 0, cameraSnap.Length);
 
