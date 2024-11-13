@@ -76,7 +76,8 @@ namespace CognexVisionProForm
             pollingTimer.Stop();
 
             heartBeat = !heartBeat;
-            cbHeartbeat.Checked = systemIdle;
+            cbHeartbeat.Checked = heartBeat;
+            cbSystemIdle.Checked = systemIdle;
 
             if (MainPLC.InitialCheck.Status == IPStatus.Success)
             {

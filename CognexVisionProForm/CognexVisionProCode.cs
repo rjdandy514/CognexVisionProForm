@@ -224,10 +224,9 @@ namespace CognexVisionProForm
 
             for (int i = 0; i < cameraCount;i++)
             {
-                CameraAcqArray[i].Abort();
+                CameraAcqArray[i].AbortTrigger = true;
             }
         }
-
         public void CameraUpdate()
         {
             // Run ToolBlocks that are enabled
@@ -497,7 +496,6 @@ namespace CognexVisionProForm
             int index = 0;
             PlcAutoMode = (MainPLC.PlcToPcControl[index] & (1 << 0)) != 0;
 
-
             systemIdle = true;
             systemIdle &= toolTrigger.All(x => x == false);
             systemIdle &= cameraSnap.All(x => x == false);
@@ -507,12 +505,10 @@ namespace CognexVisionProForm
             index = 1;
             for (int cam = 0; cam < cameraCount; cam++)
             {
-                if (systemIdle)
-                {
-                    CameraAcqArray[cam].Trigger =((MainPLC.PlcToPcControl[index + cam] & (1 << 0)) != 0);
-                }
-                
-                if((MainPLC.PlcToPcControl[index + cam] & (1 << 1)) != 0){ CameraAbort(); }
+                CameraAcqArray[cam].Trigger =((MainPLC.PlcToPcControl[index + cam] & (1 << 0)) != 0);
+
+                if ((MainPLC.PlcToPcControl[index + cam] & (1 << 1)) != 0) { CameraAbort(); }
+                else { CameraAcqArray[cam].AbortTrigger = false; }
 
                 plcTool[cam] = MainPLC.PlcToPcControl[index + cam] >> 16;
                 ToolNumberUpdate(cam);

@@ -113,13 +113,6 @@ namespace CognexVisionProForm
             get { return filePresent; }
             
         }
-        public bool Run
-        {
-            set
-            {
-                ToolRun();
-            }
-        }
         public CogToolBlockTerminalCollection Outputs
         {
             get 

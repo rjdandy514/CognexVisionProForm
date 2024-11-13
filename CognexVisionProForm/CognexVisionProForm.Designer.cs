@@ -124,6 +124,7 @@ namespace CognexVisionProForm
             this.Camera2Panel = new System.Windows.Forms.Panel();
             this.Camera1Panel = new System.Windows.Forms.Panel();
             this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.cbSystemIdle = new System.Windows.Forms.CheckBox();
             this.tabPlcConnection.SuspendLayout();
             this.panel8.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numIP1)).BeginInit();
@@ -160,6 +161,7 @@ namespace CognexVisionProForm
             // panel8
             // 
             this.panel8.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.panel8.Controls.Add(this.cbSystemIdle);
             this.panel8.Controls.Add(this.tbPlcPingResponse);
             this.panel8.Controls.Add(this.bttnPlcPing);
             this.panel8.Controls.Add(this.label33);
@@ -173,7 +175,7 @@ namespace CognexVisionProForm
             this.panel8.Controls.Add(this.bttnPLC);
             this.panel8.Location = new System.Drawing.Point(5, 5);
             this.panel8.Name = "panel8";
-            this.panel8.Size = new System.Drawing.Size(451, 210);
+            this.panel8.Size = new System.Drawing.Size(539, 210);
             this.panel8.TabIndex = 70;
             this.panel8.Tag = "pnCameraControl";
             // 
@@ -292,7 +294,7 @@ namespace CognexVisionProForm
             this.cbHeartbeat.AutoCheck = false;
             this.cbHeartbeat.Location = new System.Drawing.Point(296, 3);
             this.cbHeartbeat.Name = "cbHeartbeat";
-            this.cbHeartbeat.Size = new System.Drawing.Size(118, 24);
+            this.cbHeartbeat.Size = new System.Drawing.Size(76, 24);
             this.cbHeartbeat.TabIndex = 24;
             this.cbHeartbeat.Text = "Heartbeat";
             // 
@@ -1133,6 +1135,15 @@ namespace CognexVisionProForm
             this.tabControl1.TabIndex = 3;
             this.tabControl1.SelectedIndexChanged += new System.EventHandler(this.tabControl1_SelectedIndexChanged);
             // 
+            // cbSystemIdle
+            // 
+            this.cbSystemIdle.AutoCheck = false;
+            this.cbSystemIdle.Location = new System.Drawing.Point(372, 3);
+            this.cbSystemIdle.Name = "cbSystemIdle";
+            this.cbSystemIdle.Size = new System.Drawing.Size(76, 24);
+            this.cbSystemIdle.TabIndex = 40;
+            this.cbSystemIdle.Text = "System Idle";
+            // 
             // CognexVisionProForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1271,6 +1282,7 @@ namespace CognexVisionProForm
         private System.Windows.Forms.Button bttnPreProcessFileSelect;
         private System.Windows.Forms.CheckBox cbPreProcessFileFound;
         private System.Windows.Forms.TextBox tbPreProcessNameEdit;
+        private System.Windows.Forms.CheckBox cbSystemIdle;
     }
 }
 

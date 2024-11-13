@@ -593,8 +593,16 @@ public class DalsaImage
         grabbing = false;
         acquiring = false;
         ImageReady = true;
+        Trigger = false;
 
         if (IsMaster == 1) { ToggleEncoderPhase(); }
+    }
+    public void SoftwareTrigger()
+    {
+        bool triggerResult = acquisition.SoftwareTrigger(SapAcquisition.SoftwareTriggerType.ExternalFrame);
+
+        if (triggerResult) { }
+        else { }
     }
     public void SaveImageBMP()
     {
