@@ -274,22 +274,18 @@ namespace CognexVisionProForm
 
             for (int j = 0; j < cameraCount; j++)
             {
-                if(preProcessRequired)
-                {
-                    if (cameraSnapComplete[j] && preProcess[j].ToolReady)
-                    {
-                        toolTrigger[j] = true;
-                        cameraSnap[j] = false;
-                        cameraSnapComplete[j] = false;
-                        preProcess[j].Inputs[0].Value = CameraAcqArray[j].Image;
-                        preProcess[j].ToolRun();
-                    }
-                }
-                else
+                if (cameraSnapComplete[j])
                 {
                     toolTrigger[j] = true;
                     cameraSnap[j] = false;
                     cameraSnapComplete[j] = false;
+                    
+                    if (preProcessRequired && preProcess[j].ToolReady)
+                    {
+                        preProcess[j].Inputs[0].Value = CameraAcqArray[j].Image;
+                        preProcess[j].ToolRun();
+                    }
+
                 }
             }
 
@@ -306,6 +302,7 @@ namespace CognexVisionProForm
                 }
             }
             Array.Clear(cameraSnap, 0, cameraSnap.Length);
+            Array.Clear(cameraSnapComplete, 0, cameraSnapComplete.Length);
 
         }
         public void RetryToolBlock()
@@ -505,7 +502,7 @@ namespace CognexVisionProForm
             index = 1;
             for (int cam = 0; cam < cameraCount; cam++)
             {
-                CameraAcqArray[cam].Trigger =((MainPLC.PlcToPcControl[index + cam] & (1 << 0)) != 0);
+                CameraAcqArray[cam].Trigger = systemIdle && ((MainPLC.PlcToPcControl[index + cam] & (1 << 0)) != 0);
 
                 if ((MainPLC.PlcToPcControl[index + cam] & (1 << 1)) != 0) { CameraAbort(); }
                 else { CameraAcqArray[cam].AbortTrigger = false; }

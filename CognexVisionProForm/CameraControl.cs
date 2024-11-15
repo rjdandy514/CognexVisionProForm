@@ -167,9 +167,9 @@ namespace CognexVisionProForm
         private void bttnTest_Click(object sender, EventArgs e)
         {
 
-            //_form.RetryToolBlock();
+            _form.RetryToolBlock();
             //camera.Abort();
-            camera.SoftwareTrigger();
+            //camera.SoftwareTrigger();
         }
         private void numToolSelect_ValueChanged(object sender, EventArgs e)
         {
