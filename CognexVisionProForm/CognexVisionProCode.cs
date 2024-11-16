@@ -17,6 +17,7 @@ using System.Net.NetworkInformation;
 using Cognex.Vision.Meta;
 using Cognex.VisionPro.ToolBlock;
 using Cognex.Vision;
+using System.Threading;
 
 namespace CognexVisionProForm
 {
@@ -43,7 +44,7 @@ namespace CognexVisionProForm
         }
         public void InitClasses()
         {
-            pollingTimer = new Timer();
+            pollingTimer = new System.Windows.Forms.Timer();
             pollingTimer.Tick += new EventHandler(pollingTimer_Tick);
             pollingTimer.Interval = 50; // in miliseconds
 
@@ -272,6 +273,10 @@ namespace CognexVisionProForm
         {
             CogImage8Grey processedImage;
 
+            Thread[] threadTool;
+            threadTool = new Thread[cameraCount];
+
+
             for (int j = 0; j < cameraCount; j++)
             {
                 if (cameraSnapComplete[j])
@@ -297,10 +302,14 @@ namespace CognexVisionProForm
                 if (toolTrigger[i])
                 {
                     toolblockArray[i, desiredTool[i]].Inputs[0].Value = processedImage;
-                    toolblockArray[i, desiredTool[i]].ToolRun();
+
+                    threadTool[i] = new Thread(toolblockArray[i, desiredTool[i]].ToolRun);
+                    threadTool[i].Start();
+
                     toolTrigger[i] = false;
                 }
             }
+
             Array.Clear(cameraSnap, 0, cameraSnap.Length);
             Array.Clear(cameraSnapComplete, 0, cameraSnapComplete.Length);
 
@@ -777,7 +786,7 @@ namespace CognexVisionProForm
             else
             {
                 computerName = "Unknown Computer";
-                cameraCount = 1;
+                cameraCount = 6;
                 toolCount = 2;
                 preProcessRequired = true;
             }

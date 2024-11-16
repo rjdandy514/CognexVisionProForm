@@ -207,17 +207,19 @@ namespace CognexVisionProForm
         {
             toolReady = false;
 
-                if (toolBlock.Inputs.Count > 1)
+                if (toolBlock.Inputs.Count > 0)
                 {
                     for (int i = 0; i < toolBlock.Inputs.Count; i++)
                     {
                         if (i >= inputs.Count) { break; }
                         toolBlock.Inputs[i].Value = inputs[i].Value;
+                        toolBlock.Run();
+
                         Utilities.LoggingStatment($"{toolName}: input # {i} = {toolBlock.Inputs[i].Value}");
                     }                   
                 }
 
-                toolBlock.Run();
+                
 
             Utilities.LoggingStatment($"{toolName}: Job Triggered");
 
