@@ -17,6 +17,7 @@ using System.Net.NetworkInformation;
 using Cognex.Vision.Meta;
 using Cognex.VisionPro.ToolBlock;
 using Cognex.Vision;
+using System.Threading;
 
 namespace CognexVisionProForm
 {
@@ -43,7 +44,7 @@ namespace CognexVisionProForm
         }
         public void InitClasses()
         {
-            pollingTimer = new Timer();
+            pollingTimer = new System.Windows.Forms.Timer();
             pollingTimer.Tick += new EventHandler(pollingTimer_Tick);
             pollingTimer.Interval = 50; // in miliseconds
 
@@ -84,13 +85,22 @@ namespace CognexVisionProForm
         {
             splashScreen.UpdateProgress("Initialize JobManager", 10);
 
+            Thread[] threadPreProcess;
+            threadPreProcess = new Thread[cameraCount];
+            
+            Thread[] threadToolBlock;
+            threadToolBlock = new Thread[cameraCount];
+
             for (int cam = 0; cam <cameraCount; cam++)
             {
-
                 if(preProcess[cam].FilePresent)
                 {
                     splashScreen.UpdateProgress($"Initialize JobManager: {CameraAcqArray[cam].Name} - {preProcess[cam].Name} Toolblock", 1);
-                    preProcess[cam].InitJobManager();
+
+                    threadPreProcess[cam] = new Thread(preProcess[cam].InitJobManager); 
+                    threadPreProcess[cam].Start();
+
+                    //preProcess[cam].InitJobManager();
                 }
 
                 for (int i = 0; i < toolblockArray.GetLength(1); i++)
@@ -98,7 +108,11 @@ namespace CognexVisionProForm
                     if (toolblockArray[cam, i].FilePresent)
                     { 
                         splashScreen.UpdateProgress($"Initialize JobManager: {CameraAcqArray[cam].Name} - {toolblockArray[cam, i].Name} Toolblock", 1);
-                        toolblockArray[cam, i].InitJobManager();
+
+                        threadToolBlock[cam] = new Thread(toolblockArray[cam, i].InitJobManager);
+                        threadToolBlock[cam].Start();
+
+                       // toolblockArray[cam, i].InitJobManager();
                     }
                 }
             }
@@ -272,24 +286,24 @@ namespace CognexVisionProForm
         {
             CogImage8Grey processedImage;
 
+            Thread[] threadTool;
+            threadTool = new Thread[cameraCount];
+
+
             for (int j = 0; j < cameraCount; j++)
             {
-                if(preProcessRequired)
-                {
-                    if (cameraSnapComplete[j] && preProcess[j].ToolReady)
-                    {
-                        toolTrigger[j] = true;
-                        cameraSnap[j] = false;
-                        cameraSnapComplete[j] = false;
-                        preProcess[j].Inputs[0].Value = CameraAcqArray[j].Image;
-                        preProcess[j].ToolRun();
-                    }
-                }
-                else
+                if (cameraSnapComplete[j])
                 {
                     toolTrigger[j] = true;
                     cameraSnap[j] = false;
                     cameraSnapComplete[j] = false;
+                    
+                    if (preProcessRequired && preProcess[j].ToolReady)
+                    {
+                        preProcess[j].Inputs[0].Value = CameraAcqArray[j].Image;
+                        preProcess[j].ToolRun();
+                    }
+
                 }
             }
 
@@ -301,11 +315,16 @@ namespace CognexVisionProForm
                 if (toolTrigger[i])
                 {
                     toolblockArray[i, desiredTool[i]].Inputs[0].Value = processedImage;
-                    toolblockArray[i, desiredTool[i]].ToolRun();
+
+                    threadTool[i] = new Thread(toolblockArray[i, desiredTool[i]].ToolRun);
+                    threadTool[i].Start();
+
                     toolTrigger[i] = false;
                 }
             }
+
             Array.Clear(cameraSnap, 0, cameraSnap.Length);
+            Array.Clear(cameraSnapComplete, 0, cameraSnapComplete.Length);
 
         }
         public void RetryToolBlock()
@@ -505,7 +524,7 @@ namespace CognexVisionProForm
             index = 1;
             for (int cam = 0; cam < cameraCount; cam++)
             {
-                CameraAcqArray[cam].Trigger =((MainPLC.PlcToPcControl[index + cam] & (1 << 0)) != 0);
+                CameraAcqArray[cam].Trigger = systemIdle && ((MainPLC.PlcToPcControl[index + cam] & (1 << 0)) != 0);
 
                 if ((MainPLC.PlcToPcControl[index + cam] & (1 << 1)) != 0) { CameraAbort(); }
                 else { CameraAcqArray[cam].AbortTrigger = false; }
@@ -780,7 +799,7 @@ namespace CognexVisionProForm
             else
             {
                 computerName = "Unknown Computer";
-                cameraCount = 1;
+                cameraCount = 6;
                 toolCount = 2;
                 preProcessRequired = true;
             }
