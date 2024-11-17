@@ -85,13 +85,22 @@ namespace CognexVisionProForm
         {
             splashScreen.UpdateProgress("Initialize JobManager", 10);
 
+            Thread[] threadPreProcess;
+            threadPreProcess = new Thread[cameraCount];
+            
+            Thread[] threadToolBlock;
+            threadToolBlock = new Thread[cameraCount];
+
             for (int cam = 0; cam <cameraCount; cam++)
             {
-
                 if(preProcess[cam].FilePresent)
                 {
                     splashScreen.UpdateProgress($"Initialize JobManager: {CameraAcqArray[cam].Name} - {preProcess[cam].Name} Toolblock", 1);
-                    preProcess[cam].InitJobManager();
+
+                    threadPreProcess[cam] = new Thread(preProcess[cam].InitJobManager); 
+                    threadPreProcess[cam].Start();
+
+                    //preProcess[cam].InitJobManager();
                 }
 
                 for (int i = 0; i < toolblockArray.GetLength(1); i++)
@@ -99,7 +108,11 @@ namespace CognexVisionProForm
                     if (toolblockArray[cam, i].FilePresent)
                     { 
                         splashScreen.UpdateProgress($"Initialize JobManager: {CameraAcqArray[cam].Name} - {toolblockArray[cam, i].Name} Toolblock", 1);
-                        toolblockArray[cam, i].InitJobManager();
+
+                        threadToolBlock[cam] = new Thread(toolblockArray[cam, i].InitJobManager);
+                        threadToolBlock[cam].Start();
+
+                       // toolblockArray[cam, i].InitJobManager();
                     }
                 }
             }
