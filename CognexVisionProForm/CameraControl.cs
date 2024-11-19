@@ -96,13 +96,18 @@ namespace CognexVisionProForm
             numToolSelect.Value = toolSelect;
             UpdateButton();
 
-            if (tool.ResultUpdated != Result_Update_Mem)
+
+            
+            
+            if (tool.ResultUpdated != Result_Update_Mem && !_form.ThreadsAlive)
             {
                 UpdateImage();
                 UpdateToolDisplay();
                 UpdateImageRecord();
                 Result_Update_Mem = tool.ResultUpdated;
             }
+
+            
 
             pollingTimer.Start();
         }
@@ -167,7 +172,8 @@ namespace CognexVisionProForm
         private void bttnTest_Click(object sender, EventArgs e)
         {
 
-            _form.RetryToolBlock();
+            _form.BuildDataGrid(camera.Id);
+            //_form.RetryToolBlock();
             //camera.Abort();
             //camera.SoftwareTrigger();
         }
@@ -184,8 +190,8 @@ namespace CognexVisionProForm
         public void UpdateToolDisplay()
         {
             lbToolName.Text = tool.Name;
-            lbAcqTime.Text = $"Aquisition: {camera.AcqTime} ms";
-            lbToolRunTime.Text = $"Tool Time: {tool.RunStatus.TotalTime} ms";
+            lbAcqTime.Text = $"Aquisition: {Math.Round(camera.AcqTime,2)} ms";
+            lbToolRunTime.Text = $"Tool Time: {Math.Round(tool.RunStatus.TotalTime,2)} ms";
             cbToolPassed.Checked = tool.Result;
             cbResultsUpdated.Checked = tool.ResultUpdated;
             
@@ -314,5 +320,6 @@ namespace CognexVisionProForm
             plToolData.Height = this.Height - 5;
             
         }
+
     }
 }

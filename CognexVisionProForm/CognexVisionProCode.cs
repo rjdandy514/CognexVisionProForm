@@ -18,6 +18,10 @@ using Cognex.Vision.Meta;
 using Cognex.VisionPro.ToolBlock;
 using Cognex.Vision;
 using System.Threading;
+using System.Diagnostics;
+using Cognex.VisionPro.Exceptions;
+using System.Data;
+using System.ComponentModel;
 
 namespace CognexVisionProForm
 {
@@ -40,13 +44,17 @@ namespace CognexVisionProForm
         }
         public bool PlcCommsActive
         {
-            get;set;
+            get; set;
+        }
+        public bool ThreadsAlive
+        {
+            get { return threadToolAlive; }
         }
         public void InitClasses()
         {
             pollingTimer = new System.Windows.Forms.Timer();
             pollingTimer.Tick += new EventHandler(pollingTimer_Tick);
-            pollingTimer.Interval = 50; // in miliseconds
+            pollingTimer.Interval = 200; // in miliseconds
 
 
             for (int j = 0; j < cameraCount; j++)
@@ -74,6 +82,8 @@ namespace CognexVisionProForm
                 cameraControl[j] = new CameraControl(this, CameraAcqArray[j]);
                 cameraControl[j].PreProcess = preProcess[j];
                 cameraControl[j].Tool = toolblockArray[j, 0];
+                
+                threadTool = new Thread[cameraCount];
             }
 
             MainPLC = new PlcComms(this);
@@ -111,10 +121,15 @@ namespace CognexVisionProForm
 
                         threadToolBlock[cam] = new Thread(toolblockArray[cam, i].InitJobManager);
                         threadToolBlock[cam].Start();
-
-                       // toolblockArray[cam, i].InitJobManager();
                     }
                 }
+
+                if (threadPreProcess[cam] != null) { threadPreProcess[cam].Join(); }
+                foreach (Thread t in threadToolBlock)
+                {
+                    if (t != null) { t.Join(); }
+                }
+
             }
             
             splashScreen.Close();
@@ -285,10 +300,10 @@ namespace CognexVisionProForm
         public void ToolBlockTrigger()
         {
             CogImage8Grey processedImage;
+            Debug.WriteLine("Beginning of ToolBlock Trigger");
 
-            Thread[] threadTool;
-            threadTool = new Thread[cameraCount];
-
+            //Task[] task;
+            //task = new Task[cameraCount];
 
             for (int j = 0; j < cameraCount; j++)
             {
@@ -311,18 +326,41 @@ namespace CognexVisionProForm
             {
                 if (preProcessRequired) { processedImage = preProcess[i].Outputs[0].Value as CogImage8Grey; }
                 else { processedImage = CameraAcqArray[i].Image as CogImage8Grey; }
-
                 if (toolTrigger[i])
                 {
                     toolblockArray[i, desiredTool[i]].Inputs[0].Value = processedImage;
-
+                    //toolblockArray[i, desiredTool[i]].ToolRun();
+                    
                     threadTool[i] = new Thread(toolblockArray[i, desiredTool[i]].ToolRun);
+                    threadTool[i].Name = $"Camera {i}";
                     threadTool[i].Start();
 
+                    //Parallel.Invoke(() => toolblockArray[i, desiredTool[i]].ToolRun());
+
+                    
+                    //int camera = i;
+                    //int tool = desiredTool[i];
+                    //task[camera] = new Task(() => toolblockArray[camera, tool].ToolRun());
+                    //task[i].Start();
+                    
+                }
+            }
+            
+            
+            for (int i = 0; i < threadTool.Length;i++) 
+            {
+                if (threadTool[i] != null) 
+                {
+                    threadTool[i].Join(5000);
                     toolTrigger[i] = false;
                 }
             }
+            
 
+
+            Debug.WriteLine("Trigger Complete");
+
+            Array.Clear(toolTrigger, 0, toolTrigger.Length);
             Array.Clear(cameraSnap, 0, cameraSnap.Length);
             Array.Clear(cameraSnapComplete, 0, cameraSnapComplete.Length);
 
@@ -507,6 +545,16 @@ namespace CognexVisionProForm
         }
         public void resize_tabFileControl()
         {
+        }
+        public void resize_tabCameraData()
+        {
+            dgCameraData.Width = dgCameraData.PreferredSize.Width;
+            dgCameraData.Height = this.taCameraData.Height - 10;
+
+            numCameraSelect.Value = 0;
+
+            numCameraSelect.Minimum = 0;
+            numCameraSelect.Maximum = cameraCount - 1;
         }
         public void PlcRead()
         {
@@ -752,6 +800,28 @@ namespace CognexVisionProForm
             else
                 return false;
         }
+        public void BuildDataGrid(int cameraSelect)
+        {
+            DataTable dt = new DataTable();
+            List<ToolData> data = new List<ToolData>();
+
+            data = toolblockArray[cameraSelect, desiredTool[cameraSelect]].GetAllToolData();
+
+            dt.Columns.Add("Tool Name", typeof(string));
+            dt.Columns.Add("Data Name", typeof(string));
+            dt.Columns.Add("Data", typeof(double));
+
+
+            for(int i = 0; i < data.Count;i++)
+            {
+                dt.Rows.Add(data[i].ToolName, data[i].Name, data[i].Value );
+            }
+            
+
+            dgCameraData.DataSource = dt;
+            dgCameraData.Sort(dgCameraData.Columns["Tool Name"], ListSortDirection.Descending);
+
+        }
         public void ComputerSetup()
         {
             string OP15_IP = "10.10.30.87";
@@ -804,6 +874,19 @@ namespace CognexVisionProForm
                 preProcessRequired = true;
             }
         }
+        private bool ThreadAlive(Thread[] threads)
+        {
+            bool alive = false;
+
+            for (int i = 0; i < threads.Length; i++)
+            {
+                if (threads[i] != null) { alive |= threads[i].IsAlive; }
+                
+            }
+
+            return alive;
+        }
+
 
     }
 }

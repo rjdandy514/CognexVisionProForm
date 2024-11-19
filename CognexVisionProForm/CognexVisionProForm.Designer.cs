@@ -31,8 +31,13 @@ namespace CognexVisionProForm
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
             this.tabPlcConnection = new System.Windows.Forms.TabPage();
             this.panel8 = new System.Windows.Forms.Panel();
+            this.cbSystemIdle = new System.Windows.Forms.CheckBox();
             this.tbPlcPingResponse = new System.Windows.Forms.TextBox();
             this.bttnPlcPing = new System.Windows.Forms.Button();
             this.label33 = new System.Windows.Forms.Label();
@@ -124,7 +129,11 @@ namespace CognexVisionProForm
             this.Camera2Panel = new System.Windows.Forms.Panel();
             this.Camera1Panel = new System.Windows.Forms.Panel();
             this.tabControl1 = new System.Windows.Forms.TabControl();
-            this.cbSystemIdle = new System.Windows.Forms.CheckBox();
+            this.taCameraData = new System.Windows.Forms.TabPage();
+            this.dgCameraData = new System.Windows.Forms.DataGridView();
+            this.toolBlockBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.bttnGetData = new System.Windows.Forms.Button();
+            this.numCameraSelect = new System.Windows.Forms.NumericUpDown();
             this.tabPlcConnection.SuspendLayout();
             this.panel8.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numIP1)).BeginInit();
@@ -145,6 +154,10 @@ namespace CognexVisionProForm
             this.panel2.SuspendLayout();
             this.tabImage.SuspendLayout();
             this.tabControl1.SuspendLayout();
+            this.taCameraData.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgCameraData)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.toolBlockBindingSource)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numCameraSelect)).BeginInit();
             this.SuspendLayout();
             // 
             // tabPlcConnection
@@ -178,6 +191,15 @@ namespace CognexVisionProForm
             this.panel8.Size = new System.Drawing.Size(539, 210);
             this.panel8.TabIndex = 70;
             this.panel8.Tag = "pnCameraControl";
+            // 
+            // cbSystemIdle
+            // 
+            this.cbSystemIdle.AutoCheck = false;
+            this.cbSystemIdle.Location = new System.Drawing.Point(372, 3);
+            this.cbSystemIdle.Name = "cbSystemIdle";
+            this.cbSystemIdle.Size = new System.Drawing.Size(76, 24);
+            this.cbSystemIdle.TabIndex = 40;
+            this.cbSystemIdle.Text = "System Idle";
             // 
             // tbPlcPingResponse
             // 
@@ -1125,6 +1147,7 @@ namespace CognexVisionProForm
             this.tabControl1.Controls.Add(this.tabFileControl);
             this.tabControl1.Controls.Add(this.tabToolBlock);
             this.tabControl1.Controls.Add(this.tabPlcConnection);
+            this.tabControl1.Controls.Add(this.taCameraData);
             this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControl1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.tabControl1.Location = new System.Drawing.Point(0, 0);
@@ -1135,14 +1158,67 @@ namespace CognexVisionProForm
             this.tabControl1.TabIndex = 3;
             this.tabControl1.SelectedIndexChanged += new System.EventHandler(this.tabControl1_SelectedIndexChanged);
             // 
-            // cbSystemIdle
+            // taCameraData
             // 
-            this.cbSystemIdle.AutoCheck = false;
-            this.cbSystemIdle.Location = new System.Drawing.Point(372, 3);
-            this.cbSystemIdle.Name = "cbSystemIdle";
-            this.cbSystemIdle.Size = new System.Drawing.Size(76, 24);
-            this.cbSystemIdle.TabIndex = 40;
-            this.cbSystemIdle.Text = "System Idle";
+            this.taCameraData.Controls.Add(this.numCameraSelect);
+            this.taCameraData.Controls.Add(this.bttnGetData);
+            this.taCameraData.Controls.Add(this.dgCameraData);
+            this.taCameraData.Location = new System.Drawing.Point(4, 29);
+            this.taCameraData.Name = "taCameraData";
+            this.taCameraData.Padding = new System.Windows.Forms.Padding(3);
+            this.taCameraData.Size = new System.Drawing.Size(1284, 716);
+            this.taCameraData.TabIndex = 7;
+            this.taCameraData.Text = "Camera Data";
+            this.taCameraData.UseVisualStyleBackColor = true;
+            // 
+            // dgCameraData
+            // 
+            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle7.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle7.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle7.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle7.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle7.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dgCameraData.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle7;
+            this.dgCameraData.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle8.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle8.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle8.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle8.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle8.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle8.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dgCameraData.DefaultCellStyle = dataGridViewCellStyle8;
+            this.dgCameraData.Location = new System.Drawing.Point(6, 59);
+            this.dgCameraData.Name = "dgCameraData";
+            dataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle9.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle9.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle9.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle9.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle9.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle9.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dgCameraData.RowHeadersDefaultCellStyle = dataGridViewCellStyle9;
+            this.dgCameraData.Size = new System.Drawing.Size(781, 654);
+            this.dgCameraData.TabIndex = 0;
+            // 
+            // bttnGetData
+            // 
+            this.bttnGetData.Location = new System.Drawing.Point(8, 6);
+            this.bttnGetData.Name = "bttnGetData";
+            this.bttnGetData.Size = new System.Drawing.Size(143, 47);
+            this.bttnGetData.TabIndex = 1;
+            this.bttnGetData.Text = "Get Data";
+            this.bttnGetData.UseVisualStyleBackColor = true;
+            this.bttnGetData.Click += new System.EventHandler(this.bttnGetData_Click);
+            // 
+            // numCameraSelect
+            // 
+            this.numCameraSelect.Location = new System.Drawing.Point(174, 21);
+            this.numCameraSelect.Name = "numCameraSelect";
+            this.numCameraSelect.Size = new System.Drawing.Size(105, 20);
+            this.numCameraSelect.TabIndex = 2;
             // 
             // CognexVisionProForm
             // 
@@ -1185,6 +1261,10 @@ namespace CognexVisionProForm
             this.panel2.PerformLayout();
             this.tabImage.ResumeLayout(false);
             this.tabControl1.ResumeLayout(false);
+            this.taCameraData.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dgCameraData)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.toolBlockBindingSource)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numCameraSelect)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -1283,6 +1363,11 @@ namespace CognexVisionProForm
         private System.Windows.Forms.CheckBox cbPreProcessFileFound;
         private System.Windows.Forms.TextBox tbPreProcessNameEdit;
         private System.Windows.Forms.CheckBox cbSystemIdle;
+        private System.Windows.Forms.TabPage taCameraData;
+        private System.Windows.Forms.DataGridView dgCameraData;
+        private System.Windows.Forms.BindingSource toolBlockBindingSource;
+        private System.Windows.Forms.NumericUpDown numCameraSelect;
+        private System.Windows.Forms.Button bttnGetData;
     }
 }
 

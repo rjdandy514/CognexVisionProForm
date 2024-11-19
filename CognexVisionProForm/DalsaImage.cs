@@ -346,13 +346,15 @@ public class DalsaImage
         // Create buffer object
         if (!archiveBuffers.Create())
         {
-            Cleaning();
+            Destroy();
+            Dispose();
             return;
         }
         // Load file
         if (!archiveBuffers.Load(filename, -1))
         {
-            Cleaning();
+            Destroy();
+            Dispose();
             return;
         }
         await Task.Delay(1000);
@@ -627,46 +629,13 @@ public class DalsaImage
     }
     public void Disconnect()
     {
-        if (acqXfer != null) { acqXfer.Disconnect(); }
-        if (acqDeviceXfer != null) { acqDeviceXfer.Disconnect(); }
-        if (acqDevice != null) { acqDevice.Destroy(); }
+        Destroy();
+        Dispose();
 
-    }
-    public void Cleaning()
-    {
-        if (acqDeviceXfer != null)
-        {
-            acqDeviceXfer.Destroy();
-            acqDeviceXfer.Dispose();
-        }
-
-        if (acquisition != null)
-        {
-            acquisition.Destroy();
-            acquisition.Dispose();
-        }
-
-        if (acqDevice != null)
-        {
-            acqDevice.Destroy();
-            acqDevice.Dispose();
-        }
-
-        if (buffers != null)
-        {
-            buffers.Destroy();
-            buffers.Dispose();
-        }
-        if (archiveBuffers != null)
-        {
-            archiveBuffers.Destroy();
-            archiveBuffers.Dispose();
-        }
-        Marshal.FreeHGlobal(cogImageAddress);
     }
     public void Destroy()
     {
-        if (acqXfer != null && acqXfer.Initialized) { acqXfer.Destroy(); }
+        if (acqXfer != null && acqXfer.Initialized) {acqXfer.Destroy(); }
         if (acqDeviceXfer != null && acqDeviceXfer.Initialized) { acqDeviceXfer.Destroy(); }
         if (acqDevice != null && acqDevice.Initialized) { acqDevice.Destroy(); }
         if (acqDeviceData != null && acqDeviceData.Initialized) { acqDeviceData.Destroy(); }

@@ -7,6 +7,9 @@ using Cognex.VisionPro.ToolBlock;
 using Cognex.VisionPro.QuickBuild.Implementation.Internal;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading.Tasks;
+using System.Threading;
+using System.Collections.Generic;
+using Cognex.Vision;
 
 
 namespace CognexVisionProForm
@@ -19,11 +22,14 @@ namespace CognexVisionProForm
         string toolFileLocation;
         string toolFileType = "ToolBlock";
         string toolFileExtension = ".vpp";
+        Task task;
+        List<ToolData> data;
 
         bool filePresent = false;
         bool resultUpdated = false;
         bool resultUpdated_Mem = false;
         bool toolReady = false;
+        bool toolRunning = false;
         CogToolBlockTerminalCollection outputs = new CogToolBlockTerminalCollection();
         CogToolBlockTerminalCollection inputs = new CogToolBlockTerminalCollection();
 
@@ -89,6 +95,10 @@ namespace CognexVisionProForm
                 }
                 else { return null; }
             }
+        }
+        public bool ToolRunning
+        {
+            get { return toolRunning; }
         }
         public bool ToolReady
         {
@@ -190,7 +200,7 @@ namespace CognexVisionProForm
                     toolBlock.AbortRunOnToolFailure = false;
                     toolBlock.GarbageCollectionEnabled = true;
                     toolBlock.FailOnInvalidDataBinding = true;
-                    toolBlock.GarbageCollectionFrequency = 3;
+                    toolBlock.GarbageCollectionFrequency = 1;
 
                     toolReady = true;
 
@@ -204,40 +214,44 @@ namespace CognexVisionProForm
             }
             catch (Exception ex) { Utilities.LoggingStatment(ex.Message); }
         }
+        public void ToolSetup()
+        {
+            
+        }
         public void ToolRun()
         {
             toolReady = false;
-
-                if (toolBlock.Inputs.Count > 0)
+            
+            if (toolBlock.Inputs.Count > 0)
+            {
+                for (int i = 0; i < toolBlock.Inputs.Count; i++)
                 {
-                    for (int i = 0; i < toolBlock.Inputs.Count; i++)
-                    {
-                        if (i >= inputs.Count) { break; }
-                        toolBlock.Inputs[i].Value = inputs[i].Value;
-                        toolBlock.Run();
+                    if (i >= inputs.Count) { break; }
+                    toolBlock.Inputs[i].Value = inputs[i].Value;
 
-                        Utilities.LoggingStatment($"{toolName}: input # {i} = {toolBlock.Inputs[i].Value}");
-                    }                   
+                    Utilities.LoggingStatment($"{toolName}: input # {i} = {toolBlock.Inputs[i].Value}");
                 }
+            }
+            Debug.WriteLine(Thread.CurrentThread.Name);
+            toolBlock.Run();
 
-                
 
             Utilities.LoggingStatment($"{toolName}: Job Triggered");
-
         }
-
-        void Subject_Ran(object sender, EventArgs e)
+        void Subject_Ran(object sender, System.EventArgs e)
         {
+
             GetInfoFromTool();
+            
         }
-        void Subject_Running(object sender, EventArgs e)
+        void Subject_Running(object sender, System.EventArgs e)
         {
-
+            toolRunning = true;
         }
         private void GetInfoFromTool()
         {
             int toolOutputCount = toolBlock.Outputs.Count;
-            
+            toolRunning = false;
             
             outputs = toolBlock.Outputs;
             for(int i = 0; i < outputs.Count;i++)
@@ -268,6 +282,39 @@ namespace CognexVisionProForm
             }
             
             Utilities.LoggingStatment($"{toolName}: Job Manager closed down");
+        }
+        public List<ToolData> GetAllToolData()
+        {
+            List <ToolData> data = new List<ToolData>();
+
+
+            for (int i = 0; i < toolBlock.Tools.Count;i++)
+            {
+                if (toolBlock.Tools[i].GetType().Name ==  "CogToolBlock")
+                {
+
+                    CogToolBlock itool = toolBlock.Tools[i] as CogToolBlock;
+                    for(int j = 0;j < itool.Outputs.Count;j++)
+                    {
+
+                        string dataTypeName = itool.Outputs[j].ValueType.Name;
+                        if (!Utilities.IsNumeric(dataTypeName)) { continue; }
+                        if (dataTypeName == "Double")
+                        {
+                            double dataRound = Math.Round((double)itool.Outputs[j].Value,2);
+                            data.Add(new ToolData(itool.Name,itool.Outputs[j].Name, dataRound));
+                        }
+                        else if (dataTypeName == "Int32")
+                        {
+                            double convertData = Convert.ToDouble(itool.Outputs[j].Value);
+                            data.Add(new ToolData(itool.Name, itool.Outputs[j].Name, convertData));
+                        }
+                    }
+                    
+                }
+            }
+
+            return data;
         }
 
     }

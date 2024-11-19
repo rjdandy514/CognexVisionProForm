@@ -224,4 +224,16 @@ namespace CognexVisionProForm
             f.Show();
         }
     }
+    public class ToolData
+    {
+        public ToolData(string toolName, string name, double value)
+        {
+            ToolName = toolName;
+            Name = name;
+            Value = value;
+        }
+        public string ToolName { get; set; }
+        public string Name { get; set; }
+        public double Value { get; set; }
+    }
 }

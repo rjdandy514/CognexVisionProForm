@@ -9,7 +9,9 @@ using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Windows.Forms;
+using System.Collections.Generic;
 using EventArgs = System.EventArgs;
 
 
@@ -39,6 +41,9 @@ namespace CognexVisionProForm
         bool systemBusy;
         public CameraControl[] cameraControl;
 
+        Thread[] threadTool;
+        bool threadToolAlive;
+
         SplashScreen splashScreen;
 
         private int ExpireCount = 0;
@@ -64,7 +69,7 @@ namespace CognexVisionProForm
 
         string ServerNotFound = "No Server Found";
 
-        private Timer pollingTimer;
+        private System.Windows.Forms.Timer pollingTimer;
         public CognexVisionProForm()
         {
             InitializeComponent();
@@ -79,7 +84,11 @@ namespace CognexVisionProForm
             cbHeartbeat.Checked = heartBeat;
             cbSystemIdle.Checked = systemIdle;
 
-            if (MainPLC.InitialCheck.Status == IPStatus.Success)
+            threadToolAlive = ThreadAlive(threadTool);
+
+            
+
+            if (!threadToolAlive && MainPLC.InitialCheck.Status == IPStatus.Success)
             {
                 //Get all data from PLC
                 MainPLC.ReadPlcDataTag();
@@ -102,6 +111,7 @@ namespace CognexVisionProForm
         //*********************************************************************
         private void Form1_Load(object sender, EventArgs e)
         {
+            Thread.CurrentThread.Name = "Main Form";
 
             ComputerSetup();
 
@@ -163,6 +173,7 @@ namespace CognexVisionProForm
             resize_CameraControl();
             resize_tabToolBlock();
             resize_tabFileControl();
+            resize_tabCameraData();
         }
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -236,6 +247,10 @@ namespace CognexVisionProForm
             else if (tabControl1.SelectedTab.Name == "tabPlcConnection")
             {
                 tbBaseTag.Text = MainPLC.BaseTag;
+            }
+            else if (tabControl1.SelectedTab.Name == "tabCameraData")
+            {
+                resize_CameraControl();
             }
         }
         //*********************************************************************
@@ -314,7 +329,6 @@ namespace CognexVisionProForm
             else 
             {
                 CameraAcqArray[selectedCameraId].Disconnect();
-                CameraAcqArray[selectedCameraId].Cleaning();
             }
 
             cbCameraConnected.Checked = CameraAcqArray[selectedCameraId].Connected;
@@ -348,6 +362,8 @@ namespace CognexVisionProForm
         }
         private void bttnArchiveImage_Click(object sender, EventArgs e)
         {
+            
+
             if (CameraAcqArray[selectedCameraId].Connected)
             {
                 CameraAcqArray[selectedCameraId].Disconnect();
@@ -540,8 +556,13 @@ namespace CognexVisionProForm
             PingReply temp = MainPLC.PingPLC();
             tbPlcPingResponse.Text = temp.Status.ToString();
         }
-
-
+        //*********************************************************************
+        //camera Data
+        //*********************************************************************
+        private void bttnGetData_Click(object sender, EventArgs e)
+        {
+            BuildDataGrid((int)numCameraSelect.Value);
+        }
     }
 
 }
