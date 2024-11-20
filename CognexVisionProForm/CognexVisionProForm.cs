@@ -270,7 +270,7 @@ namespace CognexVisionProForm
             tbCameraDesc.Text = CameraAcqArray[selectedCameraId].Description;
 
             tbArchiveCount.Text = CameraAcqArray[selectedCameraId].ArchiveImageCount.ToString();
-            tbArchiveIndex.Text = CameraAcqArray[selectedCameraId].ArchiveImageIndex.ToString();
+            numArchiveIndex.Value = CameraAcqArray[selectedCameraId].ArchiveImageIndex;
             cbArchiveActive.Checked = CameraAcqArray[selectedCameraId].ArchiveImageActive;
 
             if (CameraAcqArray[selectedCameraId].Connected) { bttnConnectCamera.Text = "Disconnect"; }
@@ -428,7 +428,10 @@ namespace CognexVisionProForm
                         continue; 
                     }
                     CameraAcqArray[i].CreateCamera();
+
                     if (!CameraAcqArray[i].Connected) { return; }
+
+                    CameraAcqArray[i].SaveImageSelected = true;
                 }
 
             }
@@ -446,6 +449,12 @@ namespace CognexVisionProForm
 
             SaveSettings();
 
+        }
+        private void numArchiveIndex_ValueChanged(object sender, EventArgs e)
+        {
+            numArchiveIndex.Minimum = 0;
+            numArchiveIndex.Maximum = (int)CameraAcqArray[selectedCameraId].ArchiveImageCount;
+            CameraAcqArray[selectedCameraId].ArchiveImageIndex = (int)numArchiveIndex.Value;
         }
         //*********************************************************************
         //lICENSE CHECK
@@ -563,6 +572,8 @@ namespace CognexVisionProForm
         {
             BuildDataGrid((int)numCameraSelect.Value);
         }
+
+        
     }
 
 }

@@ -140,6 +140,7 @@ namespace CognexVisionProForm
             else if (!camera.SaveImageSelected)
             {
                 camera.SaveImageSelected = true;
+                camera.SaveImageBMP();
                 if (camera.LimitReached) { bttnCameraLog.Text = "Log Images - Active/Full"; }
                 else { bttnCameraLog.Text = "Log Images - Active"; }
             }
@@ -172,8 +173,8 @@ namespace CognexVisionProForm
         private void bttnTest_Click(object sender, EventArgs e)
         {
 
-            _form.BuildDataGrid(camera.Id);
-            //_form.RetryToolBlock();
+            //_form.GenerateCSV();
+            _form.RetryToolBlock();
             //camera.Abort();
             //camera.SoftwareTrigger();
         }
@@ -275,6 +276,7 @@ namespace CognexVisionProForm
             if (camera.Grabbing) { bttnGrab.Text = "Grabbing"; }
             else { bttnGrab.Text = "Press To Grab"; }
 
+            bttnCameraLog.Enabled = !camera.ArchiveImageActive;
             if (camera.SaveImageSelected)
             {
                 if (camera.LimitReached) { bttnCameraLog.Text = "Log Images - Active/Full"; }

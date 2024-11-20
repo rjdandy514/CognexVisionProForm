@@ -22,6 +22,7 @@ using System.Diagnostics;
 using Cognex.VisionPro.Exceptions;
 using System.Data;
 using System.ComponentModel;
+using System.IO;
 
 namespace CognexVisionProForm
 {
@@ -347,6 +348,7 @@ namespace CognexVisionProForm
             }
             
             
+            /*
             for (int i = 0; i < threadTool.Length;i++) 
             {
                 if (threadTool[i] != null) 
@@ -355,6 +357,7 @@ namespace CognexVisionProForm
                     toolTrigger[i] = false;
                 }
             }
+            */
             
 
 
@@ -380,7 +383,7 @@ namespace CognexVisionProForm
             cbCameraConnected.Checked = CameraAcqArray[selectedCameraId].Connected;
             tbCameraName.Text = CameraAcqArray[selectedCameraId].Name;
             tbArchiveCount.Text = CameraAcqArray[selectedCameraId].ArchiveImageCount.ToString();
-            tbArchiveIndex.Text = CameraAcqArray[selectedCameraId].ArchiveImageIndex.ToString();
+            numArchiveIndex.Value = CameraAcqArray[selectedCameraId].ArchiveImageIndex;
             cbArchiveActive.Checked = CameraAcqArray[selectedCameraId].ArchiveImageActive;
 
             
@@ -567,6 +570,8 @@ namespace CognexVisionProForm
             systemIdle &= toolTrigger.All(x => x == false);
             systemIdle &= cameraSnap.All(x => x == false);
             systemIdle &= cameraSnapComplete.All(x => x == false);
+            systemIdle &= !threadToolAlive;
+
 
             //CAMERA COMMANDS
             index = 1;
@@ -803,23 +808,83 @@ namespace CognexVisionProForm
         public void BuildDataGrid(int cameraSelect)
         {
             DataTable dt = new DataTable();
-            List<ToolData> data = new List<ToolData>();
+            List<ToolData>[] data = new List<ToolData>[cameraCount];
 
-            data = toolblockArray[cameraSelect, desiredTool[cameraSelect]].GetAllToolData();
+            for(int i = 0; i < cameraCount;i++)
+            {
+                data[i] = new List<ToolData>();
+                data[i] = toolblockArray[i, desiredTool[i]].GetAllToolData();
+            }
+
+            
 
             dt.Columns.Add("Tool Name", typeof(string));
             dt.Columns.Add("Data Name", typeof(string));
-            dt.Columns.Add("Data", typeof(double));
-
-
-            for(int i = 0; i < data.Count;i++)
+            for(int i = 0; i < cameraCount; i++)
             {
-                dt.Rows.Add(data[i].ToolName, data[i].Name, data[i].Value );
+                dt.Columns.Add($"Camera {i} Data", typeof(double));
             }
+
+            for(int i = 0; i < data[0].Count;i++)
+            {
+
+                object[] rowArray = new object[cameraCount + 2];
+
+                rowArray[0] = data[0][i].ToolName;
+                rowArray[1] = data[0][i].Name;
+
+                for (int j= 0; j < cameraCount; j++)
+                {
+                    rowArray[j + 2] = data[j][i].Value;
+                }
+
+                dt.Rows.Add(rowArray);
+            }
+            
             
 
             dgCameraData.DataSource = dt;
             dgCameraData.Sort(dgCameraData.Columns["Tool Name"], ListSortDirection.Descending);
+
+        }
+        public void GenerateCSV()
+        {
+            
+            StringBuilder sb = new StringBuilder();
+
+            string[] columnNames = new string[dgCameraData.Columns.Count];
+
+           for(int i = 0; i < dgCameraData.Columns.Count; i++)
+            {
+                columnNames[i] = dgCameraData.Columns[i].Name;
+            }
+
+
+            sb.AppendLine(string.Join(",", columnNames));
+
+            foreach (DataGridViewRow row in dgCameraData.Rows)
+            {
+                string[] fields = new string[row.Cells.Count];
+                for (int i = 0; i < row.Cells.Count; i++)
+                {
+                    if (row.Cells[i].Value != null) { fields[i] = row.Cells[i].Value.ToString(); }
+
+                }
+
+                sb.AppendLine(string.Join(",", fields));
+            }
+
+            string csvFileName = "CSV_" + DateTime.Now.ToString("yyyyMMddHHmmssffff") + ".csv";
+            string filePath = Utilities.ExeFilePath + "\\PartData\\";
+            string fileNameFull = filePath + csvFileName;
+
+            Directory.CreateDirectory(filePath);
+
+            if (Directory.Exists(filePath))
+            {
+                File.WriteAllText(fileNameFull, sb.ToString());
+            }          
+
 
         }
         public void ComputerSetup()
