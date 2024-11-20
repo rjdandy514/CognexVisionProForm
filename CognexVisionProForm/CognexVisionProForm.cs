@@ -570,7 +570,7 @@ namespace CognexVisionProForm
         //*********************************************************************
         private void bttnGetData_Click(object sender, EventArgs e)
         {
-            BuildDataGrid((int)numCameraSelect.Value);
+            BuildDataGrid();
         }
 
         

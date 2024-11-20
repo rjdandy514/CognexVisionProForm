@@ -805,7 +805,7 @@ namespace CognexVisionProForm
             else
                 return false;
         }
-        public void BuildDataGrid(int cameraSelect)
+        public void BuildDataGrid()
         {
             DataTable dt = new DataTable();
             List<ToolData>[] data = new List<ToolData>[cameraCount];
@@ -815,8 +815,6 @@ namespace CognexVisionProForm
                 data[i] = new List<ToolData>();
                 data[i] = toolblockArray[i, desiredTool[i]].GetAllToolData();
             }
-
-            
 
             dt.Columns.Add("Tool Name", typeof(string));
             dt.Columns.Add("Data Name", typeof(string));
@@ -840,11 +838,11 @@ namespace CognexVisionProForm
 
                 dt.Rows.Add(rowArray);
             }
-            
-            
 
             dgCameraData.DataSource = dt;
             dgCameraData.Sort(dgCameraData.Columns["Tool Name"], ListSortDirection.Descending);
+
+            GenerateCSV();
 
         }
         public void GenerateCSV()
