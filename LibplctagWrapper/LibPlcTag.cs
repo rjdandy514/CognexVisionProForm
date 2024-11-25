@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace LibplctagWrapper
 {
@@ -178,6 +179,13 @@ namespace LibplctagWrapper
         public void SetInt8Value(Tag tag, int offset, sbyte value)
         {
             plctag.plc_tag_set_int8(_tags[tag.UniqueKey], offset, value);
+        }
+        
+        public void GetStringValue(Tag tag, int offset,StringBuilder buffer, int buffer_length)
+
+        {
+            plctag.plc_tag_get_string(_tags[tag.UniqueKey], offset, buffer, buffer_length);
+
         }
 
         public void SetStringValue(Tag tag, int offset, string value)

@@ -104,6 +104,8 @@ public class DalsaImage
             return acqTime;
         }
     }
+    public string PartSerialNumber 
+    { get; set; }
     public string ConfigFile
     {
         get; set;
@@ -613,7 +615,13 @@ public class DalsaImage
         DirectoryInfo ImageDirInfo = new DirectoryInfo(imageFilePath);
         double ImageDirSize = Utilities.DirSize(ImageDirInfo);
         string RemoveFile = Utilities.DirOldest(ImageDirInfo);
-        string ImageFileName = "Image_" + DateTime.Now.ToString("yyyyMMddHHmmssffff") + ".bmp";
+
+        string identifier;
+
+        if (SerialNumber != "") { identifier = SerialNumber; }
+        else { identifier = "Image"; }
+
+        string ImageFileName = $"{identifier}_" + DateTime.Now.ToString("yyyyMMddHHmmssffff") + ".bmp";
         
         if (ImageDirSize >= 20000) 
         {

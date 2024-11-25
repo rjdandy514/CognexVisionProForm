@@ -265,7 +265,6 @@ namespace CognexVisionProForm
                 Array.Clear(toolTrigger, 0, toolTrigger.Length);
                 //if the cognex license is present, trigger Toolblock
                 if (cogLicenseOk) { ToolBlockTrigger(); }
-
             }
 
         }
@@ -305,9 +304,10 @@ namespace CognexVisionProForm
 
             //Task[] task;
             //task = new Task[cameraCount];
-
+            
             for (int j = 0; j < cameraCount; j++)
             {
+                Debug.WriteLine($"Test {cameraSnapComplete[j].ToString()}{cameraSnap[j].ToString()}");
                 if (cameraSnapComplete[j])
                 {
                     toolTrigger[j] = true;
@@ -552,12 +552,8 @@ namespace CognexVisionProForm
         public void resize_tabCameraData()
         {
             dgCameraData.Width = dgCameraData.PreferredSize.Width;
-            dgCameraData.Height = this.taCameraData.Height - 10;
+            dgCameraData.Height = this.taCameraData.Height - dgCameraData.Top - 10;
 
-            numCameraSelect.Value = 0;
-
-            numCameraSelect.Minimum = 0;
-            numCameraSelect.Maximum = cameraCount - 1;
         }
         public void PlcRead()
         {
@@ -597,6 +593,7 @@ namespace CognexVisionProForm
 
             for (int cam = 0; cam < cameraCount; cam++)
             {
+                CameraAcqArray[cam].PartSerialNumber = MainPLC.PlcToPcString[cam];
 
                 if (preProcessRequired)
                 {
@@ -608,7 +605,9 @@ namespace CognexVisionProForm
 
                 int toolIndex = 0;
                 tool = toolblockArray[cam, desiredTool[cam]];
-                
+
+                tool.PartSerialNumber = MainPLC.PlcToPcString[cam];
+
                 if (tool.ToolReady == false) { continue; }
 
                 for (int j = controlDataLoop; j < Math.Min(tool.Inputs.Count, dataLength); j++)
@@ -820,27 +819,47 @@ namespace CognexVisionProForm
             dt.Columns.Add("Data Name", typeof(string));
             for(int i = 0; i < cameraCount; i++)
             {
-                dt.Columns.Add($"Camera {i} Data", typeof(double));
+                dt.Columns.Add($"Camera {i} Data", typeof(string));
             }
 
-            for(int i = 0; i < data[0].Count;i++)
+            object[] rowArray = new object[cameraCount + 2];
+            rowArray[0] = "Camera";
+            rowArray[1] = "Serial Number";
+            for (int i = 0; i < cameraCount; i++)
             {
+                rowArray[i + 2] = CameraAcqArray[i].PartSerialNumber;
+            }
+            dt.Rows.Add(rowArray);
 
-                object[] rowArray = new object[cameraCount + 2];
+            rowArray = new object[cameraCount + 2];
+            rowArray[0] = "Tool";
+            rowArray[1] = "Serial Number";
+            for (int i = 0; i < cameraCount; i++)
+            {
+                rowArray[i + 2] = toolblockArray[i, desiredTool[i]].PartSerialNumber;
+            }
+            dt.Rows.Add(rowArray);
 
+            for (int i = 0; i < data[0].Count;i++)
+            {
+                rowArray = new object[cameraCount + 2];
                 rowArray[0] = data[0][i].ToolName;
                 rowArray[1] = data[0][i].Name;
 
                 for (int j= 0; j < cameraCount; j++)
                 {
-                    rowArray[j + 2] = data[j][i].Value;
+                    rowArray[j + 2] = data[j][i].Value.ToString();
                 }
 
                 dt.Rows.Add(rowArray);
             }
 
             dgCameraData.DataSource = dt;
-            dgCameraData.Sort(dgCameraData.Columns["Tool Name"], ListSortDirection.Descending);
+            //dgCameraData.Sort(dgCameraData.Columns["Tool Name"], ListSortDirection.Descending);
+
+            resize_tabCameraData();
+
+
 
             GenerateCSV();
 

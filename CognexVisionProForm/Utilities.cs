@@ -226,13 +226,67 @@ namespace CognexVisionProForm
     }
     public class ToolData
     {
+        string internalToolName;
         public ToolData(string toolName, string name, double value)
         {
             ToolName = toolName;
             Name = name;
             Value = value;
         }
-        public string ToolName { get; set; }
+        public string ToolName
+        { 
+            get { return internalToolName;  }
+            set
+            {
+                switch(value)
+                {
+                    case "OP":
+                        internalToolName = "Outside Perimeter";
+                        break;
+                    case "COHI":
+                        internalToolName = "Coolant Outlet Header";
+                        break;
+                    case "OOHI":
+                        internalToolName = "Oxidant Outlet Header";
+                        break;
+                    case "FOHI":
+                        internalToolName = "Fuel Outlet Header";
+                        break;
+                    case "CIHI":
+                        internalToolName = "Coolant Inlet Header";
+                        break;
+                    case "OIHI":
+                        internalToolName = "Oxidant Inlet Header";
+                        break;
+                    case "FIHI":
+                        internalToolName = "Fuel Inlet Header";
+                        break;
+                    case "OHLI":
+                        internalToolName = "Outlet Hole Left";
+                        break;
+                    case "OHRI":
+                        internalToolName = "Outlet Hole Right";
+                        break;
+                    case "OHI":
+                        internalToolName = "Outlet Hole";
+                        break;
+                    case "IHLI":
+                        internalToolName = "Inlet Hole Left";
+                        break;
+                    case "IHRI":
+                        internalToolName = "Inlet Hole Right";
+                        break;
+                    case "IHI":
+                        internalToolName = "Inlet Hole";
+                        break;
+
+                    default:
+                        internalToolName = value; 
+                        break;
+                }
+                
+            }
+    }
         public string Name { get; set; }
         public double Value { get; set; }
     }

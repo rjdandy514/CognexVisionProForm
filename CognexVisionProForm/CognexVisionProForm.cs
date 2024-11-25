@@ -38,7 +38,6 @@ namespace CognexVisionProForm
         bool[] cameraSnapComplete;
         bool[] toolTrigger;
         bool[] toolTriggerComplete;
-        bool systemBusy;
         public CameraControl[] cameraControl;
 
         Thread[] threadTool;
@@ -93,6 +92,7 @@ namespace CognexVisionProForm
                 //Get all data from PLC
                 MainPLC.ReadPlcDataTag();
                 MainPLC.ReadPlcTag();
+                MainPLC.ReadPlcStringTag();
                
                 PlcReadData();
                 PlcRead();

@@ -22,8 +22,6 @@ namespace CognexVisionProForm
         string toolFileLocation;
         string toolFileType = "ToolBlock";
         string toolFileExtension = ".vpp";
-        Task task;
-        List<ToolData> data;
 
         bool filePresent = false;
         bool resultUpdated = false;
@@ -72,6 +70,10 @@ namespace CognexVisionProForm
                     toolFile = "";
                 }
             }
+        }
+        public string PartSerialNumber
+        {
+            get;set;
         }
         public bool Result
         {
@@ -299,7 +301,12 @@ namespace CognexVisionProForm
 
                         string dataTypeName = itool.Outputs[j].ValueType.Name;
                         if (!Utilities.IsNumeric(dataTypeName)) { continue; }
-                        if (dataTypeName == "Double")
+                        if(itool.RunStatus.Result != CogToolResultConstants.Accept)
+                        {
+                            double dataRound = 0;
+                            data.Add(new ToolData(itool.Name, itool.Outputs[j].Name, dataRound));
+                        }
+                        else if (dataTypeName == "Double")
                         {
                             double dataRound = Math.Round((double)itool.Outputs[j].Value,2);
                             data.Add(new ToolData(itool.Name,itool.Outputs[j].Name, dataRound));
