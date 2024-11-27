@@ -100,6 +100,7 @@ namespace CognexVisionProForm
                 //Send Data to PLC
                 PlcWriteData();
                 PlcWrite();
+                MainPLC.WritePlcString();
                 MainPLC.WritePlcDataTag();
                 MainPLC.WritePlcTag();
                 
@@ -270,7 +271,9 @@ namespace CognexVisionProForm
             tbCameraDesc.Text = CameraAcqArray[selectedCameraId].Description;
 
             tbArchiveCount.Text = CameraAcqArray[selectedCameraId].ArchiveImageCount.ToString();
-            numArchiveIndex.Value = CameraAcqArray[selectedCameraId].ArchiveImageIndex;
+            numArchiveIndex.Maximum = CameraAcqArray[selectedCameraId].ArchiveImageCount - 1;
+            //numArchiveIndex.Value = CameraAcqArray[selectedCameraId].ArchiveImageIndex;
+            numArchiveIndex.Value = 0;
             cbArchiveActive.Checked = CameraAcqArray[selectedCameraId].ArchiveImageActive;
 
             if (CameraAcqArray[selectedCameraId].Connected) { bttnConnectCamera.Text = "Disconnect"; }
@@ -428,6 +431,8 @@ namespace CognexVisionProForm
                         continue; 
                     }
                     CameraAcqArray[i].CreateCamera();
+
+                    Thread.Sleep(500);
 
                     if (!CameraAcqArray[i].Connected) { return; }
 

@@ -538,6 +538,12 @@ public class DalsaImage
             CheckLineScanFeatures();
         }
     }
+    public void ChangeFOV()
+    {
+
+
+
+    }
     public void SnapPicture()
     {
         acqTimeWatch.Restart();
@@ -618,7 +624,7 @@ public class DalsaImage
 
         string identifier;
 
-        if (SerialNumber != "") { identifier = SerialNumber; }
+        if (SerialNumber != "") { identifier = PartSerialNumber; }
         else { identifier = "Image"; }
 
         string ImageFileName = $"{identifier}_" + DateTime.Now.ToString("yyyyMMddHHmmssffff") + ".bmp";

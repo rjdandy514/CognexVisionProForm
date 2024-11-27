@@ -24,7 +24,8 @@ namespace CognexVisionProForm
         Tag tagPlcToPcString;
         Tag tagPcToPlc;
         Tag tagPcToPlcData;
-        
+        Tag tagPcToPlcString;
+
         Libplctag client;
         int DataTimeout = 2000;
         public int[] PlcToPcControl = new int[32];
@@ -32,6 +33,7 @@ namespace CognexVisionProForm
         public int[] PcToPlcStatusData = new int[48];
         public int[] PlcToPcControlData = new int[48];
         public string[] PlcToPcString = new string[6];
+        public string[] PcToPlcString = new string[6];
         Ping pinger;
         
         public PlcComms(CognexVisionProForm Sender)
@@ -76,6 +78,7 @@ namespace CognexVisionProForm
                 string plcControlString = $"{BaseTag}.OUT.SerialNumber[0]";
                 string plcStatus =      $"{BaseTag}.IN.Status[0]";
                 string plcStatusData =  $"{BaseTag}.IN.StatusData[0]";
+                string plcStatusString = $"{BaseTag}.IN.SerialNumberEcho[0]";
 
                 // create the tag for PLC to PC communication
                 tagPlcToPc =        new Tag(IPAddress, "1,0", CpuType.LGX, plcControl, DataType.DINT, 8);
@@ -84,13 +87,16 @@ namespace CognexVisionProForm
                 tagPcToPlcData =    new Tag(IPAddress, "1,0", CpuType.LGX, plcStatusData, DataType.DINT, 48);
 
                 tagPlcToPcString = new Tag(IPAddress, "1,0", CpuType.LGX, plcControlString, DataType.String, 6);
+                tagPcToPlcString = new Tag(IPAddress, "1,0", CpuType.LGX, plcStatusString, DataType.String, 6);
 
                 //Add tags to Client
                 CreatePlcTag(tagPlcToPc, plcControl);
                 CreatePlcTag(tagPlcToPcData, plcControlData);
+                CreatePlcTag(tagPlcToPcString, plcControlString);
+                
                 CreatePlcTag(tagPcToPlc, plcStatus);
                 CreatePlcTag(tagPcToPlcData, plcStatusData);
-                CreatePlcTag(tagPlcToPcString, plcControlString);
+                CreatePlcTag(tagPcToPlcString, plcStatusString);
 
             }
 
@@ -141,6 +147,19 @@ namespace CognexVisionProForm
             return result;
 
         }
+        public int WritePlcString()
+        {
+            int result = 0;
+            // set values on the tag buffer
+            for (int i = 0; i < tagPcToPlcString.ElementCount; i++)
+            {
+                client.SetStringValue(tagPcToPlcString, i * tagPcToPlcString.ElementSize, PcToPlcString[i]);
+            }
+            // write the values
+            result = client.WriteTag(tagPcToPlcString, DataTimeout);
+            return result;
+
+        }
         public int ReadPlcTag()
         {
 
@@ -182,7 +201,6 @@ namespace CognexVisionProForm
                 {
                     StringBuilder stringBuilder = new StringBuilder();
                     stringBuilder.Length = 10;
-                    //=
                     client.GetStringValue(tagPlcToPcString, i * tagPlcToPcString.ElementSize, stringBuilder, 18);
                     PlcToPcString[i]= stringBuilder.ToString();
                 }

@@ -302,12 +302,11 @@ namespace CognexVisionProForm
             CogImage8Grey processedImage;
             Debug.WriteLine("Beginning of ToolBlock Trigger");
 
-            //Task[] task;
-            //task = new Task[cameraCount];
+            Task[] task;
+            task = new Task[cameraCount];
             
             for (int j = 0; j < cameraCount; j++)
             {
-                Debug.WriteLine($"Test {cameraSnapComplete[j].ToString()}{cameraSnap[j].ToString()}");
                 if (cameraSnapComplete[j])
                 {
                     toolTrigger[j] = true;
@@ -332,17 +331,17 @@ namespace CognexVisionProForm
                     toolblockArray[i, desiredTool[i]].Inputs[0].Value = processedImage;
                     //toolblockArray[i, desiredTool[i]].ToolRun();
                     
-                    threadTool[i] = new Thread(toolblockArray[i, desiredTool[i]].ToolRun);
-                    threadTool[i].Name = $"Camera {i}";
-                    threadTool[i].Start();
+                    //threadTool[i] = new Thread(toolblockArray[i, desiredTool[i]].ToolRun);
+                    //threadTool[i].Name = $"Camera {i}";
+                    //threadTool[i].Start();
 
                     //Parallel.Invoke(() => toolblockArray[i, desiredTool[i]].ToolRun());
 
                     
-                    //int camera = i;
-                    //int tool = desiredTool[i];
-                    //task[camera] = new Task(() => toolblockArray[camera, tool].ToolRun());
-                    //task[i].Start();
+                    int camera = i;
+                    int tool = desiredTool[i];
+                    task[camera] = new Task(() => toolblockArray[camera, tool].ToolRun());
+                    task[i].Start();
                     
                 }
             }
@@ -370,7 +369,8 @@ namespace CognexVisionProForm
         }
         public void RetryToolBlock()
         {
-            for(int i = 0; i< cameraCount;i++)
+           
+            for (int i = 0; i< cameraCount;i++)
             {
                 if (CameraAcqArray[i].Image != null) { cameraSnapComplete[i] = true; }
             }
@@ -639,7 +639,7 @@ namespace CognexVisionProForm
         {
             int index = 0;
             int tempTag = 0;
-
+            Debug.WriteLine("Polling");
             //Camera Status: info related to camera and general system         
             tempTag |= ((heartBeat ? 1 : 0 )<< 0);
             tempTag |= ((cogLicenseOk ? 1:0 ) << 1);
@@ -686,8 +686,9 @@ namespace CognexVisionProForm
             //Limit Doubles to 4 decimal places
             for (int i = 0; i < cameraCount; i++)
             {
-                tool = toolblockArray[i, desiredTool[i]];
+                MainPLC.PcToPlcString[i] = CameraAcqArray[i].PartSerialNumber;
 
+                tool = toolblockArray[i, desiredTool[i]];
                 if (tool.ResultUpdated != tool.ResultUpdated_Mem)
                 {
                     tool.ResultUpdated_Mem = tool.ResultUpdated;
@@ -703,7 +704,7 @@ namespace CognexVisionProForm
                         if (dataTypeName == "Double")
                         {
                             dData = Convert.ToDouble(tool.Outputs[j].Value);
-                            iData = Convert.ToInt32(dData * 10000);
+                            iData = Convert.ToInt32(dData) * 10000;
 
                             MainPLC.PcToPlcStatusData[(i * dataLength) + writeIndex] = iData;
                         }

@@ -178,8 +178,8 @@ namespace CognexVisionProForm
             if (toolFile != "") 
             {
 
-                toolBlock.Inputs[0].Value = null;
-                toolBlock.Run();
+                //toolBlock.Inputs[0].Value = null;
+                //toolBlock.Run();
                 CogSerializer.SaveObjectToFile(toolBlock, toolFile, typeof(System.Runtime.Serialization.Formatters.Binary.BinaryFormatter), 0); 
             }
 
@@ -234,7 +234,7 @@ namespace CognexVisionProForm
                     Utilities.LoggingStatment($"{toolName}: input # {i} = {toolBlock.Inputs[i].Value}");
                 }
             }
-            Debug.WriteLine(Thread.CurrentThread.Name);
+            //Debug.WriteLine(Thread.CurrentThread.Name);
             toolBlock.Run();
 
 
