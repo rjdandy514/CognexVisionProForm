@@ -32,9 +32,9 @@ namespace CognexVisionProForm
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
             this.tabPlcConnection = new System.Windows.Forms.TabPage();
             this.panel8 = new System.Windows.Forms.Panel();
             this.cbSystemIdle = new System.Windows.Forms.CheckBox();
@@ -133,6 +133,8 @@ namespace CognexVisionProForm
             this.bttnGetData = new System.Windows.Forms.Button();
             this.dgCameraData = new System.Windows.Forms.DataGridView();
             this.toolBlockBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.label11 = new System.Windows.Forms.Label();
+            this.label12 = new System.Windows.Forms.Label();
             this.tabPlcConnection.SuspendLayout();
             this.panel8.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numIP1)).BeginInit();
@@ -548,7 +550,7 @@ namespace CognexVisionProForm
             this.tabLicenseCheck.Padding = new System.Windows.Forms.Padding(3);
             this.tabLicenseCheck.Size = new System.Drawing.Size(1284, 716);
             this.tabLicenseCheck.TabIndex = 2;
-            this.tabLicenseCheck.Text = "LicenseCheck";
+            this.tabLicenseCheck.Text = "License Check";
             // 
             // panel11
             // 
@@ -600,7 +602,7 @@ namespace CognexVisionProForm
             this.tabFrameGrabber.Padding = new System.Windows.Forms.Padding(5);
             this.tabFrameGrabber.Size = new System.Drawing.Size(1284, 716);
             this.tabFrameGrabber.TabIndex = 0;
-            this.tabFrameGrabber.Text = "FrameGrabber";
+            this.tabFrameGrabber.Text = "Frame Grabber";
             // 
             // panel1
             // 
@@ -775,6 +777,7 @@ namespace CognexVisionProForm
             // panel4
             // 
             this.panel4.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.panel4.Controls.Add(this.label11);
             this.panel4.Controls.Add(this.label7);
             this.panel4.Controls.Add(this.txtVicName);
             this.panel4.Controls.Add(this.label6);
@@ -801,14 +804,14 @@ namespace CognexVisionProForm
             this.panel4.Margin = new System.Windows.Forms.Padding(5);
             this.panel4.Name = "panel4";
             this.panel4.Padding = new System.Windows.Forms.Padding(5);
-            this.panel4.Size = new System.Drawing.Size(592, 328);
+            this.panel4.Size = new System.Drawing.Size(592, 352);
             this.panel4.TabIndex = 33;
             this.panel4.Tag = "pnCameraControl";
             // 
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(9, 301);
+            this.label7.Location = new System.Drawing.Point(8, 332);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(56, 13);
             this.label7.TabIndex = 44;
@@ -817,7 +820,7 @@ namespace CognexVisionProForm
             // txtVicName
             // 
             this.txtVicName.AutoSize = true;
-            this.txtVicName.Location = new System.Drawing.Point(93, 301);
+            this.txtVicName.Location = new System.Drawing.Point(92, 332);
             this.txtVicName.Name = "txtVicName";
             this.txtVicName.Size = new System.Drawing.Size(61, 13);
             this.txtVicName.TabIndex = 45;
@@ -826,7 +829,7 @@ namespace CognexVisionProForm
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(9, 279);
+            this.label6.Location = new System.Drawing.Point(8, 310);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(70, 13);
             this.label6.TabIndex = 42;
@@ -835,7 +838,7 @@ namespace CognexVisionProForm
             // txtModel
             // 
             this.txtModel.AutoSize = true;
-            this.txtModel.Location = new System.Drawing.Point(93, 279);
+            this.txtModel.Location = new System.Drawing.Point(92, 310);
             this.txtModel.Name = "txtModel";
             this.txtModel.Size = new System.Drawing.Size(47, 13);
             this.txtModel.TabIndex = 43;
@@ -844,7 +847,7 @@ namespace CognexVisionProForm
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(9, 257);
+            this.label5.Location = new System.Drawing.Point(8, 288);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(85, 13);
             this.label5.TabIndex = 40;
@@ -853,7 +856,7 @@ namespace CognexVisionProForm
             // txtCompany
             // 
             this.txtCompany.AutoSize = true;
-            this.txtCompany.Location = new System.Drawing.Point(93, 257);
+            this.txtCompany.Location = new System.Drawing.Point(92, 288);
             this.txtCompany.Name = "txtCompany";
             this.txtCompany.Size = new System.Drawing.Size(62, 13);
             this.txtCompany.TabIndex = 41;
@@ -861,7 +864,7 @@ namespace CognexVisionProForm
             // 
             // bttnAutoConnect
             // 
-            this.bttnAutoConnect.Location = new System.Drawing.Point(346, 11);
+            this.bttnAutoConnect.Location = new System.Drawing.Point(345, 42);
             this.bttnAutoConnect.Name = "bttnAutoConnect";
             this.bttnAutoConnect.Size = new System.Drawing.Size(225, 24);
             this.bttnAutoConnect.TabIndex = 39;
@@ -872,7 +875,7 @@ namespace CognexVisionProForm
             // label39
             // 
             this.label39.AutoSize = true;
-            this.label39.Location = new System.Drawing.Point(9, 71);
+            this.label39.Location = new System.Drawing.Point(8, 102);
             this.label39.Name = "label39";
             this.label39.Size = new System.Drawing.Size(102, 13);
             this.label39.TabIndex = 38;
@@ -880,7 +883,7 @@ namespace CognexVisionProForm
             // 
             // tbCameraDesc
             // 
-            this.tbCameraDesc.Location = new System.Drawing.Point(120, 67);
+            this.tbCameraDesc.Location = new System.Drawing.Point(119, 98);
             this.tbCameraDesc.Name = "tbCameraDesc";
             this.tbCameraDesc.Size = new System.Drawing.Size(209, 20);
             this.tbCameraDesc.TabIndex = 37;
@@ -890,7 +893,7 @@ namespace CognexVisionProForm
             // 
             this.cbCameraIdSelected.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbCameraIdSelected.FormattingEnabled = true;
-            this.cbCameraIdSelected.Location = new System.Drawing.Point(120, 11);
+            this.cbCameraIdSelected.Location = new System.Drawing.Point(119, 42);
             this.cbCameraIdSelected.Name = "cbCameraIdSelected";
             this.cbCameraIdSelected.Size = new System.Drawing.Size(210, 21);
             this.cbCameraIdSelected.TabIndex = 35;
@@ -899,7 +902,7 @@ namespace CognexVisionProForm
             // label38
             // 
             this.label38.AutoSize = true;
-            this.label38.Location = new System.Drawing.Point(9, 15);
+            this.label38.Location = new System.Drawing.Point(8, 46);
             this.label38.Name = "label38";
             this.label38.Size = new System.Drawing.Size(60, 13);
             this.label38.TabIndex = 34;
@@ -908,7 +911,7 @@ namespace CognexVisionProForm
             // label35
             // 
             this.label35.AutoSize = true;
-            this.label35.Location = new System.Drawing.Point(9, 44);
+            this.label35.Location = new System.Drawing.Point(8, 75);
             this.label35.Name = "label35";
             this.label35.Size = new System.Drawing.Size(77, 13);
             this.label35.TabIndex = 33;
@@ -916,7 +919,7 @@ namespace CognexVisionProForm
             // 
             // tbCameraName
             // 
-            this.tbCameraName.Location = new System.Drawing.Point(120, 40);
+            this.tbCameraName.Location = new System.Drawing.Point(119, 71);
             this.tbCameraName.Name = "tbCameraName";
             this.tbCameraName.Size = new System.Drawing.Size(209, 20);
             this.tbCameraName.TabIndex = 32;
@@ -924,7 +927,7 @@ namespace CognexVisionProForm
             // label37
             // 
             this.label37.AutoSize = true;
-            this.label37.Location = new System.Drawing.Point(9, 156);
+            this.label37.Location = new System.Drawing.Point(8, 187);
             this.label37.Name = "label37";
             this.label37.Size = new System.Drawing.Size(95, 13);
             this.label37.TabIndex = 31;
@@ -933,7 +936,7 @@ namespace CognexVisionProForm
             // label31
             // 
             this.label31.AutoSize = true;
-            this.label31.Location = new System.Drawing.Point(9, 129);
+            this.label31.Location = new System.Drawing.Point(8, 160);
             this.label31.Name = "label31";
             this.label31.Size = new System.Drawing.Size(80, 13);
             this.label31.TabIndex = 30;
@@ -942,7 +945,7 @@ namespace CognexVisionProForm
             // cbCameraConnected
             // 
             this.cbCameraConnected.AutoCheck = false;
-            this.cbCameraConnected.Location = new System.Drawing.Point(120, 94);
+            this.cbCameraConnected.Location = new System.Drawing.Point(119, 125);
             this.cbCameraConnected.Name = "cbCameraConnected";
             this.cbCameraConnected.Size = new System.Drawing.Size(118, 24);
             this.cbCameraConnected.TabIndex = 19;
@@ -950,7 +953,7 @@ namespace CognexVisionProForm
             // 
             // bttnConnectCamera
             // 
-            this.bttnConnectCamera.Location = new System.Drawing.Point(9, 94);
+            this.bttnConnectCamera.Location = new System.Drawing.Point(8, 125);
             this.bttnConnectCamera.Name = "bttnConnectCamera";
             this.bttnConnectCamera.Size = new System.Drawing.Size(106, 24);
             this.bttnConnectCamera.TabIndex = 18;
@@ -961,7 +964,7 @@ namespace CognexVisionProForm
             // cbConfigFileFound
             // 
             this.cbConfigFileFound.AutoCheck = false;
-            this.cbConfigFileFound.Location = new System.Drawing.Point(120, 217);
+            this.cbConfigFileFound.Location = new System.Drawing.Point(119, 248);
             this.cbConfigFileFound.Name = "cbConfigFileFound";
             this.cbConfigFileFound.Size = new System.Drawing.Size(147, 24);
             this.cbConfigFileFound.TabIndex = 23;
@@ -971,7 +974,7 @@ namespace CognexVisionProForm
             // 
             this.cbServerList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbServerList.FormattingEnabled = true;
-            this.cbServerList.Location = new System.Drawing.Point(120, 125);
+            this.cbServerList.Location = new System.Drawing.Point(119, 156);
             this.cbServerList.Name = "cbServerList";
             this.cbServerList.Size = new System.Drawing.Size(451, 21);
             this.cbServerList.TabIndex = 16;
@@ -980,7 +983,7 @@ namespace CognexVisionProForm
             // cbConfigFileReq
             // 
             this.cbConfigFileReq.AutoCheck = false;
-            this.cbConfigFileReq.Location = new System.Drawing.Point(9, 187);
+            this.cbConfigFileReq.Location = new System.Drawing.Point(8, 218);
             this.cbConfigFileReq.Name = "cbConfigFileReq";
             this.cbConfigFileReq.Size = new System.Drawing.Size(190, 24);
             this.cbConfigFileReq.TabIndex = 22;
@@ -989,7 +992,7 @@ namespace CognexVisionProForm
             // bttnConfigSelect
             // 
             this.bttnConfigSelect.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.bttnConfigSelect.Location = new System.Drawing.Point(9, 218);
+            this.bttnConfigSelect.Location = new System.Drawing.Point(8, 249);
             this.bttnConfigSelect.Name = "bttnConfigSelect";
             this.bttnConfigSelect.Size = new System.Drawing.Size(106, 23);
             this.bttnConfigSelect.TabIndex = 20;
@@ -1001,7 +1004,7 @@ namespace CognexVisionProForm
             // 
             this.cbDeviceList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbDeviceList.FormattingEnabled = true;
-            this.cbDeviceList.Location = new System.Drawing.Point(120, 152);
+            this.cbDeviceList.Location = new System.Drawing.Point(119, 183);
             this.cbDeviceList.Name = "cbDeviceList";
             this.cbDeviceList.Size = new System.Drawing.Size(451, 21);
             this.cbDeviceList.TabIndex = 17;
@@ -1009,6 +1012,7 @@ namespace CognexVisionProForm
             // panel2
             // 
             this.panel2.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.panel2.Controls.Add(this.label12);
             this.panel2.Controls.Add(this.numArchiveIndex);
             this.panel2.Controls.Add(this.cbArchiveActive);
             this.panel2.Controls.Add(this.bttnArchiveImage);
@@ -1019,13 +1023,13 @@ namespace CognexVisionProForm
             this.panel2.Margin = new System.Windows.Forms.Padding(5);
             this.panel2.Name = "panel2";
             this.panel2.Padding = new System.Windows.Forms.Padding(5);
-            this.panel2.Size = new System.Drawing.Size(225, 250);
+            this.panel2.Size = new System.Drawing.Size(225, 169);
             this.panel2.TabIndex = 31;
             this.panel2.Tag = "pnCameraControl";
             // 
             // numArchiveIndex
             // 
-            this.numArchiveIndex.Location = new System.Drawing.Point(140, 63);
+            this.numArchiveIndex.Location = new System.Drawing.Point(141, 94);
             this.numArchiveIndex.Name = "numArchiveIndex";
             this.numArchiveIndex.Size = new System.Drawing.Size(76, 20);
             this.numArchiveIndex.TabIndex = 32;
@@ -1034,7 +1038,7 @@ namespace CognexVisionProForm
             // cbArchiveActive
             // 
             this.cbArchiveActive.AutoCheck = false;
-            this.cbArchiveActive.Location = new System.Drawing.Point(6, 38);
+            this.cbArchiveActive.Location = new System.Drawing.Point(7, 69);
             this.cbArchiveActive.Name = "cbArchiveActive";
             this.cbArchiveActive.Size = new System.Drawing.Size(178, 24);
             this.cbArchiveActive.TabIndex = 31;
@@ -1042,7 +1046,7 @@ namespace CognexVisionProForm
             // 
             // bttnArchiveImage
             // 
-            this.bttnArchiveImage.Location = new System.Drawing.Point(48, 9);
+            this.bttnArchiveImage.Location = new System.Drawing.Point(49, 40);
             this.bttnArchiveImage.Name = "bttnArchiveImage";
             this.bttnArchiveImage.Size = new System.Drawing.Size(106, 24);
             this.bttnArchiveImage.TabIndex = 26;
@@ -1053,7 +1057,7 @@ namespace CognexVisionProForm
             // label34
             // 
             this.label34.AutoSize = true;
-            this.label34.Location = new System.Drawing.Point(8, 100);
+            this.label34.Location = new System.Drawing.Point(9, 131);
             this.label34.Name = "label34";
             this.label34.Size = new System.Drawing.Size(109, 13);
             this.label34.TabIndex = 30;
@@ -1062,7 +1066,7 @@ namespace CognexVisionProForm
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(8, 71);
+            this.label3.Location = new System.Drawing.Point(9, 102);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(75, 13);
             this.label3.TabIndex = 29;
@@ -1070,7 +1074,7 @@ namespace CognexVisionProForm
             // 
             // tbArchiveCount
             // 
-            this.tbArchiveCount.Location = new System.Drawing.Point(140, 96);
+            this.tbArchiveCount.Location = new System.Drawing.Point(141, 127);
             this.tbArchiveCount.Name = "tbArchiveCount";
             this.tbArchiveCount.Size = new System.Drawing.Size(76, 20);
             this.tbArchiveCount.TabIndex = 28;
@@ -1182,35 +1186,55 @@ namespace CognexVisionProForm
             // 
             // dgCameraData
             // 
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dgCameraData.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dgCameraData.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle4;
             this.dgCameraData.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dgCameraData.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dgCameraData.DefaultCellStyle = dataGridViewCellStyle5;
             this.dgCameraData.Location = new System.Drawing.Point(6, 59);
             this.dgCameraData.Name = "dgCameraData";
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dgCameraData.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle6.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dgCameraData.RowHeadersDefaultCellStyle = dataGridViewCellStyle6;
             this.dgCameraData.Size = new System.Drawing.Size(781, 654);
             this.dgCameraData.TabIndex = 0;
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label11.Location = new System.Drawing.Point(8, 11);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(141, 24);
+            this.label11.TabIndex = 46;
+            this.label11.Text = "Camera Control";
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label12.Location = new System.Drawing.Point(21, 5);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(140, 24);
+            this.label12.TabIndex = 38;
+            this.label12.Text = "Archive Images";
             // 
             // CognexVisionProForm
             // 
@@ -1359,6 +1383,8 @@ namespace CognexVisionProForm
         private System.Windows.Forms.BindingSource toolBlockBindingSource;
         private System.Windows.Forms.Button bttnGetData;
         private System.Windows.Forms.NumericUpDown numArchiveIndex;
+        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.Label label12;
     }
 }
 

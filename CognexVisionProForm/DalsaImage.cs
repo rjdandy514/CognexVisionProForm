@@ -17,6 +17,7 @@ using System.Reflection;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using System.Runtime.InteropServices.ComTypes;
 using System.Text;
+using System.Runtime.CompilerServices;
 
 public class DalsaImage
 {
@@ -106,6 +107,8 @@ public class DalsaImage
     }
     public string PartSerialNumber 
     { get; set; }
+    public string PartType
+    {  get; set; }
     public string ConfigFile
     {
         get; set;
@@ -540,9 +543,8 @@ public class DalsaImage
     }
     public void ChangeFOV()
     {
-
-
-
+        Disconnect();
+        CreateCamera();
     }
     public void SnapPicture()
     {
@@ -561,7 +563,7 @@ public class DalsaImage
         {
             if (acqXfer.Snap())
             {
-                //acqXfer.Wait(5000);
+                acqXfer.Wait(500);
 
                 snapTime = acqTimeWatch.ElapsedMilliseconds;
                 snapping = true;
@@ -627,7 +629,7 @@ public class DalsaImage
         if (SerialNumber != "") { identifier = PartSerialNumber; }
         else { identifier = "Image"; }
 
-        string ImageFileName = $"{identifier}_" + DateTime.Now.ToString("yyyyMMddHHmmssffff") + ".bmp";
+        string ImageFileName = $"{PartType}_{identifier}_" + DateTime.Now.ToString("yyyyMMddHHmmssffff") + ".bmp";
         
         if (ImageDirSize >= 20000) 
         {
@@ -724,6 +726,11 @@ public class DalsaImage
         {
             cogImageAddress = Marshal.AllocHGlobal(size);
         }
+        else 
+        {
+            Marshal.FreeHGlobal(cogImageAddress);
+            cogImageAddress = Marshal.AllocHGlobal(size);
+        }
 
         //cogImageAddress = Marshal.AllocHGlobal(size);
 
@@ -731,6 +738,8 @@ public class DalsaImage
         Marshal.Copy(imageAddress, managedArray, 0, size);
         Marshal.Copy(managedArray, 0, cogImageAddress, size);
         NewImageRoot.Initialize(imageWidth, imageHeight, cogImageAddress, imageWidth, null);
+
+        
 
         if (imageFormat == SapFormat.Mono8)
         {
@@ -759,7 +768,6 @@ public class DalsaImage
         int phaseA = 1;
         int phaseB = 2;
         if (acquisition == null) { return 0; }
-
 
         getResult = acquisition.GetParameter(SapAcquisition.Prm.EXT_LINE_TRIGGER_SOURCE, out returnGetParm);
 

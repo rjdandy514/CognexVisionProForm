@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -222,6 +223,51 @@ namespace CognexVisionProForm
             p.Controls.Add(f);
             p.Tag = f;
             f.Show();
+        }
+        public static void GenerateCsvFromdataTable(string fileLocation,string fileName,DataTable dt)
+        {
+
+            StringBuilder sb = new StringBuilder();
+
+            string[] columnNames = new string[dt.Columns.Count];
+
+            for (int i = 0; i < dt.Columns.Count; i++)
+            {
+                columnNames[i] = dt.Columns[i].ColumnName;
+            }
+
+
+            sb.AppendLine(string.Join(",", columnNames));
+
+            foreach (DataRow row in dt.Rows)
+            {
+
+                //string[] fields = (string[]) row.ItemArray;
+                string[] fields = Array.ConvertAll(row.ItemArray, x => x.ToString());
+                sb.AppendLine(string.Join(",", fields));
+            }
+
+            string fileNameFull = fileLocation + fileName;
+
+            Directory.CreateDirectory(fileLocation);
+            if (Directory.Exists(fileLocation)) { File.WriteAllText(fileNameFull, sb.ToString()); }
+
+
+            
+        }
+        public static void AppendDatatableToCSV(string fileLocation, string fileName, DataRow dr)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            //string[] fields = (string[]) row.ItemArray;
+            string[] fields = Array.ConvertAll(dr.ItemArray, x => x.ToString());
+            sb.AppendLine(string.Join(",", fields));
+            
+
+            string fileNameFull = fileLocation + fileName;
+
+            Directory.CreateDirectory(fileLocation);
+            if (Directory.Exists(fileLocation)) { File.AppendAllText(fileNameFull, sb.ToString()); }
         }
     }
     public class ToolData

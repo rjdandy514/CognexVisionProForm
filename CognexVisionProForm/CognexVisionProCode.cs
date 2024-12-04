@@ -51,6 +51,18 @@ namespace CognexVisionProForm
         {
             get { return threadToolAlive; }
         }
+        public int Recipe
+        {
+            get => recipe;
+            set 
+            {
+                recipe = value;
+                RecipeChange();
+            }
+        }
+        public int StationNumber
+        { get; set; }
+
         public void InitClasses()
         {
             pollingTimer = new System.Windows.Forms.Timer();
@@ -62,8 +74,6 @@ namespace CognexVisionProForm
             {
                 splashScreen.UpdateProgress($"Initialize Camera {j}", 5);
                 CameraAcqArray[j] = new DalsaImage(this);
-                CameraAcqArray[j].CropLeft = cameraCropLeft;
-                CameraAcqArray[j].CropWidth = cameraCropWidth;
                 CameraAcqArray[j].Flip = cameraImageFlip;
                 CameraAcqArray[j].Id = j;
 
@@ -86,6 +96,9 @@ namespace CognexVisionProForm
                 
                 threadTool = new Thread[cameraCount];
             }
+            recipeEcho = 99;
+            Recipe = 0;
+            
 
             MainPLC = new PlcComms(this);
             dataLength = MainPLC.PlcToPcControlData.Length / cameraCount;
@@ -244,6 +257,71 @@ namespace CognexVisionProForm
                 txtVicName.Text = CameraAcqArray[selectedCameraId].Vicname;
             }
             
+        }
+        public void RecipeData()
+        {
+            
+            //Update the Part Type
+            PartType[0] = "LCS-M";
+            PartType[1] = "LCS-H";
+            PartType[2] = "HPS";
+            PartType[3] = "LCS-X";
+            //determine FOV of camera depending on part type and station number
+            switch (StationNumber)
+            {
+                case 70:
+                    cameraCropLeft[0] = 1400;
+                    cameraCropWidth[0] = 5300;
+                    cameraCropLeft[1] = 1400;
+                    cameraCropWidth[1] = 5300;
+                    cameraCropLeft[2] = 1400;
+                    cameraCropWidth[2] = 5300;
+                    cameraCropLeft[3] = 1400;
+                    cameraCropWidth[3] = 5300;
+                    break;
+                case 90:
+                    cameraCropLeft[0] = 1500;
+                    cameraCropWidth[0] = 5300;
+                    cameraCropLeft[1] = 1500;
+                    cameraCropWidth[1] = 5300;
+                    cameraCropLeft[2] = 1500;
+                    cameraCropWidth[2] = 5300;
+                    cameraCropLeft[3] = 1500;
+                    cameraCropWidth[3] = 5300;
+                    break;
+                default:
+                    cameraCropLeft[0] = 0;
+                    cameraCropWidth[0] = 8192;
+                    cameraCropLeft[1] = 0;
+                    cameraCropWidth[1] = 8192;
+                    cameraCropLeft[2] = 0;
+                    cameraCropWidth[2] = 8192;
+                    cameraCropLeft[3] = 0;
+                    cameraCropWidth[3] = 8192;
+                    break;
+            }
+        }
+        public void RecipeChange()
+        {
+            //update Recipe data
+            RecipeData();
+
+            //Only change recipe if system is idel
+            if (!systemIdle) { return; }
+            if (recipe >= cameraCropWidth.Length) { recipe = 0; }
+            
+            //only update recipe if recipe number has changed
+            if (recipe != recipeEcho)
+            {
+                for(int cam = 0; cam < cameraCount; cam++)
+                {
+                    CameraAcqArray[cam].CropWidth = cameraCropWidth[recipe];
+                    CameraAcqArray[cam].CropLeft = cameraCropLeft[recipe];
+                    if (CameraAcqArray[cam].Connected) { CameraAcqArray[cam].ChangeFOV(); }
+                    CameraAcqArray[cam].PartType = PartType[recipe];
+                }
+                recipeEcho = recipe;
+            }
         }
         public void CameraAbort()
         {
@@ -557,10 +635,11 @@ namespace CognexVisionProForm
         }
         public void PlcRead()
         {
-
+            
             //GENERAL COMMANDS
             int index = 0;
             PlcAutoMode = (MainPLC.PlcToPcControl[index] & (1 << 0)) != 0;
+            recipe = MainPLC.PlcToPcControl[index] >> 16;
 
             systemIdle = true;
             systemIdle &= toolTrigger.All(x => x == false);
@@ -639,11 +718,13 @@ namespace CognexVisionProForm
         {
             int index = 0;
             int tempTag = 0;
-            Debug.WriteLine("Polling");
+
             //Camera Status: info related to camera and general system         
             tempTag |= ((heartBeat ? 1 : 0 )<< 0);
             tempTag |= ((cogLicenseOk ? 1:0 ) << 1);
             tempTag |= ((!systemIdle ? 1 : 0) << 2);
+
+            tempTag |= recipeEcho << 16;
 
             MainPLC.PcToPlcStatus[index] = tempTag;
             index++;
@@ -813,7 +894,7 @@ namespace CognexVisionProForm
             for(int i = 0; i < cameraCount;i++)
             {
                 data[i] = new List<ToolData>();
-                data[i] = toolblockArray[i, desiredTool[i]].GetAllToolData();
+                data[i] = toolblockArray[i, desiredTool[i]].AllData;
             }
 
             dt.Columns.Add("Tool Name", typeof(string));
@@ -856,53 +937,8 @@ namespace CognexVisionProForm
             }
 
             dgCameraData.DataSource = dt;
-            //dgCameraData.Sort(dgCameraData.Columns["Tool Name"], ListSortDirection.Descending);
 
             resize_tabCameraData();
-
-
-
-            GenerateCSV();
-
-        }
-        public void GenerateCSV()
-        {
-            
-            StringBuilder sb = new StringBuilder();
-
-            string[] columnNames = new string[dgCameraData.Columns.Count];
-
-           for(int i = 0; i < dgCameraData.Columns.Count; i++)
-            {
-                columnNames[i] = dgCameraData.Columns[i].Name;
-            }
-
-
-            sb.AppendLine(string.Join(",", columnNames));
-
-            foreach (DataGridViewRow row in dgCameraData.Rows)
-            {
-                string[] fields = new string[row.Cells.Count];
-                for (int i = 0; i < row.Cells.Count; i++)
-                {
-                    if (row.Cells[i].Value != null) { fields[i] = row.Cells[i].Value.ToString(); }
-
-                }
-
-                sb.AppendLine(string.Join(",", fields));
-            }
-
-            string csvFileName = "CSV_" + DateTime.Now.ToString("yyyyMMddHHmmssffff") + ".csv";
-            string filePath = Utilities.ExeFilePath + "\\PartData\\";
-            string fileNameFull = filePath + csvFileName;
-
-            Directory.CreateDirectory(filePath);
-
-            if (Directory.Exists(filePath))
-            {
-                File.WriteAllText(fileNameFull, sb.ToString());
-            }          
-
 
         }
         public void ComputerSetup()
@@ -914,8 +950,11 @@ namespace CognexVisionProForm
 
             string iP = Utilities.GetLocalIPAddress("10.10.30.");
 
+            
+
             if (iP == OP15_IP)
             {
+                StationNumber = 15;
                 computerName = "OP15 Computer";
                 cameraCount = 2;
                 toolCount = 4;
@@ -923,6 +962,7 @@ namespace CognexVisionProForm
             }
             else if(iP == OP45_55_IP)
             {
+                StationNumber = 45;
                 computerName = "OP45/55 Computer";
                 cameraCount = 2;
                 toolCount = 9;
@@ -931,21 +971,20 @@ namespace CognexVisionProForm
             }
             else if (iP == OP70_IP)
             {
+                StationNumber = 70;
                 computerName = "OP70 Computer";
                 cameraCount = 6;
                 toolCount = 4;
-                cameraCropLeft = 1400;
-                cameraCropWidth = 5300;
+                
                 cameraImageFlip = 1;
                 preProcessRequired = true;
             }
             else if (iP == OP90_IP)
             {
+                StationNumber = 90;
                 computerName = "OP90 Computer";
                 cameraCount = 6;
                 toolCount = 4;
-                cameraCropLeft = 1500;
-                cameraCropWidth = 5300;
                 cameraImageFlip = 0;
                 preProcessRequired = true;
             }

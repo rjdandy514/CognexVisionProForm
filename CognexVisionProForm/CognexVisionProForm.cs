@@ -21,16 +21,19 @@ namespace CognexVisionProForm
     {
         private bool heartBeat = false;
         private bool PlcAutoMode;
+        private int recipe;
+        private int recipeEcho;
+        private string[] PartType;
         private bool[] ResultReadyOk;
 
         private CogStringCollection LicenseCheck;
         private bool cogLicenseOk;
-        private bool systemIdle;
+        private bool systemIdle = true;
 
         int selectedCameraId;
         int cameraConnectCount;
-        int cameraCropLeft;
-        int cameraCropWidth;
+        int[] cameraCropLeft;
+        int[] cameraCropWidth;
         int cameraImageFlip;
         int dataLength;
         public DalsaImage[] CameraAcqArray;
@@ -113,7 +116,9 @@ namespace CognexVisionProForm
         private void Form1_Load(object sender, EventArgs e)
         {
             Thread.CurrentThread.Name = "Main Form";
-
+            cameraCropLeft = new int[4];
+            cameraCropWidth = new int[4];
+            PartType = new string[4];
             ComputerSetup();
 
             this.Text = $"{computerName} - Eclipse Vision Application";
@@ -140,10 +145,6 @@ namespace CognexVisionProForm
             toolTrigger = new bool[cameraCount];
             toolTriggerComplete = new bool[cameraCount];
 
-            
-
-
-
             splashScreen.UpdateProgress("Initialize Classes", 10);
             InitClasses();
 
@@ -161,11 +162,13 @@ namespace CognexVisionProForm
 
             splashScreen.UpdateProgress("Check License", 10);
             CheckLicense();
+
             if (!cogLicenseOk)
             {
                 MessageBox.Show("Cognex VisionPro License did not load properly");
                 tabControl1.SelectedIndex = 2;
             }
+            else { tabControl1.SelectedIndex = 1; }
 
             splashScreen.UpdateProgress("Getting Ready", 10);
         }

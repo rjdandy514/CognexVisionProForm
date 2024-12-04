@@ -10,6 +10,9 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.Collections.Generic;
 using Cognex.Vision;
+using System.Data;
+using System.Data.Common;
+using Cognex.Vision.Implementation;
 
 
 namespace CognexVisionProForm
@@ -22,6 +25,10 @@ namespace CognexVisionProForm
         string toolFileLocation;
         string toolFileType = "ToolBlock";
         string toolFileExtension = ".vpp";
+        string csvFileName;
+
+        List<ToolData> data;
+        DataTable dataTable;
 
         bool filePresent = false;
         bool resultUpdated = false;
@@ -124,6 +131,10 @@ namespace CognexVisionProForm
         {
             get { return filePresent; }
             
+        }
+        public List<ToolData> AllData
+        {
+            get { return data; }
         }
 
         public CogToolBlockTerminalCollection Outputs
@@ -264,9 +275,14 @@ namespace CognexVisionProForm
             if (resultUpdated) { resultUpdated = false; }
             else { resultUpdated = true; }
             
+            if(!Preprocess)
+            {
+                GetAllToolData();
+                CreateTable();
+            }
+            
+            
             toolReady = true;
-
-
             Utilities.LoggingStatment($"{toolName}: Number of Outputs - {toolOutputCount}");
             Utilities.LoggingStatment($"{toolName}: Toolblock completed Run");
         }
@@ -285,43 +301,91 @@ namespace CognexVisionProForm
             
             Utilities.LoggingStatment($"{toolName}: Job Manager closed down");
         }
-        public List<ToolData> GetAllToolData()
+        public void GetAllToolData()
         {
-            List <ToolData> data = new List<ToolData>();
+            data = new List<ToolData>();
+            string dataTypeName;
+            double dataRound;
+            double convertData;
 
 
             for (int i = 0; i < toolBlock.Tools.Count;i++)
             {
                 if (toolBlock.Tools[i].GetType().Name ==  "CogToolBlock")
                 {
-
                     CogToolBlock itool = toolBlock.Tools[i] as CogToolBlock;
-                    for(int j = 0;j < itool.Outputs.Count;j++)
+                    // Collect all Inputs
+                    for (int j = 0; j < itool.Inputs.Count; j++)
+                    {
+                        dataTypeName = itool.Inputs[j].ValueType.Name;
+                        if (!Utilities.IsNumeric(dataTypeName)) { continue; }
+                        
+                        if (dataTypeName == "Double")
+                        {
+                            dataRound = Math.Round((double)itool.Inputs[j].Value, 4);
+                            data.Add(new ToolData(itool.Name, itool.Inputs[j].Name, dataRound));
+                        }
+                        else if (dataTypeName == "Int32")
+                        {
+                            convertData = Convert.ToDouble(itool.Inputs[j].Value);
+                            data.Add(new ToolData(itool.Name, itool.Inputs[j].Name, convertData));
+                        }
+                    }
+                    // Collect all Outputs
+                    for (int j = 0;j < itool.Outputs.Count;j++)
                     {
 
-                        string dataTypeName = itool.Outputs[j].ValueType.Name;
+                        dataTypeName = itool.Outputs[j].ValueType.Name;
                         if (!Utilities.IsNumeric(dataTypeName)) { continue; }
                         if(itool.RunStatus.Result != CogToolResultConstants.Accept)
                         {
-                            double dataRound = 0;
+                            dataRound = 0;
                             data.Add(new ToolData(itool.Name, itool.Outputs[j].Name, dataRound));
                         }
                         else if (dataTypeName == "Double")
                         {
-                            double dataRound = Math.Round((double)itool.Outputs[j].Value,2);
+                            dataRound = Math.Round((double)itool.Outputs[j].Value,4);
                             data.Add(new ToolData(itool.Name,itool.Outputs[j].Name, dataRound));
                         }
                         else if (dataTypeName == "Int32")
                         {
-                            double convertData = Convert.ToDouble(itool.Outputs[j].Value);
+                            convertData = Convert.ToDouble(itool.Outputs[j].Value);
                             data.Add(new ToolData(itool.Name, itool.Outputs[j].Name, convertData));
                         }
                     }
-                    
                 }
             }
+        }
+        public void CreateTable()
+        {
+            //dataTable = null;
+            //if table is null create base table
+            if (dataTable == null) 
+            { 
+                dataTable = new DataTable();
+                dataTable.Columns.Add("Part Serial Number", typeof(String));
 
-            return data;
+                for (int i = 0; i < data.Count;i++)
+                {
+                    dataTable.Columns.Add($"{data[i].ToolName} - {data[i].Name}", typeof(String));
+                }
+                csvFileName = $"{toolName}_{DateTime.Now.ToString("yyyyMMddHHmmssffff")}.csv";
+
+                Utilities.GenerateCsvFromdataTable(Utilities.ExeFilePath + "\\Camera" + CameraId.ToString("00") + "\\PartData\\", csvFileName, dataTable);
+            }
+            
+            PartSerialNumber = DateTime.Now.ToString("yyyyMMddHHmmssffff");
+            object[] insert = new object[dataTable.Columns.Count];
+            insert[0] = PartSerialNumber;
+            for (int i = 0; i < data.Count; i++)
+            {
+                insert[i+1] = data[i].Value.ToString();
+            }
+            dataTable.Rows.Add(insert);
+            Utilities.AppendDatatableToCSV(Utilities.ExeFilePath + "\\Camera" + CameraId.ToString("00") + "\\PartData\\", csvFileName, dataTable.Rows[dataTable.Rows.Count - 1]);
+
+            
+
         }
 
     }

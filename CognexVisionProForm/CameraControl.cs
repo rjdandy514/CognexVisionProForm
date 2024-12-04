@@ -172,7 +172,10 @@ namespace CognexVisionProForm
         }
         private void bttnTest_Click(object sender, EventArgs e)
         {
-            //camera.ChangeFOV();
+
+            //if (_form.Recipe == 0) { _form.Recipe = 1; }
+            //else { _form.Recipe = 0; }
+            //tool.CreateTable();
             //_form.GenerateCSV();
             _form.RetryToolBlock();
             //camera.Abort();
