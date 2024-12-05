@@ -277,8 +277,8 @@ namespace CognexVisionProForm
             
             if(!Preprocess)
             {
-                GetAllToolData();
-                CreateTable();
+              GetAllToolData();
+              CreateTable();
             }
             
             
@@ -323,7 +323,7 @@ namespace CognexVisionProForm
                         if (dataTypeName == "Double")
                         {
                             dataRound = Math.Round((double)itool.Inputs[j].Value, 4);
-                            data.Add(new ToolData(itool.Name, itool.Inputs[j].Name, dataRound));
+                           data.Add(new ToolData(itool.Name, itool.Inputs[j].Name, dataRound));
                         }
                         else if (dataTypeName == "Int32")
                         {
@@ -377,9 +377,12 @@ namespace CognexVisionProForm
             PartSerialNumber = DateTime.Now.ToString("yyyyMMddHHmmssffff");
             object[] insert = new object[dataTable.Columns.Count];
             insert[0] = PartSerialNumber;
-            for (int i = 0; i < data.Count; i++)
+            
+            for (int i = 1; i < insert.Length; i++)
             {
-                insert[i+1] = data[i].Value.ToString();
+                if (data != null && (i - 1) < data.Count) { insert[i] = data[i - 1].Value.ToString(); }
+                else { insert[i] = "n/a"; }
+                
             }
             dataTable.Rows.Add(insert);
             Utilities.AppendDatatableToCSV(Utilities.ExeFilePath + "\\Camera" + CameraId.ToString("00") + "\\PartData\\", csvFileName, dataTable.Rows[dataTable.Rows.Count - 1]);

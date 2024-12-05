@@ -895,8 +895,9 @@ namespace CognexVisionProForm
             {
                 data[i] = new List<ToolData>();
                 data[i] = toolblockArray[i, desiredTool[i]].AllData;
+                
             }
-
+            if (data[0] == null) { return; }
             dt.Columns.Add("Tool Name", typeof(string));
             dt.Columns.Add("Data Name", typeof(string));
             for(int i = 0; i < cameraCount; i++)
@@ -930,7 +931,8 @@ namespace CognexVisionProForm
 
                 for (int j= 0; j < cameraCount; j++)
                 {
-                    rowArray[j + 2] = data[j][i].Value.ToString();
+                    if (data[j] == null) { rowArray[j + 2] = "n/a"; }
+                    else { rowArray[j + 2] = data[j][i].Value.ToString(); }
                 }
 
                 dt.Rows.Add(rowArray);
