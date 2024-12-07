@@ -256,6 +256,11 @@ namespace CognexVisionProForm
             {
                 resize_CameraControl();
             }
+
+            if (tabControl1.SelectedTab.Name != "tabToolBlock")
+            {
+                    cogToolBlockEditV21.Subject = null;
+            }
         }
         //*********************************************************************
         //SINGLE CAMERA CONTROL
@@ -579,8 +584,6 @@ namespace CognexVisionProForm
         {
             BuildDataGrid();
         }
-
-        
     }
 
 }

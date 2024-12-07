@@ -105,10 +105,6 @@ namespace CognexVisionProForm
                 else { return null; }
             }
         }
-        public bool ToolRunning
-        {
-            get { return toolRunning; }
-        }
         public bool ToolReady
         {
             get 
@@ -136,7 +132,6 @@ namespace CognexVisionProForm
         {
             get { return data; }
         }
-
         public CogToolBlockTerminalCollection Outputs
         {
             get 
@@ -205,7 +200,6 @@ namespace CognexVisionProForm
                     toolBlock = CogSerializer.LoadObjectFromFile(toolFile, typeof(System.Runtime.Serialization.Formatters.Binary.BinaryFormatter), 0) as CogToolBlock;
                     
                     toolBlock.Ran += new EventHandler(Subject_Ran);
-                    toolBlock.Running += new EventHandler(Subject_Running);
                     toolBlock.Name = toolName;
                     if (toolBlock.Inputs.Count >= 1) { inputs = toolBlock.Inputs; }
                     if (toolBlock.Outputs.Count >= 1) { outputs = toolBlock.Outputs; }
@@ -257,10 +251,6 @@ namespace CognexVisionProForm
             GetInfoFromTool();
             
         }
-        void Subject_Running(object sender, System.EventArgs e)
-        {
-            toolRunning = true;
-        }
         private void GetInfoFromTool()
         {
             int toolOutputCount = toolBlock.Outputs.Count;
@@ -296,7 +286,6 @@ namespace CognexVisionProForm
                 
                 toolBlock.Dispose();
                 toolBlock.Ran -= new EventHandler(Subject_Ran);
-                toolBlock.Running -= new EventHandler(Subject_Running);
             }
             
             Utilities.LoggingStatment($"{toolName}: Job Manager closed down");
