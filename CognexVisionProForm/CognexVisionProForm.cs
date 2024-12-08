@@ -256,6 +256,11 @@ namespace CognexVisionProForm
             {
                 resize_CameraControl();
             }
+
+            if (tabControl1.SelectedTab.Name != "tabToolBlock")
+            {
+                    cogToolBlockEditV21.Subject = null;
+            }
         }
         //*********************************************************************
         //SINGLE CAMERA CONTROL
@@ -273,9 +278,11 @@ namespace CognexVisionProForm
             tbCameraName.Text = CameraAcqArray[selectedCameraId].Name;
             tbCameraDesc.Text = CameraAcqArray[selectedCameraId].Description;
 
-            tbArchiveCount.Text = CameraAcqArray[selectedCameraId].ArchiveImageCount.ToString();
-            numArchiveIndex.Maximum = CameraAcqArray[selectedCameraId].ArchiveImageCount - 1;
-            //numArchiveIndex.Value = CameraAcqArray[selectedCameraId].ArchiveImageIndex;
+            int archiveCount = (int) CameraAcqArray[selectedCameraId].ArchiveImageCount;
+            tbArchiveCount.Text = archiveCount.ToString();
+            numArchiveIndex.Maximum = archiveCount - 1;
+
+            numArchiveIndex.Minimum = 0;
             numArchiveIndex.Value = 0;
             cbArchiveActive.Checked = CameraAcqArray[selectedCameraId].ArchiveImageActive;
 
@@ -378,7 +385,6 @@ namespace CognexVisionProForm
 
             if (!CameraAcqArray[selectedCameraId].ArchiveImageActive)
             {
-                CameraAcqArray[selectedCameraId].FindArchivedImages();
                 if (CameraAcqArray[selectedCameraId].ArchiveImageCount > 0)
                 {
                     CameraAcqArray[selectedCameraId].ArchiveImageActive = true;
@@ -460,8 +466,6 @@ namespace CognexVisionProForm
         }
         private void numArchiveIndex_ValueChanged(object sender, EventArgs e)
         {
-            numArchiveIndex.Minimum = 0;
-            numArchiveIndex.Maximum = (int)CameraAcqArray[selectedCameraId].ArchiveImageCount;
             CameraAcqArray[selectedCameraId].ArchiveImageIndex = (int)numArchiveIndex.Value;
         }
         //*********************************************************************
@@ -580,8 +584,6 @@ namespace CognexVisionProForm
         {
             BuildDataGrid();
         }
-
-        
     }
 
 }
