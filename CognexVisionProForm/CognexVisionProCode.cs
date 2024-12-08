@@ -785,13 +785,13 @@ namespace CognexVisionProForm
                         if (dataTypeName == "Double")
                         {
                             dData = Convert.ToDouble(tool.Outputs[j].Value);
-                            iData = Convert.ToInt32(dData) * 10000;
+                            iData = Convert.ToInt32(dData * 10000);
 
                             MainPLC.PcToPlcStatusData[(i * dataLength) + writeIndex] = iData;
                         }
                         else if (dataTypeName == "Int32")
                         {
-                            MainPLC.PcToPlcStatusData[(i * dataLength) + j] = Convert.ToInt32(tool.Outputs[j].Value) * 10000;
+                            MainPLC.PcToPlcStatusData[(i * dataLength) + j] = Convert.ToInt32(tool.Outputs[j].Value);
                         }
                         writeIndex++;
                     }
