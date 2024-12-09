@@ -239,8 +239,16 @@ namespace CognexVisionProForm
                     Utilities.LoggingStatment($"{toolName}: input # {i} = {toolBlock.Inputs[i].Value}");
                 }
             }
-            //Debug.WriteLine(Thread.CurrentThread.Name);
-            toolBlock.Run();
+            Debug.WriteLine(Thread.CurrentThread.Name);
+            try
+            {
+                toolBlock.Run();
+            }
+            catch(Exception e)
+            {
+                Debug.WriteLine(e.Message);
+            }
+            
 
 
             Utilities.LoggingStatment($"{toolName}: Job Triggered");

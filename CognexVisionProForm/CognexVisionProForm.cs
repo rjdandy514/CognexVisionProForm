@@ -13,6 +13,7 @@ using System.Threading;
 using System.Windows.Forms;
 using System.Collections.Generic;
 using EventArgs = System.EventArgs;
+using System.Threading.Tasks;
 
 
 namespace CognexVisionProForm
@@ -45,6 +46,8 @@ namespace CognexVisionProForm
 
         Thread[] threadTool;
         bool threadToolAlive;
+
+        Task[] taskToolRun;
 
         SplashScreen splashScreen;
 
@@ -86,7 +89,7 @@ namespace CognexVisionProForm
             cbHeartbeat.Checked = heartBeat;
             cbSystemIdle.Checked = systemIdle;
 
-            threadToolAlive = ThreadAlive(threadTool);
+            threadToolAlive = ThreadAlive(taskToolRun);
 
             
 
@@ -144,6 +147,7 @@ namespace CognexVisionProForm
             ResultReadyOk = new bool[cameraCount];
             toolTrigger = new bool[cameraCount];
             toolTriggerComplete = new bool[cameraCount];
+            taskToolRun = new Task[cameraCount];
 
             splashScreen.UpdateProgress("Initialize Classes", 10);
             InitClasses();

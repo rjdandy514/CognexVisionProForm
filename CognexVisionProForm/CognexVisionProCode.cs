@@ -88,6 +88,7 @@ namespace CognexVisionProForm
                     toolblockArray[j, i] = new ToolBlock(this);
                     toolblockArray[j, i].CameraId = j;
                     toolblockArray[j, i].Preprocess = false;
+                    
                 }
 
                 cameraControl[j] = new CameraControl(this, CameraAcqArray[j]);
@@ -380,9 +381,9 @@ namespace CognexVisionProForm
             CogImage8Grey processedImage;
             Debug.WriteLine("Beginning of ToolBlock Trigger");
 
-            Task[] task;
-            task = new Task[cameraCount];
+            //if (ThreadAlive(taskToolRun)) { return; }
             
+
             for (int j = 0; j < cameraCount; j++)
             {
                 if (cameraSnapComplete[j])
@@ -417,9 +418,12 @@ namespace CognexVisionProForm
 
                     
                     int camera = i;
-                    int tool = desiredTool[i];
-                    task[camera] = new Task(() => toolblockArray[camera, tool].ToolRun());
-                    task[i].Start();
+                    int tool = desiredTool[camera];
+
+                    
+                    taskToolRun[camera] = new Task(() => toolblockArray[camera, tool].ToolRun());
+                    if (taskToolRun[camera].Status == TaskStatus.Running) { return; }
+                    taskToolRun[camera].Start();
                     
                 }
             }
@@ -998,13 +1002,13 @@ namespace CognexVisionProForm
                 preProcessRequired = true;
             }
         }
-        private bool ThreadAlive(Thread[] threads)
+        private bool ThreadAlive(Task[] task)
         {
             bool alive = false;
 
-            for (int i = 0; i < threads.Length; i++)
+            for (int i = 0; i < task.Length; i++)
             {
-                if (threads[i] != null) { alive |= threads[i].IsAlive; }
+                if (task[i] != null) { alive |= !task[i].IsCompleted; }
                 
             }
 
