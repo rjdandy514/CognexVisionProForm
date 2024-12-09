@@ -543,9 +543,13 @@ public class DalsaImage
     }
     public void ChangeFOV()
     {
-        Disconnect();
-        Dispose();
-        CreateCamera();
+        if (Connected)
+        {
+            Disconnect();
+            Dispose();
+            CreateCamera();
+        }
+        
     }
     public void SnapPicture()
     {

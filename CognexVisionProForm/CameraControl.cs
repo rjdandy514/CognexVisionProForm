@@ -221,7 +221,6 @@ namespace CognexVisionProForm
             {
                 record = tool.toolBlock.CreateLastRunRecord();
             }
-            
             //Determine last record to display
             if (record != null)
             {
@@ -230,6 +229,7 @@ namespace CognexVisionProForm
 
                 int selectedRecord = Convert.ToInt32(numRecordSelect.Value);
                 recordDisplay.Record = record.SubRecords[selectedRecord];
+
                 lbRecordName.Text = record.SubRecords[selectedRecord].Annotation;
 
             }

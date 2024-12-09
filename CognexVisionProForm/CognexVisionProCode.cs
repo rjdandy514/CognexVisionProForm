@@ -272,8 +272,8 @@ namespace CognexVisionProForm
                 case 70:
                     cameraCropLeft[0] = 1400;
                     cameraCropWidth[0] = 5300;
-                    cameraCropLeft[1] = 1400;
-                    cameraCropWidth[1] = 5300;
+                    cameraCropLeft[1] = 0;
+                    cameraCropWidth[1] = 8192;
                     cameraCropLeft[2] = 1400;
                     cameraCropWidth[2] = 5300;
                     cameraCropLeft[3] = 1400;
@@ -313,7 +313,7 @@ namespace CognexVisionProForm
             //only update recipe if recipe number has changed
             if (recipe != recipeEcho)
             {
-                for(int cam = 0; cam < cameraCount; cam++)
+                for(int cam = cameraCount-1; cam >= 0; cam--)
                 {
                     CameraAcqArray[cam].CropWidth = cameraCropWidth[recipe];
                     CameraAcqArray[cam].CropLeft = cameraCropLeft[recipe];
