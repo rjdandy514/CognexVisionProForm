@@ -239,7 +239,7 @@ namespace CognexVisionProForm
                     Utilities.LoggingStatment($"{toolName}: input # {i} = {toolBlock.Inputs[i].Value}");
                 }
             }
-            Debug.WriteLine(Thread.CurrentThread.Name);
+            //Debug.WriteLine(Thread.CurrentThread.Name);
             try
             {
                 toolBlock.Run();
@@ -248,6 +248,7 @@ namespace CognexVisionProForm
             {
                 Debug.WriteLine(e.Message);
             }
+            
             
 
 
@@ -291,8 +292,8 @@ namespace CognexVisionProForm
             if (toolBlock != null)
             {
                 SaveVisionProject();
-                
                 toolBlock.Dispose();
+
                 toolBlock.Ran -= new EventHandler(Subject_Ran);
             }
             
@@ -311,6 +312,8 @@ namespace CognexVisionProForm
                 if (toolBlock.Tools[i].GetType().Name ==  "CogToolBlock")
                 {
                     CogToolBlock itool = toolBlock.Tools[i] as CogToolBlock;
+
+                    itool.GarbageCollectionEnabled = true;
                     // Collect all Inputs
                     for (int j = 0; j < itool.Inputs.Count; j++)
                     {

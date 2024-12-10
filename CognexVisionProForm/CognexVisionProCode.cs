@@ -381,13 +381,14 @@ namespace CognexVisionProForm
             CogImage8Grey processedImage;
             Debug.WriteLine("Beginning of ToolBlock Trigger");
 
-            //if (ThreadAlive(taskToolRun)) { return; }
+            if (ThreadAlive(taskToolRun)) { return; }
             
 
             for (int j = 0; j < cameraCount; j++)
             {
                 if (cameraSnapComplete[j])
                 {
+                    GC.Collect();
                     toolTrigger[j] = true;
                     cameraSnap[j] = false;
                     cameraSnapComplete[j] = false;
@@ -420,9 +421,7 @@ namespace CognexVisionProForm
                     int camera = i;
                     int tool = desiredTool[camera];
 
-                    
                     taskToolRun[camera] = new Task(() => toolblockArray[camera, tool].ToolRun());
-                    if (taskToolRun[camera].Status == TaskStatus.Running) { return; }
                     taskToolRun[camera].Start();
                     
                 }
@@ -1008,7 +1007,7 @@ namespace CognexVisionProForm
 
             for (int i = 0; i < task.Length; i++)
             {
-                if (task[i] != null) { alive |= !task[i].IsCompleted; }
+                if (task[i] != null) { alive |= (task[i].Status == TaskStatus.Running); }
                 
             }
 

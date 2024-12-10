@@ -66,8 +66,8 @@ namespace CognexVisionProForm
         }
         public static void LoggingStatment(string Message)
         {
-            appListener.Write(DateTime.Now.ToString("G") + ": ");
-            appListener.WriteLine(Message);
+            //appListener.Write(DateTime.Now.ToString("G") + ": ");
+            //appListener.WriteLine(Message);
         }
         public static void Closing()
         {
