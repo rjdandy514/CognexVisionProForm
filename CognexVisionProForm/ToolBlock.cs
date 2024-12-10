@@ -313,7 +313,7 @@ namespace CognexVisionProForm
                 {
                     CogToolBlock itool = toolBlock.Tools[i] as CogToolBlock;
 
-                    itool.GarbageCollectionEnabled = true;
+                    itool.GarbageCollectionEnabled = false;
                     // Collect all Inputs
                     for (int j = 0; j < itool.Inputs.Count; j++)
                     {
@@ -384,9 +384,9 @@ namespace CognexVisionProForm
                 else { insert[i] = "n/a"; }
                 
             }
-            dataTable.Rows.Add(insert);
+            dataTable.Rows[0].ItemArray =insert;
             Utilities.AppendDatatableToCSV(Utilities.ExeFilePath + "\\Camera" + CameraId.ToString("00") + "\\PartData\\", csvFileName, dataTable.Rows[dataTable.Rows.Count - 1]);
-
+            insert = null;
             
 
         }
