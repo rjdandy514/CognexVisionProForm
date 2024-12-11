@@ -372,8 +372,9 @@ namespace CognexVisionProForm
                     desiredTool[cam] = 0;
                 }
             }
-                toolblockArray[cam, desiredTool[cam]].ResultUpdated = false;
-                cameraControl[cam].Tool = toolblockArray[cam, desiredTool[cam]];
+            cameraControl[cam].ToolSelect = desiredTool[cam];
+            toolblockArray[cam, desiredTool[cam]].ResultUpdated = false;
+            cameraControl[cam].Tool = toolblockArray[cam, desiredTool[cam]];
 
         }
         public void ToolBlockTrigger()
@@ -396,9 +397,9 @@ namespace CognexVisionProForm
                     if (preProcessRequired && preProcess[j].ToolReady)
                     {
                         preProcess[j].Inputs[0].Value = CameraAcqArray[j].Image;
+                        //preProcess[j].Inputs[1].Value = j;
                         preProcess[j].ToolRun();
                     }
-
                 }
             }
 
