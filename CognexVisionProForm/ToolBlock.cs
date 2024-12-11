@@ -302,60 +302,63 @@ namespace CognexVisionProForm
         public void GetAllToolData()
         {
             data = new List<ToolData>();
-            string dataTypeName;
-            double dataRound;
-            double convertData;
 
+            GetToolData(toolBlock);
 
             for (int i = 0; i < toolBlock.Tools.Count;i++)
             {
                 if (toolBlock.Tools[i].GetType().Name ==  "CogToolBlock")
                 {
-                    CogToolBlock itool = toolBlock.Tools[i] as CogToolBlock;
-
-                    itool.GarbageCollectionEnabled = false;
-                    // Collect all Inputs
-                    for (int j = 0; j < itool.Inputs.Count; j++)
-                    {
-                        dataTypeName = itool.Inputs[j].ValueType.Name;
-                        if (!Utilities.IsNumeric(dataTypeName)) { continue; }
-                        
-                        if (dataTypeName == "Double")
-                        {
-                            dataRound = Math.Round((double)itool.Inputs[j].Value, 4);
-                           data.Add(new ToolData(itool.Name, itool.Inputs[j].Name, dataRound));
-                        }
-                        else if (dataTypeName == "Int32")
-                        {
-                            convertData = Convert.ToDouble(itool.Inputs[j].Value);
-                            data.Add(new ToolData(itool.Name, itool.Inputs[j].Name, convertData));
-                        }
-                    }
-                    // Collect all Outputs
-                    for (int j = 0;j < itool.Outputs.Count;j++)
-                    {
-
-                        dataTypeName = itool.Outputs[j].ValueType.Name;
-                        if (!Utilities.IsNumeric(dataTypeName)) { continue; }
-                        if(itool.RunStatus.Result != CogToolResultConstants.Accept)
-                        {
-                            dataRound = 0;
-                            data.Add(new ToolData(itool.Name, itool.Outputs[j].Name, dataRound));
-                        }
-                        else if (dataTypeName == "Double")
-                        {
-                            dataRound = Math.Round((double)itool.Outputs[j].Value,4);
-                            data.Add(new ToolData(itool.Name,itool.Outputs[j].Name, dataRound));
-                        }
-                        else if (dataTypeName == "Int32")
-                        {
-                            convertData = Convert.ToDouble(itool.Outputs[j].Value);
-                            data.Add(new ToolData(itool.Name, itool.Outputs[j].Name, convertData));
-                        }
-                    }
+                    GetToolData(toolBlock.Tools[i] as CogToolBlock);
                 }
             }
         }
+        public void GetToolData(CogToolBlock tool)
+        {
+            string dataTypeName = "";
+            double dataRound;
+            double convertData;
+
+            for (int j = 0; j < tool.Inputs.Count; j++)
+            {
+                dataTypeName = tool.Inputs[j].ValueType.Name;
+                if (!Utilities.IsNumeric(dataTypeName)) { continue; }
+
+                if (dataTypeName == "Double")
+                {
+                    dataRound = Math.Round((double)tool.Inputs[j].Value, 4);
+                    data.Add(new ToolData(tool.Name, tool.Inputs[j].Name, dataRound));
+                }
+                else if (dataTypeName == "Int32")
+                {
+                    convertData = Convert.ToDouble(tool.Inputs[j].Value);
+                    data.Add(new ToolData(tool.Name, tool.Inputs[j].Name, convertData));
+                }
+            }
+            // Collect all Outputs
+            for (int j = 0; j < tool.Outputs.Count; j++)
+            {
+
+                dataTypeName = tool.Outputs[j].ValueType.Name;
+                if (!Utilities.IsNumeric(dataTypeName)) { continue; }
+                if (tool.RunStatus.Result != CogToolResultConstants.Accept)
+                {
+                    dataRound = 0;
+                    data.Add(new ToolData(tool.Name, tool.Outputs[j].Name, dataRound));
+                }
+                else if (dataTypeName == "Double")
+                {
+                    dataRound = Math.Round((double)tool.Outputs[j].Value, 4);
+                    data.Add(new ToolData(tool.Name, tool.Outputs[j].Name, dataRound));
+                }
+                else if (dataTypeName == "Int32")
+                {
+                    convertData = Convert.ToDouble(tool.Outputs[j].Value);
+                    data.Add(new ToolData(tool.Name, tool.Outputs[j].Name, convertData));
+                }
+            }
+        }
+
         public void CreateTable()
         {
             //dataTable = null;

@@ -396,9 +396,9 @@ namespace CognexVisionProForm
                     if (preProcessRequired && preProcess[j].ToolReady)
                     {
                         preProcess[j].Inputs[0].Value = CameraAcqArray[j].Image;
+                        //preProcess[j].Inputs[1].Value = j;
                         preProcess[j].ToolRun();
                     }
-
                 }
             }
 
