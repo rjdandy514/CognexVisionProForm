@@ -351,7 +351,7 @@ namespace CognexVisionProForm
         {
             if (MainPLC.InitialCheck != null && MainPLC.InitialCheck.Status == IPStatus.Success && PlcCommsActive)
             {
-                if (desiredTool[cam] == plcTool[cam]) { return; };
+                //if (desiredTool[cam] == plcTool[cam]) { return; };
                 if (Enumerable.Range(0, toolCount).Contains(plcTool[cam]) && toolblockArray[cam, plcTool[cam]].ToolReady)
                 {
                     desiredTool[cam] = plcTool[cam];
@@ -368,12 +368,12 @@ namespace CognexVisionProForm
                 }
                 else
                 {
-                    cameraControl[cam].ToolSelect = 0;
                     desiredTool[cam] = 0;
                 }
             }
-                toolblockArray[cam, desiredTool[cam]].ResultUpdated = false;
-                cameraControl[cam].Tool = toolblockArray[cam, desiredTool[cam]];
+            cameraControl[cam].ToolSelect = desiredTool[cam];
+            toolblockArray[cam, desiredTool[cam]].ResultUpdated = false;
+            cameraControl[cam].Tool = toolblockArray[cam, desiredTool[cam]];
 
         }
         public void ToolBlockTrigger()
