@@ -500,10 +500,16 @@ namespace CognexVisionProForm
 
         private void cbTBCameraSelected_SelectedIndexChanged(object sender, EventArgs e)
         {
+            int toolMemory = cbTBToolSelected.SelectedIndex;
             cbTBToolSelected.Items.Clear();
             for (int i = 0; i < toolCount; i++)
             {
                 cbTBToolSelected.Items.Add(toolblockArray[cbTBCameraSelected.SelectedIndex, i].Name);
+            }
+
+            if(toolMemory < cbTBToolSelected.Items.Count)
+            {
+                cbTBToolSelected.SelectedIndex = toolMemory;
             }
         }
         private void bttnToolBlockLoad_Click(object sender, EventArgs e)

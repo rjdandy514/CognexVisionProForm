@@ -189,11 +189,9 @@ namespace CognexVisionProForm
         }
         public static bool IsNumeric(string inputVariable)
         {
-
-            string variableType = inputVariable;
             bool isNumeric = false;
 
-            switch(variableType)
+            switch(inputVariable)
             {
                 case "Int32":
                     isNumeric = true;
@@ -224,7 +222,7 @@ namespace CognexVisionProForm
             p.Tag = f;
             f.Show();
         }
-        public static void GenerateCsvFromdataTable(string fileLocation,string fileName,DataTable dt)
+        public static void GenerateCsvFromdataTable(string fileLocation,ref string fileName,ref DataTable dt)
         {
 
             StringBuilder sb = new StringBuilder();
@@ -236,13 +234,10 @@ namespace CognexVisionProForm
                 columnNames[i] = dt.Columns[i].ColumnName;
             }
 
-
             sb.AppendLine(string.Join(",", columnNames));
 
             foreach (DataRow row in dt.Rows)
             {
-
-                //string[] fields = (string[]) row.ItemArray;
                 string[] fields = Array.ConvertAll(row.ItemArray, x => x.ToString());
                 sb.AppendLine(string.Join(",", fields));
             }
@@ -251,15 +246,10 @@ namespace CognexVisionProForm
 
             Directory.CreateDirectory(fileLocation);
             if (Directory.Exists(fileLocation)) { File.WriteAllText(fileNameFull, sb.ToString()); }
-
-
-            
         }
-        public static void AppendDatatableToCSV(string fileLocation, string fileName, DataRow dr)
+        public static void AppendDatatableToCSV(string fileLocation, ref string fileName, DataRow dr)
         {
             StringBuilder sb = new StringBuilder();
-
-            //string[] fields = (string[]) row.ItemArray;
             string[] fields = Array.ConvertAll(dr.ItemArray, x => x.ToString());
             sb.AppendLine(string.Join(",", fields));
             
@@ -268,6 +258,9 @@ namespace CognexVisionProForm
 
             Directory.CreateDirectory(fileLocation);
             if (Directory.Exists(fileLocation)) { File.AppendAllText(fileNameFull, sb.ToString()); }
+            
+            sb = null;
+            fields = null;
         }
     }
     public class ToolData

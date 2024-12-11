@@ -370,8 +370,9 @@ namespace CognexVisionProForm
                     dataTable.Columns.Add($"{data[i].ToolName} - {data[i].Name}", typeof(String));
                 }
                 csvFileName = $"{toolName}_{DateTime.Now.ToString("yyyyMMddHHmmssffff")}.csv";
+                Utilities.GenerateCsvFromdataTable(Utilities.ExeFilePath + "\\Camera" + CameraId.ToString("00") + "\\PartData\\", ref csvFileName, ref dataTable);
 
-                Utilities.GenerateCsvFromdataTable(Utilities.ExeFilePath + "\\Camera" + CameraId.ToString("00") + "\\PartData\\", csvFileName, dataTable);
+                dataTable.Rows.Add();
             }
             
             PartSerialNumber = DateTime.Now.ToString("yyyyMMddHHmmssffff");
@@ -382,13 +383,14 @@ namespace CognexVisionProForm
             {
                 if (data != null && (i - 1) < data.Count) { insert[i] = data[i - 1].Value.ToString(); }
                 else { insert[i] = "n/a"; }
-                
             }
-            dataTable.Rows[0].ItemArray =insert;
-            Utilities.AppendDatatableToCSV(Utilities.ExeFilePath + "\\Camera" + CameraId.ToString("00") + "\\PartData\\", csvFileName, dataTable.Rows[dataTable.Rows.Count - 1]);
-            insert = null;
-            
 
+            if (dataTable.Rows.Count > 0) { dataTable.Rows[0].ItemArray = insert; }
+            else { dataTable.Rows.Add(insert); }
+
+
+            Utilities.AppendDatatableToCSV( Utilities.ExeFilePath + "\\Camera" + CameraId.ToString("00") + "\\PartData\\", ref csvFileName, dataTable.Rows[dataTable.Rows.Count - 1]);
+            insert = null;
         }
 
     }
