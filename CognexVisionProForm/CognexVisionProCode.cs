@@ -894,8 +894,9 @@ namespace CognexVisionProForm
         {
             DataTable dt = new DataTable();
             List<ToolData>[] data = new List<ToolData>[cameraCount];
+            //dgCameraData.Rows.Clear();
 
-            for(int i = 0; i < cameraCount;i++)
+            for (int i = 0; i < cameraCount;i++)
             {
                 data[i] = new List<ToolData>();
                 data[i] = toolblockArray[i, desiredTool[i]].AllData;
@@ -935,7 +936,7 @@ namespace CognexVisionProForm
 
                 for (int j= 0; j < cameraCount; j++)
                 {
-                    if (data[j] == null) { rowArray[j + 2] = "n/a"; }
+                    if (data[j] == null || data[j].Count != data[0].Count) { rowArray[j + 2] = "n/a"; }
                     else { rowArray[j + 2] = data[j][i].Value.ToString(); }
                 }
 
