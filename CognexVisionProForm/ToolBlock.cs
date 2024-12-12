@@ -28,6 +28,7 @@ namespace CognexVisionProForm
         string csvFileName;
 
         List<ToolData> data;
+        ToolData[] dataArray;
         DataTable dataTable;
 
         bool filePresent = false;
