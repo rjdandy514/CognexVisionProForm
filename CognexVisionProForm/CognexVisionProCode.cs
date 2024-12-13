@@ -351,7 +351,7 @@ namespace CognexVisionProForm
         {
             if (MainPLC.InitialCheck != null && MainPLC.InitialCheck.Status == IPStatus.Success && PlcCommsActive)
             {
-                //if (desiredTool[cam] == plcTool[cam]) { return; };
+                if (desiredTool[cam] == plcTool[cam]) { return; };
                 if (Enumerable.Range(0, toolCount).Contains(plcTool[cam]) && toolblockArray[cam, plcTool[cam]].ToolReady)
                 {
                     desiredTool[cam] = plcTool[cam];
@@ -382,13 +382,12 @@ namespace CognexVisionProForm
             Debug.WriteLine("Beginning of ToolBlock Trigger");
 
             if (ThreadAlive(taskToolRun)) { return; }
-            
+            GC.Collect();
 
             for (int j = 0; j < cameraCount; j++)
             {
                 if (cameraSnapComplete[j])
                 {
-                    GC.Collect();
                     toolTrigger[j] = true;
                     cameraSnap[j] = false;
                     cameraSnapComplete[j] = false;
@@ -396,7 +395,6 @@ namespace CognexVisionProForm
                     if (preProcessRequired && preProcess[j].ToolReady)
                     {
                         preProcess[j].Inputs[0].Value = CameraAcqArray[j].Image;
-                        //preProcess[j].Inputs[1].Value = j;
                         preProcess[j].ToolRun();
                     }
                 }
@@ -424,6 +422,8 @@ namespace CognexVisionProForm
                     taskToolRun[camera] = new Task(() => toolblockArray[camera, tool].ToolRun());
                     taskToolRun[camera].Start();
                     
+                    
+                        
                 }
             }
             
@@ -943,6 +943,9 @@ namespace CognexVisionProForm
             }
 
             dgCameraData.DataSource = dt;
+
+            dt = null;
+            data = null;
 
             resize_tabCameraData();
 

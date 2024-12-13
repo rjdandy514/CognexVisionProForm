@@ -540,7 +540,18 @@ namespace CognexVisionProForm
             int cameraSelected = cbTBCameraSelected.SelectedIndex;
             if (cogToolBlockEditV21.Subject != null)
             {
-                cogToolBlockEditV21.Subject.Inputs[0].Value = CameraAcqArray[cameraSelected].Image;
+                if(preProcessRequired)
+                {
+                    preProcess[cameraSelected].Inputs[0].Value = CameraAcqArray[cameraSelected].Image;
+                    preProcess[cameraSelected].Inputs[1].Value = cameraSelected;
+                    preProcess[cameraSelected].ToolRun();
+                    Thread.Sleep(200);
+                    cogToolBlockEditV21.Subject.Inputs[0].Value = preProcess[cameraSelected].Outputs[0].Value as CogImage8Grey;
+                }
+                else
+                {
+                    cogToolBlockEditV21.Subject.Inputs[0].Value = CameraAcqArray[cameraSelected].Image;
+                }
                 cogToolBlockEditV21.Subject.Run();
             }
         }

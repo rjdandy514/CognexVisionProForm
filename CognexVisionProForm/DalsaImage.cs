@@ -18,6 +18,7 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Runtime.CompilerServices;
+using System.Linq;
 
 public class DalsaImage
 {
@@ -329,7 +330,8 @@ public class DalsaImage
         //Create Directory Type
         DirectoryInfo imageDirInfo = new DirectoryInfo(imageFilePath);
         //Create Array of names if files
-        archiveImageArray = imageDirInfo.GetFiles();
+        archiveImageArray = imageDirInfo.GetFiles().OrderByDescending(x => x.Name).ToArray();
+        
 
         if (archiveImageArray.Length > 0) { archiveImageCount = archiveImageArray.Length; }
         else { archiveImageCount = -1; }
@@ -631,21 +633,33 @@ public class DalsaImage
 
         string identifier;
 
-        if (SerialNumber != "") { identifier = PartSerialNumber; }
+        if (PartSerialNumber != "") { identifier = PartSerialNumber; }
         else { identifier = "Image"; }
 
         string ImageFileName = $"{PartType}_{identifier}_" + DateTime.Now.ToString("yyyyMMddHHmmssffff") + ".bmp";
         
-        if (ImageDirSize >= 20000) 
+        if (ImageDirSize >= 20000 && File.Exists(RemoveFile)) 
         {
             limitReached = true;
-            File.Delete(RemoveFile); 
+            try
+            {
+                File.Delete(RemoveFile);
+                Thread.Sleep(300);
+                Debug.WriteLine($"Camera {Id}: Image Deleted");
+                Utilities.LoggingStatment($"{cameraName}: Deleted");
+            }
+            catch(Exception e)
+            {
+                Debug.WriteLine(e);
+            }
+            
         }
         else
         {
             limitReached = false;
         }
         buffers.Save(imageFilePath + ImageFileName, "-format bmp");
+        Debug.WriteLine($"Camera {Id}: Image saved");
         Utilities.LoggingStatment($"{cameraName}: Save Image to BMP, folder size is {ImageDirSize}");
     }
     public void Disconnect()

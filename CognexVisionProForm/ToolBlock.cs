@@ -13,6 +13,7 @@ using Cognex.Vision;
 using System.Data;
 using System.Data.Common;
 using Cognex.Vision.Implementation;
+using System.Linq;
 
 
 namespace CognexVisionProForm
@@ -28,6 +29,7 @@ namespace CognexVisionProForm
         string csvFileName;
 
         List<ToolData> data;
+        List<ToolRecipe> recipe;
         ToolData[] dataArray;
         DataTable dataTable;
 
@@ -303,6 +305,8 @@ namespace CognexVisionProForm
         public void GetAllToolData()
         {
             data = new List<ToolData>();
+            recipe = new List<ToolRecipe>();
+            
 
             GetToolData(toolBlock);
 
@@ -310,9 +314,13 @@ namespace CognexVisionProForm
             {
                 if (toolBlock.Tools[i].GetType().Name ==  "CogToolBlock")
                 {
-                    GetToolData(toolBlock.Tools[i] as CogToolBlock);
+                    CogToolBlock iTool = toolBlock.Tools[i] as CogToolBlock;
+                    iTool.GarbageCollectionEnabled = false;
+                    GetToolData(iTool);
                 }
             }
+
+            recipe = recipe.Distinct().ToList();
         }
         public void GetToolData(CogToolBlock tool)
         {
@@ -324,16 +332,19 @@ namespace CognexVisionProForm
             {
                 dataTypeName = tool.Inputs[j].ValueType.Name;
                 if (!Utilities.IsNumeric(dataTypeName)) { continue; }
-
+                if (tool.Inputs[j].Value == null) { continue; }
                 if (dataTypeName == "Double")
                 {
                     dataRound = Math.Round((double)tool.Inputs[j].Value, 4);
                     data.Add(new ToolData(tool.Name, tool.Inputs[j].Name, dataRound));
+                    recipe.Add(new ToolRecipe(tool.Inputs[j].Name, dataRound));
+
                 }
                 else if (dataTypeName == "Int32")
                 {
                     convertData = Convert.ToDouble(tool.Inputs[j].Value);
                     data.Add(new ToolData(tool.Name, tool.Inputs[j].Name, convertData));
+                    recipe.Add(new ToolRecipe(tool.Inputs[j].Name, convertData));
                 }
             }
             // Collect all Outputs
@@ -359,6 +370,7 @@ namespace CognexVisionProForm
                 }
             }
         }
+
 
         public void CreateTable()
         {

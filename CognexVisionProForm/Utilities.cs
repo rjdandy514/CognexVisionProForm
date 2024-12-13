@@ -66,8 +66,8 @@ namespace CognexVisionProForm
         }
         public static void LoggingStatment(string Message)
         {
-            //appListener.Write(DateTime.Now.ToString("G") + ": ");
-            //appListener.WriteLine(Message);
+            appListener.Write(DateTime.Now.ToString("G") + ": ");
+            appListener.WriteLine(Message);
         }
         public static void Closing()
         {
@@ -326,6 +326,17 @@ namespace CognexVisionProForm
                 
             }
     }
+        public string Name { get; set; }
+        public double Value { get; set; }
+    }
+
+    public class ToolRecipe
+    {
+        public ToolRecipe(string name, double value)
+        { 
+            Name = name;
+            Value = value;
+        }
         public string Name { get; set; }
         public double Value { get; set; }
     }
