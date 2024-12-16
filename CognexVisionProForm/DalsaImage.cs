@@ -173,8 +173,8 @@ public class DalsaImage
                 }
                 else if (ArchiveImageActive)
                 {
-                    CreateBufferFromFile();
                     ArchiveImageIndex++;
+                    CreateBufferFromFile();
                 }
             }
 
@@ -330,7 +330,7 @@ public class DalsaImage
         //Create Directory Type
         DirectoryInfo imageDirInfo = new DirectoryInfo(imageFilePath);
         //Create Array of names if files
-        archiveImageArray = imageDirInfo.GetFiles().OrderByDescending(x => x.Name).ToArray();
+        archiveImageArray = imageDirInfo.GetFiles().OrderByDescending(x => x.CreationTime).ToArray();
         
 
         if (archiveImageArray.Length > 0) { archiveImageCount = archiveImageArray.Length; }

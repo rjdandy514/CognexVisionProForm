@@ -221,6 +221,8 @@ namespace CognexVisionProForm
             p.Controls.Add(f);
             p.Tag = f;
             f.Show();
+
+            
         }
         public static void GenerateCsvFromdataTable(string fileLocation,ref string fileName,ref DataTable dt)
         {

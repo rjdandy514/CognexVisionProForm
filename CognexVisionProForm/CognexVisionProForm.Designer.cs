@@ -32,6 +32,9 @@ namespace CognexVisionProForm
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle11 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle12 = new System.Windows.Forms.DataGridViewCellStyle();
@@ -74,6 +77,11 @@ namespace CognexVisionProForm
             this.btnLicenseCheck = new System.Windows.Forms.Button();
             this.tbExpireDate = new System.Windows.Forms.TextBox();
             this.tabFrameGrabber = new System.Windows.Forms.TabPage();
+            this.panel5 = new System.Windows.Forms.Panel();
+            this.dgRecipe = new System.Windows.Forms.DataGridView();
+            this.bttnSetRecipe = new System.Windows.Forms.Button();
+            this.label13 = new System.Windows.Forms.Label();
+            this.bttnGetRecipe = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
             this.label9 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
@@ -149,6 +157,8 @@ namespace CognexVisionProForm
             this.tabLicenseCheck.SuspendLayout();
             this.panel11.SuspendLayout();
             this.tabFrameGrabber.SuspendLayout();
+            this.panel5.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgRecipe)).BeginInit();
             this.panel1.SuspendLayout();
             this.panel3.SuspendLayout();
             this.panel4.SuspendLayout();
@@ -168,7 +178,7 @@ namespace CognexVisionProForm
             this.tabPlcConnection.Location = new System.Drawing.Point(4, 29);
             this.tabPlcConnection.Name = "tabPlcConnection";
             this.tabPlcConnection.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPlcConnection.Size = new System.Drawing.Size(1284, 716);
+            this.tabPlcConnection.Size = new System.Drawing.Size(1305, 716);
             this.tabPlcConnection.TabIndex = 6;
             this.tabPlcConnection.Text = "PLC Connection";
             // 
@@ -340,7 +350,7 @@ namespace CognexVisionProForm
             this.tabToolBlock.Margin = new System.Windows.Forms.Padding(0);
             this.tabToolBlock.Name = "tabToolBlock";
             this.tabToolBlock.Padding = new System.Windows.Forms.Padding(5);
-            this.tabToolBlock.Size = new System.Drawing.Size(1284, 716);
+            this.tabToolBlock.Size = new System.Drawing.Size(1305, 716);
             this.tabToolBlock.TabIndex = 5;
             this.tabToolBlock.Text = "Tool Block";
             // 
@@ -453,7 +463,7 @@ namespace CognexVisionProForm
             this.tabFileControl.Location = new System.Drawing.Point(4, 29);
             this.tabFileControl.Name = "tabFileControl";
             this.tabFileControl.Padding = new System.Windows.Forms.Padding(3);
-            this.tabFileControl.Size = new System.Drawing.Size(1284, 716);
+            this.tabFileControl.Size = new System.Drawing.Size(1305, 716);
             this.tabFileControl.TabIndex = 3;
             this.tabFileControl.Text = "File Control";
             // 
@@ -548,7 +558,7 @@ namespace CognexVisionProForm
             this.tabLicenseCheck.Location = new System.Drawing.Point(4, 29);
             this.tabLicenseCheck.Name = "tabLicenseCheck";
             this.tabLicenseCheck.Padding = new System.Windows.Forms.Padding(3);
-            this.tabLicenseCheck.Size = new System.Drawing.Size(1284, 716);
+            this.tabLicenseCheck.Size = new System.Drawing.Size(1305, 716);
             this.tabLicenseCheck.TabIndex = 2;
             this.tabLicenseCheck.Text = "License Check";
             // 
@@ -592,6 +602,7 @@ namespace CognexVisionProForm
             // tabFrameGrabber
             // 
             this.tabFrameGrabber.BackColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.tabFrameGrabber.Controls.Add(this.panel5);
             this.tabFrameGrabber.Controls.Add(this.panel1);
             this.tabFrameGrabber.Controls.Add(this.panel3);
             this.tabFrameGrabber.Controls.Add(this.panel4);
@@ -600,9 +611,85 @@ namespace CognexVisionProForm
             this.tabFrameGrabber.Margin = new System.Windows.Forms.Padding(5);
             this.tabFrameGrabber.Name = "tabFrameGrabber";
             this.tabFrameGrabber.Padding = new System.Windows.Forms.Padding(5);
-            this.tabFrameGrabber.Size = new System.Drawing.Size(1284, 716);
+            this.tabFrameGrabber.Size = new System.Drawing.Size(1408, 716);
             this.tabFrameGrabber.TabIndex = 0;
             this.tabFrameGrabber.Text = "Frame Grabber";
+            // 
+            // panel5
+            // 
+            this.panel5.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.panel5.Controls.Add(this.dgRecipe);
+            this.panel5.Controls.Add(this.bttnSetRecipe);
+            this.panel5.Controls.Add(this.label13);
+            this.panel5.Controls.Add(this.bttnGetRecipe);
+            this.panel5.Location = new System.Drawing.Point(936, 5);
+            this.panel5.Margin = new System.Windows.Forms.Padding(5);
+            this.panel5.Name = "panel5";
+            this.panel5.Padding = new System.Windows.Forms.Padding(5);
+            this.panel5.Size = new System.Drawing.Size(359, 379);
+            this.panel5.TabIndex = 39;
+            // 
+            // dgRecipe
+            // 
+            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle7.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle7.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle7.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle7.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle7.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dgRecipe.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle7;
+            this.dgRecipe.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle8.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle8.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle8.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle8.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle8.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle8.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dgRecipe.DefaultCellStyle = dataGridViewCellStyle8;
+            this.dgRecipe.Location = new System.Drawing.Point(12, 41);
+            this.dgRecipe.Name = "dgRecipe";
+            dataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle9.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle9.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle9.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle9.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle9.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle9.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dgRecipe.RowHeadersDefaultCellStyle = dataGridViewCellStyle9;
+            this.dgRecipe.Size = new System.Drawing.Size(341, 331);
+            this.dgRecipe.TabIndex = 54;
+            // 
+            // bttnSetRecipe
+            // 
+            this.bttnSetRecipe.Location = new System.Drawing.Point(229, 14);
+            this.bttnSetRecipe.Name = "bttnSetRecipe";
+            this.bttnSetRecipe.Size = new System.Drawing.Size(79, 23);
+            this.bttnSetRecipe.TabIndex = 38;
+            this.bttnSetRecipe.Text = "Set Recipe";
+            this.bttnSetRecipe.UseVisualStyleBackColor = true;
+            this.bttnSetRecipe.Click += new System.EventHandler(this.bttnSetRecipe_Click);
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label13.Location = new System.Drawing.Point(8, 11);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(135, 24);
+            this.label13.TabIndex = 37;
+            this.label13.Text = "Recipe Control";
+            // 
+            // bttnGetRecipe
+            // 
+            this.bttnGetRecipe.Location = new System.Drawing.Point(149, 14);
+            this.bttnGetRecipe.Name = "bttnGetRecipe";
+            this.bttnGetRecipe.Size = new System.Drawing.Size(79, 23);
+            this.bttnGetRecipe.TabIndex = 21;
+            this.bttnGetRecipe.Text = "Get Recipe";
+            this.bttnGetRecipe.UseVisualStyleBackColor = true;
+            this.bttnGetRecipe.Click += new System.EventHandler(this.bttnGetRecipe_Click);
             // 
             // panel1
             // 
@@ -1029,11 +1116,11 @@ namespace CognexVisionProForm
             this.panel2.Controls.Add(this.label34);
             this.panel2.Controls.Add(this.label3);
             this.panel2.Controls.Add(this.tbArchiveCount);
-            this.panel2.Location = new System.Drawing.Point(936, 5);
+            this.panel2.Location = new System.Drawing.Point(599, 300);
             this.panel2.Margin = new System.Windows.Forms.Padding(5);
             this.panel2.Name = "panel2";
             this.panel2.Padding = new System.Windows.Forms.Padding(5);
-            this.panel2.Size = new System.Drawing.Size(225, 169);
+            this.panel2.Size = new System.Drawing.Size(335, 86);
             this.panel2.TabIndex = 31;
             this.panel2.Tag = "pnCameraControl";
             // 
@@ -1041,7 +1128,7 @@ namespace CognexVisionProForm
             // 
             this.label12.AutoSize = true;
             this.label12.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label12.Location = new System.Drawing.Point(21, 5);
+            this.label12.Location = new System.Drawing.Point(6, 5);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(140, 24);
             this.label12.TabIndex = 38;
@@ -1049,16 +1136,16 @@ namespace CognexVisionProForm
             // 
             // numArchiveIndex
             // 
-            this.numArchiveIndex.Location = new System.Drawing.Point(141, 94);
+            this.numArchiveIndex.Location = new System.Drawing.Point(90, 59);
             this.numArchiveIndex.Name = "numArchiveIndex";
-            this.numArchiveIndex.Size = new System.Drawing.Size(76, 20);
+            this.numArchiveIndex.Size = new System.Drawing.Size(55, 20);
             this.numArchiveIndex.TabIndex = 32;
             this.numArchiveIndex.ValueChanged += new System.EventHandler(this.numArchiveIndex_ValueChanged);
             // 
             // cbArchiveActive
             // 
             this.cbArchiveActive.AutoCheck = false;
-            this.cbArchiveActive.Location = new System.Drawing.Point(7, 69);
+            this.cbArchiveActive.Location = new System.Drawing.Point(126, 33);
             this.cbArchiveActive.Name = "cbArchiveActive";
             this.cbArchiveActive.Size = new System.Drawing.Size(178, 24);
             this.cbArchiveActive.TabIndex = 31;
@@ -1066,7 +1153,7 @@ namespace CognexVisionProForm
             // 
             // bttnArchiveImage
             // 
-            this.bttnArchiveImage.Location = new System.Drawing.Point(49, 40);
+            this.bttnArchiveImage.Location = new System.Drawing.Point(6, 33);
             this.bttnArchiveImage.Name = "bttnArchiveImage";
             this.bttnArchiveImage.Size = new System.Drawing.Size(106, 24);
             this.bttnArchiveImage.TabIndex = 26;
@@ -1077,7 +1164,7 @@ namespace CognexVisionProForm
             // label34
             // 
             this.label34.AutoSize = true;
-            this.label34.Location = new System.Drawing.Point(9, 131);
+            this.label34.Location = new System.Drawing.Point(151, 63);
             this.label34.Name = "label34";
             this.label34.Size = new System.Drawing.Size(109, 13);
             this.label34.TabIndex = 30;
@@ -1086,7 +1173,7 @@ namespace CognexVisionProForm
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(9, 102);
+            this.label3.Location = new System.Drawing.Point(9, 63);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(75, 13);
             this.label3.TabIndex = 29;
@@ -1094,9 +1181,9 @@ namespace CognexVisionProForm
             // 
             // tbArchiveCount
             // 
-            this.tbArchiveCount.Location = new System.Drawing.Point(141, 127);
+            this.tbArchiveCount.Location = new System.Drawing.Point(265, 59);
             this.tbArchiveCount.Name = "tbArchiveCount";
-            this.tbArchiveCount.Size = new System.Drawing.Size(76, 20);
+            this.tbArchiveCount.Size = new System.Drawing.Size(62, 20);
             this.tbArchiveCount.TabIndex = 28;
             // 
             // tabImage
@@ -1111,7 +1198,7 @@ namespace CognexVisionProForm
             this.tabImage.Location = new System.Drawing.Point(4, 29);
             this.tabImage.Name = "tabImage";
             this.tabImage.Padding = new System.Windows.Forms.Padding(5);
-            this.tabImage.Size = new System.Drawing.Size(1284, 716);
+            this.tabImage.Size = new System.Drawing.Size(1305, 716);
             this.tabImage.TabIndex = 1;
             this.tabImage.Text = "Single Camera Control";
             // 
@@ -1178,9 +1265,11 @@ namespace CognexVisionProForm
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.Padding = new System.Drawing.Point(5, 5);
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(1292, 749);
+            this.tabControl1.Size = new System.Drawing.Size(1416, 749);
             this.tabControl1.TabIndex = 3;
             this.tabControl1.SelectedIndexChanged += new System.EventHandler(this.tabControl1_SelectedIndexChanged);
+            this.tabControl1.Selecting += new System.Windows.Forms.TabControlCancelEventHandler(this.tabControl1_Selecting);
+            this.tabControl1.Deselecting += new System.Windows.Forms.TabControlCancelEventHandler(this.tabControl1_Deselecting);
             // 
             // taCameraData
             // 
@@ -1189,7 +1278,7 @@ namespace CognexVisionProForm
             this.taCameraData.Location = new System.Drawing.Point(4, 29);
             this.taCameraData.Name = "taCameraData";
             this.taCameraData.Padding = new System.Windows.Forms.Padding(3);
-            this.taCameraData.Size = new System.Drawing.Size(1284, 716);
+            this.taCameraData.Size = new System.Drawing.Size(1305, 716);
             this.taCameraData.TabIndex = 7;
             this.taCameraData.Text = "Camera Data";
             this.taCameraData.UseVisualStyleBackColor = true;
@@ -1241,7 +1330,7 @@ namespace CognexVisionProForm
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ControlDarkDark;
-            this.ClientSize = new System.Drawing.Size(1292, 749);
+            this.ClientSize = new System.Drawing.Size(1416, 749);
             this.Controls.Add(this.tabControl1);
             this.IsMdiContainer = true;
             this.Name = "CognexVisionProForm";
@@ -1267,6 +1356,9 @@ namespace CognexVisionProForm
             this.panel11.ResumeLayout(false);
             this.panel11.PerformLayout();
             this.tabFrameGrabber.ResumeLayout(false);
+            this.panel5.ResumeLayout(false);
+            this.panel5.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgRecipe)).EndInit();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.panel3.ResumeLayout(false);
@@ -1385,6 +1477,11 @@ namespace CognexVisionProForm
         private System.Windows.Forms.NumericUpDown numArchiveIndex;
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.Panel panel5;
+        private System.Windows.Forms.Button bttnSetRecipe;
+        private System.Windows.Forms.Label label13;
+        private System.Windows.Forms.Button bttnGetRecipe;
+        private System.Windows.Forms.DataGridView dgRecipe;
     }
 }
 

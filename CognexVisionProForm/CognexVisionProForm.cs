@@ -14,6 +14,7 @@ using System.Windows.Forms;
 using System.Collections.Generic;
 using EventArgs = System.EventArgs;
 using System.Threading.Tasks;
+using System.Data;
 
 
 namespace CognexVisionProForm
@@ -225,6 +226,7 @@ namespace CognexVisionProForm
                     if (CameraAcqArray[i].Connected || CameraAcqArray[i].ArchiveImageActive)
                     {
                         Utilities.LoadForm(allPanels[cameraConnectCount], cameraControl[i]);
+                        cameraControl[i].PauseTimer = false;
                         cameraConnectCount++;
                     }
                 }
@@ -265,6 +267,32 @@ namespace CognexVisionProForm
             {
                     cogToolBlockEditV21.Subject = null;
             }
+            if (tabControl1.SelectedTab.Name != "tabImage")
+            {
+                foreach(CameraControl camera in cameraControl)
+                {
+                    camera.PauseTimer = true;
+                }
+            }
+        }
+        private void tabControl1_Deselecting(object sender, TabControlCancelEventArgs e)
+        {
+
+
+            systemIdle = true;
+            systemIdle &= toolTrigger.All(x => x == false);
+            systemIdle &= cameraSnap.All(x => x == false);
+            systemIdle &= cameraSnapComplete.All(x => x == false);
+            systemIdle &= !threadToolAlive;
+            if (!systemIdle)
+            {
+                e.Cancel = true;
+            }
+            
+        }
+        private void tabControl1_Selecting(object sender, TabControlCancelEventArgs e)
+        {
+
         }
         //*********************************************************************
         //SINGLE CAMERA CONTROL
@@ -472,6 +500,59 @@ namespace CognexVisionProForm
         {
             CameraAcqArray[selectedCameraId].ArchiveImageIndex = (int)numArchiveIndex.Value;
         }
+
+        private void bttnGetRecipe_Click(object sender, EventArgs e)
+        {
+            DataTable dt = new DataTable();
+            dt.Columns.Add("Recipe Name", typeof(string));
+            dt.Columns.Add("Data Name", typeof(string));
+
+            int toolIndex = cbToolBlock.SelectedIndex;
+            int cam = cbCameraIdSelected.SelectedIndex;
+
+            if (toolblockArray[cam, toolIndex].ToolReady)
+            { 
+                toolblockArray[cam, toolIndex].GetRecipe();
+            }
+
+            object[] rowArray = new object[2];
+
+            for(int i = 0; i < toolblockArray[cam, toolIndex].Recipe.Count; i++)
+            {
+                rowArray[0] = toolblockArray[cam, toolIndex].Recipe[i].Name;
+                rowArray[1] = toolblockArray[cam, toolIndex].Recipe[i].Value.ToString();
+                dt.Rows.Add(rowArray);
+            }
+            dgRecipe.DataSource = dt;
+            dt = null;
+        }
+
+        private void bttnSetRecipe_Click(object sender, EventArgs e)
+        {
+            List<ToolRecipe> recipes = new List<ToolRecipe>();
+
+            for(int i = 0; i< dgRecipe.Rows.Count; i++)
+            {
+                if (dgRecipe.Rows[i].Cells[0].Value == null) { continue; }
+                string name = dgRecipe.Rows[i].Cells[0].Value.ToString();
+                double value = Convert.ToDouble(dgRecipe.Rows[i].Cells[1].Value);
+                recipes.Add(new ToolRecipe(name, value));
+            }
+
+            int toolIndex = cbToolBlock.SelectedIndex;
+            int cam = cbCameraIdSelected.SelectedIndex;
+            toolblockArray[cam, toolIndex].Recipe = recipes;
+
+            for (int i = 0; i < cameraCount; i++)
+            {
+                if (toolblockArray[i, toolIndex].ToolReady)
+                {
+                    toolblockArray[i, toolIndex].SetRecipe();
+                }
+            }
+
+                recipes = null;
+        }
         //*********************************************************************
         //lICENSE CHECK
         //*********************************************************************
@@ -514,7 +595,7 @@ namespace CognexVisionProForm
         }
         private void bttnToolBlockLoad_Click(object sender, EventArgs e)
         {
-
+            CogToolBlock toolBlock;
             int cameraSelected = cbTBCameraSelected.SelectedIndex;
             int toolSelected = cbTBToolSelected.SelectedIndex;
 
@@ -522,18 +603,9 @@ namespace CognexVisionProForm
             if (cameraSelected < 0 || cameraSelected >= cameraCount) { return; }
             if (toolSelected < 0 || toolSelected >= toolCount) { return; }
 
+            toolBlock = (CogToolBlock) CogSerializer.DeepCopyObject(toolblockArray[cameraSelected, toolSelected].toolBlock);            
+            cogToolBlockEditV21.Subject = toolBlock;
 
-            if (toolblockArray[cameraSelected, toolSelected].ToolReady)
-            {
-                cogToolBlockEditV21.Subject = toolblockArray[cameraSelected, toolSelected].toolBlock;
-            }
-
-            if (cogToolBlockEditV21.Subject != null && toolblockArray[cameraSelected, toolSelected].ToolReady)
-            {          
-                    cogToolBlockEditV21.Subject.Inputs[0].Value = toolblockArray[cameraSelected, toolSelected].toolBlock.Inputs[0].Value;
-                    cogToolBlockEditV21.Subject.Run();
-                
-            }
         }
         private void bttnUpdateImage_Click(object sender, EventArgs e)
         {
@@ -557,7 +629,11 @@ namespace CognexVisionProForm
         }
         private void bttnSaveJob_Click(object sender, EventArgs e)
         {
-            toolblockArray[cbTBCameraSelected.SelectedIndex, cbTBToolSelected.SelectedIndex].SaveVisionProject();
+            if (cogToolBlockEditV21.Subject != null)
+            {
+                //toolblockArray[cbTBCameraSelected.SelectedIndex, cbTBToolSelected.SelectedIndex].toolBlock.Dispose();
+                //toolblockArray[cbTBCameraSelected.SelectedIndex, cbTBToolSelected.SelectedIndex].toolBlock = (CogToolBlock)CogSerializer.DeepCopyObject(cogToolBlockEditV21.Subject);
+            }
         }
 
         //*********************************************************************
@@ -605,6 +681,8 @@ namespace CognexVisionProForm
         {
             BuildDataGrid();
         }
+
+
     }
 
 }

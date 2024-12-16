@@ -135,6 +135,11 @@ namespace CognexVisionProForm
         {
             get { return data; }
         }
+        public List<ToolRecipe> Recipe
+        {
+            set { recipe = value; }
+            get { return recipe; }
+        }
         public CogToolBlockTerminalCollection Outputs
         {
             get 
@@ -230,6 +235,7 @@ namespace CognexVisionProForm
         }
         public void ToolRun()
         {
+            
             toolReady = false;
             
             if (toolBlock.Inputs.Count > 0)
@@ -251,22 +257,15 @@ namespace CognexVisionProForm
             {
                 Debug.WriteLine(e.Message);
             }
-            
-            
-
-
             Utilities.LoggingStatment($"{toolName}: Job Triggered");
         }
         void Subject_Ran(object sender, System.EventArgs e)
         {
-
             GetInfoFromTool();
-            
         }
         private void GetInfoFromTool()
         {
             int toolOutputCount = toolBlock.Outputs.Count;
-            toolRunning = false;
             
             outputs = toolBlock.Outputs;
             for(int i = 0; i < outputs.Count;i++)
@@ -296,7 +295,6 @@ namespace CognexVisionProForm
             {
                 SaveVisionProject();
                 toolBlock.Dispose();
-
                 toolBlock.Ran -= new EventHandler(Subject_Ran);
             }
             
@@ -304,9 +302,7 @@ namespace CognexVisionProForm
         }
         public void GetAllToolData()
         {
-            data = new List<ToolData>();
-            recipe = new List<ToolRecipe>();
-            
+            data = new List<ToolData>();          
 
             GetToolData(toolBlock);
 
@@ -319,8 +315,6 @@ namespace CognexVisionProForm
                     GetToolData(iTool);
                 }
             }
-
-            recipe = recipe.Distinct().ToList();
         }
         public void GetToolData(CogToolBlock tool)
         {
@@ -337,14 +331,11 @@ namespace CognexVisionProForm
                 {
                     dataRound = Math.Round((double)tool.Inputs[j].Value, 4);
                     data.Add(new ToolData(tool.Name, tool.Inputs[j].Name, dataRound));
-                    recipe.Add(new ToolRecipe(tool.Inputs[j].Name, dataRound));
-
                 }
                 else if (dataTypeName == "Int32")
                 {
                     convertData = Convert.ToDouble(tool.Inputs[j].Value);
                     data.Add(new ToolData(tool.Name, tool.Inputs[j].Name, convertData));
-                    recipe.Add(new ToolRecipe(tool.Inputs[j].Name, convertData));
                 }
             }
             // Collect all Outputs
@@ -370,8 +361,6 @@ namespace CognexVisionProForm
                 }
             }
         }
-
-
         public void CreateTable()
         {
             //dataTable = null;
@@ -407,6 +396,51 @@ namespace CognexVisionProForm
 
             Utilities.AppendDatatableToCSV( Utilities.ExeFilePath + "\\Camera" + CameraId.ToString("00") + "\\PartData\\", ref csvFileName, dataTable.Rows[dataTable.Rows.Count - 1]);
             insert = null;
+        }
+        public void SetRecipe()
+        {
+            for (int i = 0; i < toolBlock.Tools.Count; i++)
+            {
+                if (toolBlock.Tools[i].GetType().Name == "CogToolBlock")
+                {
+                    CogToolBlock iTool = toolBlock.Tools[i] as CogToolBlock;
+                    for(int j = 0; j < iTool.Inputs.Count;j++)
+                    {
+                        if (Recipe.Exists(x => x.Name.Contains(iTool.Inputs[j].Name)))
+                        {
+                            ToolRecipe entry = Recipe.Find(x => x.Name.Contains(iTool.Inputs[j].Name));
+                            iTool.Inputs[j].Value = entry.Value;
+                        }
+                    }
+                }
+            }
+
+        }
+        public void GetRecipe()
+        {
+            double dataRound;
+            string dataTypeName;
+            recipe = new List<ToolRecipe>();
+
+            for (int i = 0; i < toolBlock.Tools.Count; i++)
+            {
+                if (toolBlock.Tools[i].GetType().Name == "CogToolBlock")
+                {
+                    CogToolBlock iTool = toolBlock.Tools[i] as CogToolBlock;
+                    for (int j = 0; j < iTool.Inputs.Count; j++)
+                    {
+                        dataTypeName = iTool.Inputs[j].ValueType.Name;
+                        if (!Utilities.IsNumeric(dataTypeName)) { continue; }
+
+                        if (iTool.Inputs[j].Value != null) { dataRound = Math.Round((double)iTool.Inputs[j].Value, 4); }
+                        else { dataRound = 0; }
+                        recipe.Add(new ToolRecipe(iTool.Inputs[j].Name, dataRound));
+                    }
+                }
+            }
+            recipe = recipe.GroupBy(x => x.Name).Select(x => x.FirstOrDefault()).ToList();
+
+
         }
 
     }

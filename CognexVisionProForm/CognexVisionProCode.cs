@@ -122,10 +122,10 @@ namespace CognexVisionProForm
                 {
                     splashScreen.UpdateProgress($"Initialize JobManager: {CameraAcqArray[cam].Name} - {preProcess[cam].Name} Toolblock", 1);
 
-                    threadPreProcess[cam] = new Thread(preProcess[cam].InitJobManager); 
-                    threadPreProcess[cam].Start();
+                    //threadPreProcess[cam] = new Thread(preProcess[cam].InitJobManager); 
+                    //threadPreProcess[cam].Start();
 
-                    //preProcess[cam].InitJobManager();
+                    preProcess[cam].InitJobManager();
                 }
 
                 for (int i = 0; i < toolblockArray.GetLength(1); i++)
@@ -134,16 +134,20 @@ namespace CognexVisionProForm
                     { 
                         splashScreen.UpdateProgress($"Initialize JobManager: {CameraAcqArray[cam].Name} - {toolblockArray[cam, i].Name} Toolblock", 1);
 
-                        threadToolBlock[cam] = new Thread(toolblockArray[cam, i].InitJobManager);
-                        threadToolBlock[cam].Start();
+                        //threadToolBlock[cam] = new Thread(toolblockArray[cam, i].InitJobManager);
+                        //threadToolBlock[cam].Start();
+
+                        toolblockArray[cam, i].InitJobManager();
                     }
                 }
 
+                /*
                 if (threadPreProcess[cam] != null) { threadPreProcess[cam].Join(); }
                 foreach (Thread t in threadToolBlock)
                 {
                     if (t != null) { t.Join(); }
                 }
+                */
 
             }
             
@@ -383,6 +387,8 @@ namespace CognexVisionProForm
 
             if (ThreadAlive(taskToolRun)) { return; }
             GC.Collect();
+
+            cogToolBlockEditV21.ActiveControl = null;
 
             for (int j = 0; j < cameraCount; j++)
             {
@@ -893,7 +899,6 @@ namespace CognexVisionProForm
         {
             DataTable dt = new DataTable();
             List<ToolData>[] data = new List<ToolData>[cameraCount];
-            //dgCameraData.Rows.Clear();
 
             for (int i = 0; i < cameraCount;i++)
             {

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -55,6 +56,20 @@ namespace CognexVisionProForm
         {
             get;set;
         }
+        public bool PauseTimer
+        {
+            set 
+            {
+                if (pollingTimer == null) { return; }
+                if (value)
+                {
+
+                    pollingTimer.Stop();
+                }
+                else { pollingTimer.Start(); }
+            }
+
+        }
         public CameraControl(CognexVisionProForm Sender, DalsaImage Camera)
         {
             _form = new CognexVisionProForm();
@@ -101,10 +116,13 @@ namespace CognexVisionProForm
             
             if (tool.ResultUpdated != Result_Update_Mem && !_form.ThreadsAlive)
             {
+                recordDisplay.Enabled = false;
+                this.ActiveControl = null;
                 UpdateImage();
                 UpdateToolDisplay();
                 UpdateImageRecord();
                 Result_Update_Mem = tool.ResultUpdated;
+                recordDisplay.Enabled = true;
             }
 
             
@@ -172,15 +190,7 @@ namespace CognexVisionProForm
         }
         private void bttnTest_Click(object sender, EventArgs e)
         {
-
-            //GC.Collect();
-            //if (_form.Recipe == 0) { _form.Recipe = 1; }
-            //else { _form.Recipe = 0; }
-            //tool.CreateTable();
-            //_form.GenerateCSV();
             _form.RetryToolBlock();
-            //camera.Abort();
-            //camera.SoftwareTrigger();
         }
         private void numToolSelect_ValueChanged(object sender, EventArgs e)
         {
@@ -220,7 +230,15 @@ namespace CognexVisionProForm
         {
             if(tool.toolBlock !=null)
             {
-                record = tool.toolBlock.CreateLastRunRecord();
+                try
+                {
+                    record = tool.toolBlock.CreateLastRunRecord();
+                }
+                catch(Exception e)
+                {
+                    Debug.WriteLine(e);
+                }
+                
             }
             //Determine last record to display
             if (record != null)
