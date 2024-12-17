@@ -288,11 +288,20 @@ namespace CognexVisionProForm
             {
                 e.Cancel = true;
             }
-            
-        }
+
+ 
+
+            }
         private void tabControl1_Selecting(object sender, TabControlCancelEventArgs e)
         {
-
+            if(e.TabPage == tabToolBlock)
+            {
+                if (PlcCommsActive)
+                {
+                    e.Cancel = true;
+                    MessageBox.Show("Disconnect from PLC before accessing Toolblock");
+                }
+            }
         }
         //*********************************************************************
         //SINGLE CAMERA CONTROL
@@ -473,9 +482,10 @@ namespace CognexVisionProForm
                     }
                     CameraAcqArray[i].CreateCamera();
 
-                    Thread.Sleep(500);
+                    
 
                     if (!CameraAcqArray[i].Connected) { return; }
+                    Thread.Sleep(1000);
 
                     CameraAcqArray[i].SaveImageSelected = true;
                 }
@@ -500,7 +510,6 @@ namespace CognexVisionProForm
         {
             CameraAcqArray[selectedCameraId].ArchiveImageIndex = (int)numArchiveIndex.Value;
         }
-
         private void bttnGetRecipe_Click(object sender, EventArgs e)
         {
             DataTable dt = new DataTable();
@@ -526,7 +535,6 @@ namespace CognexVisionProForm
             dgRecipe.DataSource = dt;
             dt = null;
         }
-
         private void bttnSetRecipe_Click(object sender, EventArgs e)
         {
             List<ToolRecipe> recipes = new List<ToolRecipe>();
@@ -578,7 +586,6 @@ namespace CognexVisionProForm
         //*********************************************************************
         //TOOL BLOCK
         //*********************************************************************
-
         private void cbTBCameraSelected_SelectedIndexChanged(object sender, EventArgs e)
         {
             int toolMemory = cbTBToolSelected.SelectedIndex;
@@ -603,8 +610,8 @@ namespace CognexVisionProForm
             if (cameraSelected < 0 || cameraSelected >= cameraCount) { return; }
             if (toolSelected < 0 || toolSelected >= toolCount) { return; }
 
-            toolBlock = (CogToolBlock) CogSerializer.DeepCopyObject(toolblockArray[cameraSelected, toolSelected].toolBlock);            
-            cogToolBlockEditV21.Subject = toolBlock;
+            //toolBlock = (CogToolBlock) CogSerializer.DeepCopyObject(toolblockArray[cameraSelected, toolSelected].toolBlock);            
+            cogToolBlockEditV21.Subject = toolblockArray[cameraSelected, toolSelected].toolBlock;
 
         }
         private void bttnUpdateImage_Click(object sender, EventArgs e)
@@ -635,7 +642,6 @@ namespace CognexVisionProForm
                 //toolblockArray[cbTBCameraSelected.SelectedIndex, cbTBToolSelected.SelectedIndex].toolBlock = (CogToolBlock)CogSerializer.DeepCopyObject(cogToolBlockEditV21.Subject);
             }
         }
-
         //*********************************************************************
         //PLC CONNECTION
         //*********************************************************************
@@ -654,8 +660,8 @@ namespace CognexVisionProForm
                     pollingTimer.Start();
                 }
                 for (int i = 0; i < cameraCount; i++) { cameraControl[i].DisableCameraControl(); }
-
                 PlcCommsActive = true;
+
             }
             else
             {
@@ -663,6 +669,7 @@ namespace CognexVisionProForm
                 pollingTimer.Stop();
                 for (int i = 0; i < cameraCount; i++) { cameraControl[i].EnableCameraControl(); }
                 PlcCommsActive = false;
+              
             }
 
         }

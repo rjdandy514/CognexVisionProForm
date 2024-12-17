@@ -677,6 +677,8 @@ public class DalsaImage
         if (buffers != null && buffers.Initialized) { buffers.Destroy(); }
         if (archiveBuffers != null && archiveBuffers.Initialized) { archiveBuffers.Destroy(); }
         if (acquisition != null && acquisition.Initialized) { acquisition.Destroy(); }
+
+        Thread.Sleep(500);
     }
     public void Dispose()
     {
@@ -687,7 +689,7 @@ public class DalsaImage
         if (buffers != null) { buffers.Dispose(); }
         if (archiveBuffers != null) { archiveBuffers.Dispose(); }
         if (acquisition != null) { acquisition.Dispose(); }
-
+        Thread.Sleep(500);
         acqXfer = null;
         acqDeviceXfer = null;
         acqDevice = null;
