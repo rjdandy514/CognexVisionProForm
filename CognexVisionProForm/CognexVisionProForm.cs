@@ -559,7 +559,6 @@ namespace CognexVisionProForm
                     toolblockArray[i, toolIndex].SetRecipe();
                 }
             }
-
                 recipes = null;
         }
         //*********************************************************************

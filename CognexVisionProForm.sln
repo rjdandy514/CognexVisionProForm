@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CognexVisionProForm", "Cogn
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibplctagWrapper", "LibplctagWrapper\LibplctagWrapper.csproj", "{394ABFC2-E570-462E-9994-37B33C348702}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "AppInstaller", "AppInstaller\AppInstaller.vdproj", "{75C4D61A-9221-4110-B08B-C6BE3BC8CB47}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +33,10 @@ Global
 		{394ABFC2-E570-462E-9994-37B33C348702}.Release|Any CPU.Build.0 = Release|Any CPU
 		{394ABFC2-E570-462E-9994-37B33C348702}.Release|x64.ActiveCfg = Release|Any CPU
 		{394ABFC2-E570-462E-9994-37B33C348702}.Release|x64.Build.0 = Release|Any CPU
+		{75C4D61A-9221-4110-B08B-C6BE3BC8CB47}.Debug|Any CPU.ActiveCfg = Debug
+		{75C4D61A-9221-4110-B08B-C6BE3BC8CB47}.Debug|x64.ActiveCfg = Debug
+		{75C4D61A-9221-4110-B08B-C6BE3BC8CB47}.Release|Any CPU.ActiveCfg = Release
+		{75C4D61A-9221-4110-B08B-C6BE3BC8CB47}.Release|x64.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
