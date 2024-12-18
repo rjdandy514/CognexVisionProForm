@@ -406,11 +406,13 @@ namespace CognexVisionProForm
                     CogToolBlock iTool = toolBlock.Tools[i] as CogToolBlock;
                     for(int j = 0; j < iTool.Inputs.Count;j++)
                     {
-                        if (Recipe.Exists(x => x.Name.Contains(iTool.Inputs[j].Name)))
+                        
+                        if(recipe.Exists(x => x.Name.Contains(iTool.Inputs[j].Name)))
                         {
-                            ToolRecipe entry = Recipe.Find(x => x.Name.Contains(iTool.Inputs[j].Name));
+                            ToolRecipe entry = recipe.Find(x => x.Name.Contains(iTool.Inputs[j].Name));
                             iTool.Inputs[j].Value = entry.Value;
                         }
+                        
                     }
                 }
             }
@@ -434,6 +436,7 @@ namespace CognexVisionProForm
 
                         if (iTool.Inputs[j].Value != null) { dataRound = Math.Round((double)iTool.Inputs[j].Value, 4); }
                         else { dataRound = 0; }
+                        
                         recipe.Add(new ToolRecipe(iTool.Inputs[j].Name, dataRound));
                     }
                 }
