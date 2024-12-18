@@ -14,6 +14,7 @@ using System.Data;
 using System.Data.Common;
 using Cognex.Vision.Implementation;
 using System.Linq;
+using System.Net.Security;
 
 
 namespace CognexVisionProForm
@@ -399,6 +400,7 @@ namespace CognexVisionProForm
         }
         public void SetRecipe()
         {
+            if (recipe == null) { return; }
             for (int i = 0; i < toolBlock.Tools.Count; i++)
             {
                 if (toolBlock.Tools[i].GetType().Name == "CogToolBlock")
@@ -406,8 +408,7 @@ namespace CognexVisionProForm
                     CogToolBlock iTool = toolBlock.Tools[i] as CogToolBlock;
                     for(int j = 0; j < iTool.Inputs.Count;j++)
                     {
-                        
-                        if(recipe.Exists(x => x.Name.Contains(iTool.Inputs[j].Name)))
+                        if(recipe != null && recipe.Exists(x => x.Name.Contains(iTool.Inputs[j].Name)))
                         {
                             ToolRecipe entry = recipe.Find(x => x.Name.Contains(iTool.Inputs[j].Name));
                             iTool.Inputs[j].Value = entry.Value;

@@ -555,6 +555,7 @@ namespace CognexVisionProForm
             {
                 if (toolblockArray[i, toolIndex].ToolReady)
                 {
+                    toolblockArray[i, toolIndex].Recipe = recipes;
                     toolblockArray[i, toolIndex].SetRecipe();
                 }
             }
