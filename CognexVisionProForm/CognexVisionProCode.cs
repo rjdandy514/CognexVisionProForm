@@ -69,7 +69,6 @@ namespace CognexVisionProForm
             pollingTimer.Tick += new EventHandler(pollingTimer_Tick);
             pollingTimer.Interval = 200; // in miliseconds
 
-
             for (int j = 0; j < cameraCount; j++)
             {
                 splashScreen.UpdateProgress($"Initialize Camera {j}", 5);
@@ -80,8 +79,6 @@ namespace CognexVisionProForm
                 preProcess[j] = new ToolBlock(this);
                 preProcess[j].CameraId = j;
                 preProcess[j].Preprocess = true;
-
-                
 
                 for (int i = 0; i < toolCount; i++)
                 {
@@ -95,11 +92,9 @@ namespace CognexVisionProForm
                 cameraControl[j].PreProcess = preProcess[j];
                 cameraControl[j].Tool = toolblockArray[j, 0];
                 
-                threadTool = new Thread[cameraCount];
             }
             recipeEcho = 99;
             Recipe = 0;
-            
 
             MainPLC = new PlcComms(this);
             dataLength = MainPLC.PlcToPcControlData.Length / cameraCount;
@@ -414,39 +409,14 @@ namespace CognexVisionProForm
                 {
                     toolblockArray[i, desiredTool[i]].Inputs[0].Value = processedImage;
                     //toolblockArray[i, desiredTool[i]].ToolRun();
-                    
-                    //threadTool[i] = new Thread(toolblockArray[i, desiredTool[i]].ToolRun);
-                    //threadTool[i].Name = $"Camera {i}";
-                    //threadTool[i].Start();
 
-                    //Parallel.Invoke(() => toolblockArray[i, desiredTool[i]].ToolRun());
-
-                    
                     int camera = i;
                     int tool = desiredTool[camera];
 
                     taskToolRun[camera] = new Task(() => toolblockArray[camera, tool].ToolRun());
                     taskToolRun[camera].Start();
-                    
-                    
-                        
                 }
             }
-            
-            
-            /*
-            for (int i = 0; i < threadTool.Length;i++) 
-            {
-                if (threadTool[i] != null) 
-                {
-                    threadTool[i].Join(5000);
-                    toolTrigger[i] = false;
-                }
-            }
-            */
-            
-
-
             Debug.WriteLine("Trigger Complete");
 
             Array.Clear(toolTrigger, 0, toolTrigger.Length);

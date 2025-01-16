@@ -24,7 +24,6 @@ namespace CognexVisionProForm
         DalsaImage camera;
         ToolBlock tool;
         ToolBlock preProcess;
-        public ICogImage image;
         public ICogRecord record;
         private int toolSelect = 0;
         private bool updateDisplayRequest;
@@ -54,11 +53,11 @@ namespace CognexVisionProForm
         }
         public bool AutoDisplay
         {
-            get;set;
+            get; set;
         }
         public bool PauseTimer
         {
-            set 
+            set
             {
                 if (pollingTimer == null) { return; }
                 if (value)
@@ -104,31 +103,11 @@ namespace CognexVisionProForm
         {
             pollingTimer.Stop();
 
-            cbCameraConnected.Checked = camera.Connected;
-            cbTrigger.Checked = camera.Trigger;
-            cbArchiveImageActive.Checked = camera.ArchiveImageActive;
-            cbImageReady.Checked = camera.ImageReady;
-            numToolSelect.Value = toolSelect;
-            UpdateButton();
-
-
-            
-            
-            if (tool.ResultUpdated != Result_Update_Mem && !_form.ThreadsAlive)
-            {
-                recordDisplay.Enabled = false;
-                this.ActiveControl = null;
-                UpdateImage();
-                UpdateToolDisplay();
-                UpdateImageRecord();
-                Result_Update_Mem = tool.ResultUpdated;
-                recordDisplay.Enabled = true;
-            }
-
-            
+            this.BeginInvoke((Action)delegate { updateAll(); });
 
             pollingTimer.Start();
         }
+        
         private void bttnCameraSnap_MouseUp(object sender, MouseEventArgs e)
         {
             camera.Trigger = false;
@@ -144,7 +123,7 @@ namespace CognexVisionProForm
             camera.TriggerGrab = false;
             camera.Trigger = false;
             _form.CameraAbort();
-            
+
         }
         private void bttnCameraLog_Click(object sender, EventArgs e)
         {
@@ -153,7 +132,7 @@ namespace CognexVisionProForm
                 camera.SaveImageSelected = false;
                 if (camera.LimitReached) { bttnCameraLog.Text = "Log Images - Full"; }
                 else { bttnCameraLog.Text = "Log Images"; }
-                
+
             }
             else if (!camera.SaveImageSelected)
             {
@@ -165,9 +144,7 @@ namespace CognexVisionProForm
         }
         private void numRecordSelect_ValueChanged(object sender, EventArgs e)
         {
-
             UpdateImageRecord();
-
         }
         private void bttnGetToolData_Click(object sender, EventArgs e)
         {
@@ -202,14 +179,33 @@ namespace CognexVisionProForm
             camera.TriggerGrab = true;
             UpdateButton();
         }
+        public void updateAll()
+        {
+            cbCameraConnected.Checked = camera.Connected;
+            cbTrigger.Checked = camera.Trigger;
+            cbArchiveImageActive.Checked = camera.ArchiveImageActive;
+            cbImageReady.Checked = camera.ImageReady;
+            numToolSelect.Value = toolSelect;
+            UpdateButton();
+
+            if (tool.ResultUpdated != Result_Update_Mem && !_form.ThreadsAlive)
+            {
+                recordDisplay.Enabled = false;
+                this.ActiveControl = null;
+                UpdateImage();
+                UpdateToolDisplay();
+                UpdateImageRecord();
+                Result_Update_Mem = tool.ResultUpdated;
+                recordDisplay.Enabled = true;
+            }
+        }
         public void UpdateToolDisplay()
         {
             lbToolName.Text = tool.Name;
-            lbAcqTime.Text = $"Aquisition: {Math.Round(camera.AcqTime,2)} ms";
-            lbToolRunTime.Text = $"Tool Time: {Math.Round(tool.RunStatus.TotalTime,2)} ms";
+            lbAcqTime.Text = $"Aquisition: {Math.Round(camera.AcqTime, 2)} ms";
+            lbToolRunTime.Text = $"Tool Time: {Math.Round(tool.RunStatus.TotalTime, 2)} ms";
             cbToolPassed.Checked = tool.Result;
             cbResultsUpdated.Checked = tool.ResultUpdated;
-            
 
             // Display message if tool failed
             if ((!tool.Result || (preProcess.ToolReady && !preProcess.Result)) && WindowState != FormWindowState.Minimized && toolFailedDisplay.AutoDisplayShow)
@@ -228,17 +224,10 @@ namespace CognexVisionProForm
         }
         public void UpdateImageRecord()
         {
-            if(tool.toolBlock !=null)
+            if (tool.toolBlock != null)
             {
-                try
-                {
-                    record = tool.toolBlock.CreateLastRunRecord();
-                }
-                catch(Exception e)
-                {
-                    Debug.WriteLine(e);
-                }
-                
+                try { record = tool.toolBlock.CreateLastRunRecord(); }
+                catch (Exception e) { Debug.WriteLine(e); }
             }
             //Determine last record to display
             if (record != null)
@@ -253,21 +242,14 @@ namespace CognexVisionProForm
 
             }
         }
-        private delegate void Set_UpdateImage();
-        public void UpdateImage()
-        {
-            if (this.InvokeRequired)
-            {
-                BeginInvoke(new Set_UpdateImage(UpdateImage));
-                return;
-            }
 
-            image = camera.Image;
-            if (image == null) { return; }
+        public void UpdateImage()
+        { 
+            if (camera.Image == null) { return; }
             //Do not try to resize if App is Minimized
             if (_form.WindowState == FormWindowState.Minimized) { return; }
 
-            recordDisplay.Image = image;
+            recordDisplay.Image = camera.Image;
             //*********************************************
             //update cogdisplay
             //*********************************************
