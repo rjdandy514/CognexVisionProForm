@@ -206,14 +206,20 @@ namespace CognexVisionProForm
             {
                 if (filePresent)
                 {
-                    toolBlock = CogSerializer.LoadObjectFromFile(toolFile, typeof(System.Runtime.Serialization.Formatters.Binary.BinaryFormatter), 0) as CogToolBlock;
+                    CogToolBlock loadToolBlock = CogSerializer.LoadObjectFromFile(toolFile, typeof(System.Runtime.Serialization.Formatters.Binary.BinaryFormatter), 0) as CogToolBlock;
                     
+                    toolBlock = new CogToolBlock();
+                    toolBlock = CogSerializer.DeepCopyObject(loadToolBlock) as CogToolBlock;
+                    
+                    loadToolBlock.Dispose();
+                    loadToolBlock = null;
+
                     toolBlock.Ran += new EventHandler(Subject_Ran);
                     toolBlock.Name = toolName;
                     if (toolBlock.Inputs.Count >= 1) { inputs = toolBlock.Inputs; }
                     if (toolBlock.Outputs.Count >= 1) { outputs = toolBlock.Outputs; }
 
-                    toolBlock.AbortRunOnToolFailure = false;
+                    toolBlock.AbortRunOnToolFailure = true;
                     toolBlock.GarbageCollectionEnabled = true;
                     toolBlock.FailOnInvalidDataBinding = true;
                     toolBlock.GarbageCollectionFrequency = 1;

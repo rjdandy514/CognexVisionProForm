@@ -638,8 +638,7 @@ namespace CognexVisionProForm
         {
             if (cogToolBlockEditV21.Subject != null)
             {
-                //toolblockArray[cbTBCameraSelected.SelectedIndex, cbTBToolSelected.SelectedIndex].toolBlock.Dispose();
-                //toolblockArray[cbTBCameraSelected.SelectedIndex, cbTBToolSelected.SelectedIndex].toolBlock = (CogToolBlock)CogSerializer.DeepCopyObject(cogToolBlockEditV21.Subject);
+                toolblockArray[cbTBCameraSelected.SelectedIndex, cbTBToolSelected.SelectedIndex].toolBlock = (CogToolBlock)CogSerializer.DeepCopyObject(cogToolBlockEditV21.Subject);
             }
         }
         //*********************************************************************
