@@ -27,6 +27,9 @@ namespace CognexVisionProForm
         private int recipeEcho;
         private string[] PartType;
         private bool[] ResultReadyOk;
+        private bool plcRetry;
+        private bool plcRetry_Mem;
+
 
         private CogStringCollection LicenseCheck;
         private bool cogLicenseOk;
@@ -44,10 +47,6 @@ namespace CognexVisionProForm
         bool[] toolTrigger;
         bool[] toolTriggerComplete;
         public CameraControl[] cameraControl;
-
-        Thread[] threadTool;
-        bool threadToolAlive;
-
         Task[] taskToolRun;
 
         SplashScreen splashScreen;
@@ -76,6 +75,7 @@ namespace CognexVisionProForm
         string ServerNotFound = "No Server Found";
 
         private System.Windows.Forms.Timer pollingTimer;
+        private System.Windows.Forms.Timer watchDogTimer;
         public CognexVisionProForm()
         {
             InitializeComponent();
@@ -88,13 +88,11 @@ namespace CognexVisionProForm
 
             heartBeat = !heartBeat;
             cbHeartbeat.Checked = heartBeat;
-            cbSystemIdle.Checked = systemIdle;
+            cbSystemIdle.Checked = SystemIdle;
 
-            threadToolAlive = ThreadAlive(taskToolRun);
 
-            
 
-            if (!threadToolAlive && MainPLC.InitialCheck.Status == IPStatus.Success)
+            if (!ThreadsAlive && MainPLC.InitialCheck.Status == IPStatus.Success)
             {
                 //Get all data from PLC
                 MainPLC.ReadPlcDataTag();
@@ -113,6 +111,13 @@ namespace CognexVisionProForm
                 
             }
             pollingTimer.Start();
+        }
+        private void watchDogTimer_Tick(object sender, EventArgs e)
+        {
+            watchDogTimer.Stop();
+
+            MessageBox.Show("watchdogTimer was triggered");
+
         }
         //*********************************************************************
         //GENERAL FORM CONTROL
@@ -265,6 +270,7 @@ namespace CognexVisionProForm
 
             if (tabControl1.SelectedTab.Name != "tabToolBlock")
             {
+                if (cogToolBlockEditV21.Subject != null) { cogToolBlockEditV21.Subject.Dispose(); }
                     cogToolBlockEditV21.Subject = null;
             }
             if (tabControl1.SelectedTab.Name != "tabImage")
@@ -277,24 +283,14 @@ namespace CognexVisionProForm
         }
         private void tabControl1_Deselecting(object sender, TabControlCancelEventArgs e)
         {
+            
 
-
-            systemIdle = true;
-            systemIdle &= toolTrigger.All(x => x == false);
-            systemIdle &= cameraSnap.All(x => x == false);
-            systemIdle &= cameraSnapComplete.All(x => x == false);
-            systemIdle &= !threadToolAlive;
-            if (!systemIdle)
-            {
-                e.Cancel = true;
-            }
-
- 
-
-            }
+        }
         private void tabControl1_Selecting(object sender, TabControlCancelEventArgs e)
         {
-            if(e.TabPage == tabToolBlock)
+            if (!SystemIdle) { e.Cancel = true; }
+
+            if (e.TabPage == tabToolBlock)
             {
                 if (PlcCommsActive)
                 {
@@ -485,7 +481,7 @@ namespace CognexVisionProForm
                     
 
                     if (!CameraAcqArray[i].Connected) { return; }
-                    Thread.Sleep(1000);
+                    Thread.Sleep(2000);
 
                     CameraAcqArray[i].SaveImageSelected = true;
                 }
@@ -610,8 +606,9 @@ namespace CognexVisionProForm
             if (cameraSelected < 0 || cameraSelected >= cameraCount) { return; }
             if (toolSelected < 0 || toolSelected >= toolCount) { return; }
 
-            //toolBlock = (CogToolBlock) CogSerializer.DeepCopyObject(toolblockArray[cameraSelected, toolSelected].toolBlock);            
-            cogToolBlockEditV21.Subject = toolblockArray[cameraSelected, toolSelected].toolBlock;
+            toolBlock = CogSerializer.DeepCopyObject(toolblockArray[cameraSelected, toolSelected].toolBlock) as CogToolBlock;
+            cogToolBlockEditV21.Subject = new CogToolBlock();
+            cogToolBlockEditV21.Subject = toolBlock;
 
         }
         private void bttnUpdateImage_Click(object sender, EventArgs e)
@@ -639,6 +636,9 @@ namespace CognexVisionProForm
             if (cogToolBlockEditV21.Subject != null)
             {
                 toolblockArray[cbTBCameraSelected.SelectedIndex, cbTBToolSelected.SelectedIndex].toolBlock = (CogToolBlock)CogSerializer.DeepCopyObject(cogToolBlockEditV21.Subject);
+                toolblockArray[cbTBCameraSelected.SelectedIndex, cbTBToolSelected.SelectedIndex].SaveVisionProject();
+                MessageBox.Show("Program Saved");
+
             }
         }
         //*********************************************************************

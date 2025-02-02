@@ -49,7 +49,33 @@ namespace CognexVisionProForm
         }
         public bool ThreadsAlive
         {
-            get { return threadToolAlive; }
+            get 
+            {
+                return ThreadAlive(taskToolRun);
+            }
+        }
+        public bool SystemIdle
+        {
+            get 
+            {
+                systemIdle = true;
+                systemIdle &= toolTrigger.All(x => x == false);
+                systemIdle &= cameraSnap.All(x => x == false);
+                systemIdle &= cameraSnapComplete.All(x => x == false);
+                systemIdle &= !ThreadsAlive;
+                return systemIdle; 
+            }
+        }
+        public bool PlcRetry
+        {
+            set
+            {
+                plcRetry = value;
+
+                if (plcRetry && !plcRetry_Mem) { RetryToolBlock(); }
+
+                plcRetry_Mem = plcRetry;
+            }
         }
         public int Recipe
         {
@@ -68,6 +94,10 @@ namespace CognexVisionProForm
             pollingTimer = new System.Windows.Forms.Timer();
             pollingTimer.Tick += new EventHandler(pollingTimer_Tick);
             pollingTimer.Interval = 200; // in miliseconds
+
+            watchDogTimer = new System.Windows.Forms.Timer();
+            watchDogTimer.Tick += new EventHandler(watchDogTimer_Tick);
+            watchDogTimer.Interval = 8000; // in miliseconds
 
             for (int j = 0; j < cameraCount; j++)
             {
@@ -307,7 +337,7 @@ namespace CognexVisionProForm
             RecipeData();
 
             //Only change recipe if system is idel
-            if (!systemIdle) { return; }
+            if (!SystemIdle) { return; }
             if (recipe >= cameraCropWidth.Length) { recipe = 0; }
             
             //only update recipe if recipe number has changed
@@ -380,8 +410,7 @@ namespace CognexVisionProForm
             CogImage8Grey processedImage;
             Debug.WriteLine("Beginning of ToolBlock Trigger");
 
-            if (ThreadAlive(taskToolRun)) { return; }
-            GC.Collect();
+            if (ThreadsAlive) { return; }
 
             cogToolBlockEditV21.ActiveControl = null;
 
@@ -408,11 +437,9 @@ namespace CognexVisionProForm
                 if (toolTrigger[i])
                 {
                     toolblockArray[i, desiredTool[i]].Inputs[0].Value = processedImage;
-                    //toolblockArray[i, desiredTool[i]].ToolRun();
 
                     int camera = i;
-                    int tool = desiredTool[camera];
-
+                    int tool = desiredTool[camera];                    
                     taskToolRun[camera] = new Task(() => toolblockArray[camera, tool].ToolRun());
                     taskToolRun[camera].Start();
                 }
@@ -423,6 +450,22 @@ namespace CognexVisionProForm
             Array.Clear(cameraSnap, 0, cameraSnap.Length);
             Array.Clear(cameraSnapComplete, 0, cameraSnapComplete.Length);
 
+           
+
+        }
+        public void ToolBlockReload()
+        {
+            for(int i = 0; i < cameraCount; i++)
+            {
+                if (toolblockArray[i, desiredTool[i]].RunStatus.ProcessingTime > 5000)
+                {
+                    toolblockArray[i, desiredTool[i]].RefreshTool();
+                }
+
+                
+            }
+            MessageBox.Show("Vision Programs Reloaded");
+            
         }
         public void RetryToolBlock()
         {
@@ -436,6 +479,16 @@ namespace CognexVisionProForm
         }
         public void UpdateFrameGrabberTab()
         {
+            /*
+            for(int i = 0; i< cameraCount;i++)
+            {
+                CameraAcqArray[i].FindArchivedImages();
+                CameraAcqArray[i].ArchiveImageActive = true;
+            }
+            */
+            
+
+
             cbConfigFileFound.Checked = CameraAcqArray[selectedCameraId].ConfigFilePresent;
             cbCameraConnected.Checked = CameraAcqArray[selectedCameraId].Connected;
             tbCameraName.Text = CameraAcqArray[selectedCameraId].Name;
@@ -618,24 +671,22 @@ namespace CognexVisionProForm
             //GENERAL COMMANDS
             int index = 0;
             PlcAutoMode = (MainPLC.PlcToPcControl[index] & (1 << 0)) != 0;
+            PlcRetry = ((MainPLC.PlcToPcControl[index] & (1 << 1)) != 0);
+
             recipe = MainPLC.PlcToPcControl[index] >> 16;
 
-            systemIdle = true;
-            systemIdle &= toolTrigger.All(x => x == false);
-            systemIdle &= cameraSnap.All(x => x == false);
-            systemIdle &= cameraSnapComplete.All(x => x == false);
-            systemIdle &= !threadToolAlive;
-
-
+            bool systemIdle_ONS = SystemIdle;
             //CAMERA COMMANDS
             index = 1;
             for (int cam = 0; cam < cameraCount; cam++)
             {
-                CameraAcqArray[cam].Trigger = systemIdle && ((MainPLC.PlcToPcControl[index + cam] & (1 << 0)) != 0);
-
+                CameraAcqArray[cam].Trigger = systemIdle_ONS && ((MainPLC.PlcToPcControl[index + cam] & (1 << 0)) != 0);
+                
                 if ((MainPLC.PlcToPcControl[index + cam] & (1 << 1)) != 0) { CameraAbort(); }
                 else { CameraAcqArray[cam].AbortTrigger = false; }
 
+                
+                
                 plcTool[cam] = MainPLC.PlcToPcControl[index + cam] >> 16;
                 ToolNumberUpdate(cam);
 
@@ -701,7 +752,7 @@ namespace CognexVisionProForm
             //Camera Status: info related to camera and general system         
             tempTag |= ((heartBeat ? 1 : 0 )<< 0);
             tempTag |= ((cogLicenseOk ? 1:0 ) << 1);
-            tempTag |= ((!systemIdle ? 1 : 0) << 2);
+            tempTag |= ((!SystemIdle ? 1 : 0) << 2);
 
             tempTag |= recipeEcho << 16;
 
@@ -764,7 +815,7 @@ namespace CognexVisionProForm
                         if (dataTypeName == "Double")
                         {
                             dData = Convert.ToDouble(tool.Outputs[j].Value);
-                            iData = Convert.ToInt32(dData * 10000);
+                            iData = Convert.ToInt32(dData * 100000);
 
                             MainPLC.PcToPlcStatusData[(i * dataLength) + writeIndex] = iData;
                         }

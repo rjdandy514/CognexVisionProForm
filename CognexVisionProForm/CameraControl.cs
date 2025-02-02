@@ -144,6 +144,7 @@ namespace CognexVisionProForm
         }
         private void numRecordSelect_ValueChanged(object sender, EventArgs e)
         {
+            if (!_form.SystemIdle) { return; }
             UpdateImageRecord();
         }
         private void bttnGetToolData_Click(object sender, EventArgs e)
@@ -167,7 +168,9 @@ namespace CognexVisionProForm
         }
         private void bttnTest_Click(object sender, EventArgs e)
         {
+            //_form.ToolBlockReload();
             _form.RetryToolBlock();
+
         }
         private void numToolSelect_ValueChanged(object sender, EventArgs e)
         {
@@ -190,13 +193,11 @@ namespace CognexVisionProForm
 
             if (tool.ResultUpdated != Result_Update_Mem && !_form.ThreadsAlive)
             {
-                recordDisplay.Enabled = false;
                 this.ActiveControl = null;
-                UpdateImage();
                 UpdateToolDisplay();
                 UpdateImageRecord();
                 Result_Update_Mem = tool.ResultUpdated;
-                recordDisplay.Enabled = true;
+                if(tool.toolBlock.RunStatus.ProcessingTime > 5000){ tool.RefreshTool(); }
             }
         }
         public void UpdateToolDisplay()
@@ -224,32 +225,40 @@ namespace CognexVisionProForm
         }
         public void UpdateImageRecord()
         {
+            recordDisplay.Enabled = false;
+
             if (tool.toolBlock != null)
             {
                 try { record = tool.toolBlock.CreateLastRunRecord(); }
                 catch (Exception e) { Debug.WriteLine(e); }
             }
+            
             //Determine last record to display
             if (record != null)
             {
                 numRecordSelect.Minimum = 0;
                 numRecordSelect.Maximum = record.SubRecords.Count - 1;
+                if (numRecordSelect.Value > numRecordSelect.Maximum) { numRecordSelect.Value = 0; }
 
-                int selectedRecord = Convert.ToInt32(numRecordSelect.Value);
-                recordDisplay.Record = record.SubRecords[selectedRecord];
-
-                lbRecordName.Text = record.SubRecords[selectedRecord].Annotation;
+                try
+                {
+                    int selectedRecord = Convert.ToInt32(numRecordSelect.Value);
+                    recordDisplay.Record = CogSerializer.DeepCopyObject(record.SubRecords[selectedRecord]) as ICogRecord;
+                    recordDisplay.Fit();
+                    lbRecordName.Text = record.SubRecords[selectedRecord].Annotation;
+                }
+                catch (Exception e) { Debug.WriteLine(e); }
+                
 
             }
+            record = null;
+            recordDisplay.Enabled = true;
         }
 
         public void UpdateImage()
-        { 
-            if (camera.Image == null) { return; }
+        {
             //Do not try to resize if App is Minimized
             if (_form.WindowState == FormWindowState.Minimized) { return; }
-
-            recordDisplay.Image = camera.Image;
             //*********************************************
             //update cogdisplay
             //*********************************************
@@ -260,7 +269,11 @@ namespace CognexVisionProForm
             recordDisplay.Height = cogHeight;
 
             // Fit Image to Display
-            recordDisplay.Fit();
+            if(recordDisplay.Created && recordDisplay.Image!=null)
+            {
+                recordDisplay.Fit();
+            }
+            
         }
         private void UpdateButton()
         {

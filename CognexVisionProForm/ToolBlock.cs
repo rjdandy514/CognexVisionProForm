@@ -21,6 +21,7 @@ namespace CognexVisionProForm
 {
     public class ToolBlock
     {
+        
         //Internal Variable
         string toolName;
         string toolFile;
@@ -43,6 +44,7 @@ namespace CognexVisionProForm
         CogToolBlockTerminalCollection inputs = new CogToolBlockTerminalCollection();
 
         public CogToolBlock toolBlock;
+        private CogToolBlock loadToolBlock;
         CognexVisionProForm form = new CognexVisionProForm();
        
         public ToolBlock(CognexVisionProForm Form)
@@ -192,9 +194,6 @@ namespace CognexVisionProForm
         {
             if (toolFile != "") 
             {
-
-                //toolBlock.Inputs[0].Value = null;
-                //toolBlock.Run();
                 CogSerializer.SaveObjectToFile(toolBlock, toolFile, typeof(System.Runtime.Serialization.Formatters.Binary.BinaryFormatter), 0); 
             }
 
@@ -206,13 +205,10 @@ namespace CognexVisionProForm
             {
                 if (filePresent)
                 {
-                    CogToolBlock loadToolBlock = CogSerializer.LoadObjectFromFile(toolFile, typeof(System.Runtime.Serialization.Formatters.Binary.BinaryFormatter), 0) as CogToolBlock;
+                    loadToolBlock = CogSerializer.LoadObjectFromFile(toolFile) as CogToolBlock;
                     
                     toolBlock = new CogToolBlock();
-                    toolBlock = CogSerializer.DeepCopyObject(loadToolBlock) as CogToolBlock;
-                    
-                    loadToolBlock.Dispose();
-                    loadToolBlock = null;
+                    toolBlock = CogSerializer.DeepCopyObject(loadToolBlock, CogSerializationOptionsConstants.All) as CogToolBlock;
 
                     toolBlock.Ran += new EventHandler(Subject_Ran);
                     toolBlock.Name = toolName;
@@ -236,15 +232,23 @@ namespace CognexVisionProForm
             }
             catch (Exception ex) { Utilities.LoggingStatment(ex.Message); }
         }
+        public void RefreshTool()
+        {
+            toolReady = false;
+            toolBlock.Dispose();
+            toolBlock = new CogToolBlock();
+            toolBlock = CogSerializer.DeepCopyObject(loadToolBlock, CogSerializationOptionsConstants.Minimum) as CogToolBlock;
+            toolBlock.Ran += new EventHandler(Subject_Ran);
+            toolReady = true;
+        }
         public void ToolSetup()
         {
             
         }
         public void ToolRun()
         {
-            
             toolReady = false;
-            
+            toolBlock.GarbageCollectionEnabled = true;
             if (toolBlock.Inputs.Count > 0)
             {
                 for (int i = 0; i < toolBlock.Inputs.Count; i++)
@@ -255,7 +259,6 @@ namespace CognexVisionProForm
                     Utilities.LoggingStatment($"{toolName}: input # {i} = {toolBlock.Inputs[i].Value}");
                 }
             }
-            //Debug.WriteLine(Thread.CurrentThread.Name);
             try
             {
                 toolBlock.Run();
@@ -287,12 +290,16 @@ namespace CognexVisionProForm
             {
               GetAllToolData();
               CreateTable();
+              Debug.WriteLine($"Camera {CameraId} tool finished");
             }
             
             
             toolReady = true;
+            
             Utilities.LoggingStatment($"{toolName}: Number of Outputs - {toolOutputCount}");
             Utilities.LoggingStatment($"{toolName}: Toolblock completed Run");
+
+
         }
         public void Cleaning()
         {
@@ -312,14 +319,17 @@ namespace CognexVisionProForm
             data = new List<ToolData>();          
 
             GetToolData(toolBlock);
+            toolBlock.GarbageCollectionEnabled = true;
+            toolBlock.GarbageCollectionFrequency = 1;
 
             for (int i = 0; i < toolBlock.Tools.Count;i++)
             {
                 if (toolBlock.Tools[i].GetType().Name ==  "CogToolBlock")
                 {
                     CogToolBlock iTool = toolBlock.Tools[i] as CogToolBlock;
-                    iTool.GarbageCollectionEnabled = false;
                     GetToolData(iTool);
+                    iTool.GarbageCollectionEnabled = true;
+                    iTool.GarbageCollectionFrequency = 1;
                 }
             }
         }
