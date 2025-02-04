@@ -226,10 +226,15 @@ namespace CognexVisionProForm
         {
             recordDisplay.Enabled = false;
 
-            if (tool.toolBlock != null)
+
+            if (tool.toolBlock != null && !_form.PlcCommsActive)
             {
                 try { record = tool.toolBlock.CreateLastRunRecord(); }
                 catch (Exception e) { Debug.WriteLine(e); }
+            }
+            else
+            {
+                record = null;
             }
             
             //Determine last record to display
@@ -250,7 +255,15 @@ namespace CognexVisionProForm
                 
 
             }
-            record = null;
+            else
+            {
+                if (tool.Inputs[0].Value != null)
+                {
+                    recordDisplay.Image = tool.Inputs[0].Value as CogImage8Grey;
+                    lbRecordName.Text = "Disable PLC connection to view Image Records";
+                }
+            }
+            
             recordDisplay.Enabled = true;
         }
         public void UpdateImage()
@@ -276,6 +289,7 @@ namespace CognexVisionProForm
         private void UpdateButton()
         {
             numToolSelect.Enabled = !_form.PlcCommsActive;
+            numRecordSelect.Enabled = !_form.PlcCommsActive;
 
             bool imageControl = !_form.PlcCommsActive && !(camera.Snapping || camera.Acquiring || camera.Grabbing);
             bttnCameraSnap.Enabled = imageControl;
