@@ -103,7 +103,7 @@ namespace CognexVisionProForm
         {
             pollingTimer.Stop();
 
-            this.BeginInvoke((Action)delegate { updateAll(); });
+            this.BeginInvoke((Action)delegate { UpdateAll(); });
 
             pollingTimer.Start();
         }
@@ -182,7 +182,7 @@ namespace CognexVisionProForm
             camera.TriggerGrab = true;
             UpdateButton();
         }
-        public void updateAll()
+        public void UpdateAll()
         {
             cbCameraConnected.Checked = camera.Connected;
             cbTrigger.Checked = camera.Trigger;
@@ -197,7 +197,6 @@ namespace CognexVisionProForm
                 UpdateToolDisplay();
                 UpdateImageRecord();
                 Result_Update_Mem = tool.ResultUpdated;
-                if(tool.toolBlock.RunStatus.ProcessingTime > 5000){ tool.RefreshTool(); }
             }
         }
         public void UpdateToolDisplay()
@@ -254,7 +253,6 @@ namespace CognexVisionProForm
             record = null;
             recordDisplay.Enabled = true;
         }
-
         public void UpdateImage()
         {
             //Do not try to resize if App is Minimized
