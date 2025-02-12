@@ -853,7 +853,7 @@ namespace CognexVisionProForm
             this.panel1.Controls.Add(this.bttnPreProcessFileSelect);
             this.panel1.Controls.Add(this.cbPreProcessFileFound);
             this.panel1.Controls.Add(this.tbPreProcessNameEdit);
-            this.panel1.Location = new System.Drawing.Point(342, 385);
+            this.panel1.Location = new System.Drawing.Point(342, 369);
             this.panel1.Margin = new System.Windows.Forms.Padding(5);
             this.panel1.Name = "panel1";
             this.panel1.Padding = new System.Windows.Forms.Padding(5);
@@ -934,7 +934,7 @@ namespace CognexVisionProForm
             this.panel3.Controls.Add(this.cbToolBlock);
             this.panel3.Controls.Add(this.cbToolBlockFileFound);
             this.panel3.Controls.Add(this.tbToolBlockNameEdit);
-            this.panel3.Location = new System.Drawing.Point(342, 206);
+            this.panel3.Location = new System.Drawing.Point(342, 198);
             this.panel3.Margin = new System.Windows.Forms.Padding(5);
             this.panel3.Name = "panel3";
             this.panel3.Padding = new System.Windows.Forms.Padding(5);

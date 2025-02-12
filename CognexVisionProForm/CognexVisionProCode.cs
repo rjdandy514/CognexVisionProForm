@@ -1016,6 +1016,7 @@ namespace CognexVisionProForm
                     cbRecipe.Items.Add(temp);
                 }
             }
+            else { cbRecipe.Items.Add("DEFAULT"); }
         }
         public static bool CloseCancel()
         {
