@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using EventArgs = System.EventArgs;
 using System.Threading.Tasks;
 using System.Data;
+using System.IO;
 
 
 namespace CognexVisionProForm
@@ -23,9 +24,6 @@ namespace CognexVisionProForm
     {
         private bool heartBeat = false;
         private bool PlcAutoMode;
-        private int recipe;
-        private int recipeEcho;
-        private string[] PartType;
         private bool[] ResultReadyOk;
         private bool plcRetry;
         private bool plcRetry_Mem;
@@ -37,8 +35,6 @@ namespace CognexVisionProForm
 
         int selectedCameraId;
         int cameraConnectCount;
-        int[] cameraCropLeft;
-        int[] cameraCropWidth;
         int cameraImageFlip;
         int dataLength;
         public DalsaImage[] CameraAcqArray;
@@ -47,6 +43,7 @@ namespace CognexVisionProForm
         bool[] toolTrigger;
         bool[] toolTriggerComplete;
         public CameraControl[] cameraControl;
+        int[] recipeSelected;
         Task[] taskToolRun;
 
         SplashScreen splashScreen;
@@ -125,9 +122,6 @@ namespace CognexVisionProForm
         private void Form1_Load(object sender, EventArgs e)
         {
             Thread.CurrentThread.Name = "Main Form";
-            cameraCropLeft = new int[4];
-            cameraCropWidth = new int[4];
-            PartType = new string[4];
             ComputerSetup();
 
             this.Text = $"{computerName} - Eclipse Vision Application";
@@ -154,7 +148,7 @@ namespace CognexVisionProForm
             toolTrigger = new bool[cameraCount];
             toolTriggerComplete = new bool[cameraCount];
             taskToolRun = new Task[cameraCount];
-
+            recipeSelected = new int[cameraCount];
             splashScreen.UpdateProgress("Initialize Classes", 10);
             InitClasses();
 
@@ -270,7 +264,7 @@ namespace CognexVisionProForm
 
             if (tabControl1.SelectedTab.Name != "tabToolBlock")
             {
-                if (cogToolBlockEditV21.Subject != null) { cogToolBlockEditV21.Subject.Dispose(); }
+                //if (cogToolBlockEditV21.Subject != null) { cogToolBlockEditV21.Subject.Dispose(); }
                     cogToolBlockEditV21.Subject = null;
             }
             if (tabControl1.SelectedTab.Name != "tabImage")
@@ -449,7 +443,7 @@ namespace CognexVisionProForm
             if (toolSelected >= 0 && toolSelected < toolCount)
             {
                 toolblockArray[cbCameraIdSelected.SelectedIndex, toolSelected].Name = toolNameUpdated;
-                toolblockArray[cbCameraIdSelected.SelectedIndex, toolSelected].LoadvisionProject();
+                toolblockArray[cbCameraIdSelected.SelectedIndex, toolSelected].LoadVisionProject();
                 toolblockArray[cbCameraIdSelected.SelectedIndex, toolSelected].InitJobManager();
 
                 cbToolBlock.Items[toolSelected] = toolNameUpdated;
@@ -459,44 +453,62 @@ namespace CognexVisionProForm
         }
         private void bttnAutoConnect_Click(object sender, EventArgs e)
         {
+           var allConnected = CameraAcqArray.All(x => x.Connected);
 
-            for (int i = cameraCount - 1; i >= 0; i--)
+            if(!allConnected)
             {
-
-                if (!CameraAcqArray[i].Connected && CameraAcqArray[i].LoadServerSelect != null && CameraAcqArray[i].LoadResourceIndex != -1)
+                for (int i = cameraCount - 1; i >= 0; i--)
                 {
 
-                    //get serial number of pr
-                    SapLocation serverLocation = new SapLocation(CameraAcqArray[i].LoadServerSelect, CameraAcqArray[i].LoadResourceIndex);
-
-                    string serialNumberCheck = SapManager.GetSerialNumber(serverLocation);
-
-                    if (CameraAcqArray[i].SerialNumber != serialNumberCheck) 
+                    if (!CameraAcqArray[i].Connected && CameraAcqArray[i].LoadServerSelect != null && CameraAcqArray[i].LoadResourceIndex != -1)
                     {
-                        MessageBox.Show($"{CameraAcqArray[i].Name} did not connect: Serial number stored{CameraAcqArray[i].SerialNumber} does not match current selection {serialNumberCheck}");
-                        continue; 
+
+                        //get serial number of pr
+                        SapLocation serverLocation = new SapLocation(CameraAcqArray[i].LoadServerSelect, CameraAcqArray[i].LoadResourceIndex);
+
+                        string serialNumberCheck = SapManager.GetSerialNumber(serverLocation);
+
+                        if (CameraAcqArray[i].SerialNumber != serialNumberCheck)
+                        {
+                            MessageBox.Show($"{CameraAcqArray[i].Name} did not connect: Serial number stored{CameraAcqArray[i].SerialNumber} does not match current selection {serialNumberCheck}");
+                            continue;
+                        }
+                        CameraAcqArray[i].CreateCamera();
+
+
+
+                        if (!CameraAcqArray[i].Connected) { return; }
+                        Thread.Sleep(2000);
+
+                        CameraAcqArray[i].SaveImageSelected = true;
                     }
-                    CameraAcqArray[i].CreateCamera();
 
-                    
-
-                    if (!CameraAcqArray[i].Connected) { return; }
-                    Thread.Sleep(2000);
-
-                    CameraAcqArray[i].SaveImageSelected = true;
                 }
+                SaveSettings();
+                this.WindowState = FormWindowState.Maximized;
+                tabControl1.SelectedIndex = 0;
 
+                bttnAutoConnect.Text = "Auto Disconnect All Cameras";
             }
-            SaveSettings();
-            this.WindowState = FormWindowState.Maximized;
-            tabControl1.SelectedIndex = 0;
+            else
+            {
+                for (int i = 0;i < cameraCount; i++)
+                {
+                    CameraAcqArray[i].Disconnect();
+                    Thread.Sleep(300);
+                }
+                bttnAutoConnect.Text = "Auto Connect All Cameras";
+            }
+
+
+            
         }
         private void bttnPreProcessFileSelect_Click(object sender, EventArgs e)
         {
             string preProcessNameUpdated = tbPreProcessNameEdit.Text.ToString();
 
             preProcess[cbCameraIdSelected.SelectedIndex].Name = preProcessNameUpdated;
-            preProcess[cbCameraIdSelected.SelectedIndex].LoadvisionProject();
+            preProcess[cbCameraIdSelected.SelectedIndex].LoadVisionProject();
             preProcess[cbCameraIdSelected.SelectedIndex].InitJobManager();
 
             SaveSettings();
@@ -506,7 +518,7 @@ namespace CognexVisionProForm
         {
             CameraAcqArray[selectedCameraId].ArchiveImageIndex = (int)numArchiveIndex.Value;
         }
-        private void bttnGetRecipe_Click(object sender, EventArgs e)
+        private void bttnLoadParameter_Click(object sender, EventArgs e)
         {
             DataTable dt = new DataTable();
             dt.Columns.Add("Recipe Name", typeof(string));
@@ -521,17 +533,19 @@ namespace CognexVisionProForm
             }
 
             object[] rowArray = new object[2];
-
-            for(int i = 0; i < toolblockArray[cam, toolIndex].Recipe.Count; i++)
+            if(toolblockArray[cam, toolIndex].Recipe == null) { return; }
+            
+            for (int i = 0; i < toolblockArray[cam, toolIndex].Recipe.Count; i++)
             {
                 rowArray[0] = toolblockArray[cam, toolIndex].Recipe[i].Name;
                 rowArray[1] = toolblockArray[cam, toolIndex].Recipe[i].Value.ToString();
                 dt.Rows.Add(rowArray);
             }
             dgRecipe.DataSource = dt;
-            dt = null;
+            dt= null;
+            
         }
-        private void bttnSetRecipe_Click(object sender, EventArgs e)
+        private void bttnSaveParameter_Click(object sender, EventArgs e)
         {
             List<ToolRecipe> recipes = new List<ToolRecipe>();
 
@@ -557,6 +571,94 @@ namespace CognexVisionProForm
             }
                 recipes = null;
         }
+
+        //*********************************************************************
+        //FRAME GRABBER - RECIPE CONTROL
+        //*********************************************************************
+        private void bttnRecipeCreate_Click(object sender, EventArgs e)
+        {
+            bool recipeExists;
+            string recipeName;
+            string recipePath;
+
+            if (tbRecipeNew.Text == "")
+            {
+                MessageBox.Show("Enter valid Name");
+                return;
+            }
+
+            recipeName = tbRecipeNew.Text;
+            recipePath = Utilities.ExeFilePath + $"\\Camera{cbCameraIdSelected.SelectedIndex.ToString("00")}\\Recipe\\{recipeName}";
+            recipeExists = Directory.Exists(recipePath);
+
+            if (!recipeExists) { Directory.CreateDirectory(recipePath); }
+
+            CreateRecipeList();
+        }
+        private void bttnRecipeDelete_Click(object sender, EventArgs e)
+        {
+            bool recipeExists;
+            string recipeName;
+            string recipePath;
+
+            if (cbRecipe.SelectedItem == null) { return; }
+            recipeName = cbRecipe.SelectedItem.ToString();
+            recipePath = Utilities.ExeFilePath + $"\\Camera{cbCameraIdSelected.SelectedIndex.ToString("00")}\\Recipe\\{recipeName}";
+
+            recipeExists = Directory.Exists(recipePath);
+            if (recipeExists) { Directory.Delete(recipePath,true); }
+            CreateRecipeList();
+        }
+        private void bttnRecipeSave_Click(object sender, EventArgs e)
+        {
+            if(cbRecipe.SelectedItem.ToString() != "" && cbCameraIdSelected.SelectedIndex >= 0)
+            {
+                CameraConfigSave(cbRecipe.SelectedItem.ToString(), cbCameraIdSelected.SelectedIndex);
+                ToolblockRecipeSave(cbRecipe.SelectedItem.ToString(), cbCameraIdSelected.SelectedIndex);
+            }
+
+        }
+        private void bttnRecipeLoad_Click(object sender, EventArgs e)
+        {
+
+            if (cbRecipe.SelectedItem.ToString() != "" && cbCameraIdSelected.SelectedIndex >= 0)
+            {
+                CameraConfigLoad(cbRecipe.SelectedItem.ToString(), cbCameraIdSelected.SelectedIndex);
+                ToolblockRecipeLoad(cbRecipe.SelectedItem.ToString(), cbCameraIdSelected.SelectedIndex);
+                recipeSelected[cbCameraIdSelected.SelectedIndex] = cbRecipe.SelectedIndex;
+            }
+            UpdateFrameGrabberTab();
+        }
+        private void bttnRecipeLoadAll_Click(object sender, EventArgs e)
+        {
+            for(int i = cameraCount - 1; i >= 0;i--)
+            {
+                if (cbRecipe.SelectedItem.ToString() == "") { return; }
+                CameraConfigLoad(cbRecipe.SelectedItem.ToString(), i);
+                ToolblockRecipeLoad(cbRecipe.SelectedItem.ToString(), i);
+                recipeSelected[i] = cbRecipe.SelectedIndex;
+            }
+
+            UpdateFrameGrabberTab();
+            MessageBox.Show("All Recipe Files have been Loaded \n Reconnected Cameras ");
+
+        }
+        private void bttnRecipeSaveAll_Click(object sender, EventArgs e)
+        {
+            for (int i = cameraCount - 1; i >= 0; i--)
+            {
+                if (cbRecipe.SelectedItem.ToString() == "") { return; }
+                CameraConfigSave(cbRecipe.SelectedItem.ToString(), i);
+                ToolblockRecipeSave(cbRecipe.SelectedItem.ToString(), i);
+            }
+
+            MessageBox.Show("All Recipe Files have been Saved");
+        }
+        private void cbRecipe_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+       
         //*********************************************************************
         //lICENSE CHECK
         //*********************************************************************

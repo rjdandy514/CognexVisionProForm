@@ -78,11 +78,24 @@ namespace CognexVisionProForm
             this.btnLicenseCheck = new System.Windows.Forms.Button();
             this.tbExpireDate = new System.Windows.Forms.TextBox();
             this.tabFrameGrabber = new System.Windows.Forms.TabPage();
+            this.panel6 = new System.Windows.Forms.Panel();
+            this.bttnRecipeSaveAll = new System.Windows.Forms.Button();
+            this.bttnRecipeLoadAll = new System.Windows.Forms.Button();
+            this.label16 = new System.Windows.Forms.Label();
+            this.tbRecipeActive = new System.Windows.Forms.TextBox();
+            this.label15 = new System.Windows.Forms.Label();
+            this.bttnRecipeSave = new System.Windows.Forms.Button();
+            this.bttnRecipeLoad = new System.Windows.Forms.Button();
+            this.bttnRecipeDelete = new System.Windows.Forms.Button();
+            this.label14 = new System.Windows.Forms.Label();
+            this.bttnRecipeCreate = new System.Windows.Forms.Button();
+            this.cbRecipe = new System.Windows.Forms.ComboBox();
+            this.tbRecipeNew = new System.Windows.Forms.TextBox();
             this.panel5 = new System.Windows.Forms.Panel();
             this.dgRecipe = new System.Windows.Forms.DataGridView();
-            this.bttnSetRecipe = new System.Windows.Forms.Button();
+            this.bttnSaveParameter = new System.Windows.Forms.Button();
             this.label13 = new System.Windows.Forms.Label();
-            this.bttnGetRecipe = new System.Windows.Forms.Button();
+            this.bttnLoadParameter = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
             this.label9 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
@@ -158,6 +171,7 @@ namespace CognexVisionProForm
             this.tabLicenseCheck.SuspendLayout();
             this.panel11.SuspendLayout();
             this.tabFrameGrabber.SuspendLayout();
+            this.panel6.SuspendLayout();
             this.panel5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgRecipe)).BeginInit();
             this.panel1.SuspendLayout();
@@ -603,6 +617,7 @@ namespace CognexVisionProForm
             // tabFrameGrabber
             // 
             this.tabFrameGrabber.BackColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.tabFrameGrabber.Controls.Add(this.panel6);
             this.tabFrameGrabber.Controls.Add(this.panel5);
             this.tabFrameGrabber.Controls.Add(this.panel1);
             this.tabFrameGrabber.Controls.Add(this.panel3);
@@ -616,18 +631,154 @@ namespace CognexVisionProForm
             this.tabFrameGrabber.TabIndex = 0;
             this.tabFrameGrabber.Text = "Frame Grabber";
             // 
+            // panel6
+            // 
+            this.panel6.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.panel6.Controls.Add(this.bttnRecipeSaveAll);
+            this.panel6.Controls.Add(this.bttnRecipeLoadAll);
+            this.panel6.Controls.Add(this.label16);
+            this.panel6.Controls.Add(this.tbRecipeActive);
+            this.panel6.Controls.Add(this.label15);
+            this.panel6.Controls.Add(this.bttnRecipeSave);
+            this.panel6.Controls.Add(this.bttnRecipeLoad);
+            this.panel6.Controls.Add(this.bttnRecipeDelete);
+            this.panel6.Controls.Add(this.label14);
+            this.panel6.Controls.Add(this.bttnRecipeCreate);
+            this.panel6.Controls.Add(this.cbRecipe);
+            this.panel6.Controls.Add(this.tbRecipeNew);
+            this.panel6.Location = new System.Drawing.Point(342, 5);
+            this.panel6.Margin = new System.Windows.Forms.Padding(5);
+            this.panel6.Name = "panel6";
+            this.panel6.Padding = new System.Windows.Forms.Padding(5);
+            this.panel6.Size = new System.Drawing.Size(335, 191);
+            this.panel6.TabIndex = 38;
+            // 
+            // bttnRecipeSaveAll
+            // 
+            this.bttnRecipeSaveAll.Location = new System.Drawing.Point(152, 160);
+            this.bttnRecipeSaveAll.Name = "bttnRecipeSaveAll";
+            this.bttnRecipeSaveAll.Size = new System.Drawing.Size(175, 23);
+            this.bttnRecipeSaveAll.TabIndex = 45;
+            this.bttnRecipeSaveAll.Text = "Save Active Recipe All Cameras";
+            this.bttnRecipeSaveAll.UseVisualStyleBackColor = true;
+            this.bttnRecipeSaveAll.Click += new System.EventHandler(this.bttnRecipeSaveAll_Click);
+            // 
+            // bttnRecipeLoadAll
+            // 
+            this.bttnRecipeLoadAll.Location = new System.Drawing.Point(14, 160);
+            this.bttnRecipeLoadAll.Name = "bttnRecipeLoadAll";
+            this.bttnRecipeLoadAll.Size = new System.Drawing.Size(132, 23);
+            this.bttnRecipeLoadAll.TabIndex = 44;
+            this.bttnRecipeLoadAll.Text = "Load To All Cameras";
+            this.bttnRecipeLoadAll.UseVisualStyleBackColor = true;
+            this.bttnRecipeLoadAll.Click += new System.EventHandler(this.bttnRecipeLoadAll_Click);
+            // 
+            // label16
+            // 
+            this.label16.AutoSize = true;
+            this.label16.Location = new System.Drawing.Point(11, 134);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(77, 13);
+            this.label16.TabIndex = 43;
+            this.label16.Text = "Active Recipe:";
+            // 
+            // tbRecipeActive
+            // 
+            this.tbRecipeActive.Location = new System.Drawing.Point(119, 130);
+            this.tbRecipeActive.Name = "tbRecipeActive";
+            this.tbRecipeActive.ReadOnly = true;
+            this.tbRecipeActive.Size = new System.Drawing.Size(210, 20);
+            this.tbRecipeActive.TabIndex = 42;
+            this.tbRecipeActive.UseWaitCursor = true;
+            // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.Location = new System.Drawing.Point(9, 78);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(94, 13);
+            this.label15.TabIndex = 41;
+            this.label15.Text = "Selected Recipes:";
+            // 
+            // bttnRecipeSave
+            // 
+            this.bttnRecipeSave.Location = new System.Drawing.Point(229, 99);
+            this.bttnRecipeSave.Name = "bttnRecipeSave";
+            this.bttnRecipeSave.Size = new System.Drawing.Size(100, 23);
+            this.bttnRecipeSave.TabIndex = 40;
+            this.bttnRecipeSave.Text = "Save";
+            this.bttnRecipeSave.UseVisualStyleBackColor = true;
+            this.bttnRecipeSave.Click += new System.EventHandler(this.bttnRecipeSave_Click);
+            // 
+            // bttnRecipeLoad
+            // 
+            this.bttnRecipeLoad.Location = new System.Drawing.Point(117, 99);
+            this.bttnRecipeLoad.Name = "bttnRecipeLoad";
+            this.bttnRecipeLoad.Size = new System.Drawing.Size(100, 23);
+            this.bttnRecipeLoad.TabIndex = 39;
+            this.bttnRecipeLoad.Text = "Load";
+            this.bttnRecipeLoad.UseVisualStyleBackColor = true;
+            this.bttnRecipeLoad.Click += new System.EventHandler(this.bttnRecipeLoad_Click);
+            // 
+            // bttnRecipeDelete
+            // 
+            this.bttnRecipeDelete.Location = new System.Drawing.Point(6, 99);
+            this.bttnRecipeDelete.Name = "bttnRecipeDelete";
+            this.bttnRecipeDelete.Size = new System.Drawing.Size(100, 23);
+            this.bttnRecipeDelete.TabIndex = 38;
+            this.bttnRecipeDelete.Text = "Delete";
+            this.bttnRecipeDelete.UseVisualStyleBackColor = true;
+            this.bttnRecipeDelete.Click += new System.EventHandler(this.bttnRecipeDelete_Click);
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label14.Location = new System.Drawing.Point(8, 11);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(135, 24);
+            this.label14.TabIndex = 37;
+            this.label14.Text = "Recipe Control";
+            // 
+            // bttnRecipeCreate
+            // 
+            this.bttnRecipeCreate.Location = new System.Drawing.Point(5, 45);
+            this.bttnRecipeCreate.Name = "bttnRecipeCreate";
+            this.bttnRecipeCreate.Size = new System.Drawing.Size(117, 23);
+            this.bttnRecipeCreate.TabIndex = 21;
+            this.bttnRecipeCreate.Text = "Create New";
+            this.bttnRecipeCreate.UseVisualStyleBackColor = true;
+            this.bttnRecipeCreate.Click += new System.EventHandler(this.bttnRecipeCreate_Click);
+            // 
+            // cbRecipe
+            // 
+            this.cbRecipe.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbRecipe.FormattingEnabled = true;
+            this.cbRecipe.Location = new System.Drawing.Point(117, 72);
+            this.cbRecipe.Name = "cbRecipe";
+            this.cbRecipe.Size = new System.Drawing.Size(212, 21);
+            this.cbRecipe.TabIndex = 35;
+            this.cbRecipe.SelectedIndexChanged += new System.EventHandler(this.cbRecipe_SelectedIndexChanged);
+            // 
+            // tbRecipeNew
+            // 
+            this.tbRecipeNew.Location = new System.Drawing.Point(128, 46);
+            this.tbRecipeNew.Name = "tbRecipeNew";
+            this.tbRecipeNew.Size = new System.Drawing.Size(201, 20);
+            this.tbRecipeNew.TabIndex = 34;
+            // 
             // panel5
             // 
             this.panel5.BackColor = System.Drawing.SystemColors.ControlLight;
             this.panel5.Controls.Add(this.dgRecipe);
-            this.panel5.Controls.Add(this.bttnSetRecipe);
+            this.panel5.Controls.Add(this.bttnSaveParameter);
             this.panel5.Controls.Add(this.label13);
-            this.panel5.Controls.Add(this.bttnGetRecipe);
-            this.panel5.Location = new System.Drawing.Point(936, 5);
+            this.panel5.Controls.Add(this.bttnLoadParameter);
+            this.panel5.Location = new System.Drawing.Point(679, 5);
             this.panel5.Margin = new System.Windows.Forms.Padding(5);
             this.panel5.Name = "panel5";
             this.panel5.Padding = new System.Windows.Forms.Padding(5);
-            this.panel5.Size = new System.Drawing.Size(359, 381);
+            this.panel5.Size = new System.Drawing.Size(359, 425);
             this.panel5.TabIndex = 39;
             // 
             // dgRecipe
@@ -659,18 +810,18 @@ namespace CognexVisionProForm
             dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
             dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
             this.dgRecipe.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
-            this.dgRecipe.Size = new System.Drawing.Size(341, 331);
+            this.dgRecipe.Size = new System.Drawing.Size(341, 379);
             this.dgRecipe.TabIndex = 54;
             // 
-            // bttnSetRecipe
+            // bttnSaveParameter
             // 
-            this.bttnSetRecipe.Location = new System.Drawing.Point(229, 14);
-            this.bttnSetRecipe.Name = "bttnSetRecipe";
-            this.bttnSetRecipe.Size = new System.Drawing.Size(79, 23);
-            this.bttnSetRecipe.TabIndex = 38;
-            this.bttnSetRecipe.Text = "Set Recipe";
-            this.bttnSetRecipe.UseVisualStyleBackColor = true;
-            this.bttnSetRecipe.Click += new System.EventHandler(this.bttnSetRecipe_Click);
+            this.bttnSaveParameter.Location = new System.Drawing.Point(274, 14);
+            this.bttnSaveParameter.Name = "bttnSaveParameter";
+            this.bttnSaveParameter.Size = new System.Drawing.Size(79, 23);
+            this.bttnSaveParameter.TabIndex = 38;
+            this.bttnSaveParameter.Text = "Save";
+            this.bttnSaveParameter.UseVisualStyleBackColor = true;
+            this.bttnSaveParameter.Click += new System.EventHandler(this.bttnSaveParameter_Click);
             // 
             // label13
             // 
@@ -678,19 +829,19 @@ namespace CognexVisionProForm
             this.label13.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label13.Location = new System.Drawing.Point(8, 11);
             this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(135, 24);
+            this.label13.Size = new System.Drawing.Size(161, 24);
             this.label13.TabIndex = 37;
-            this.label13.Text = "Recipe Control";
+            this.label13.Text = "Parameter Control";
             // 
-            // bttnGetRecipe
+            // bttnLoadParameter
             // 
-            this.bttnGetRecipe.Location = new System.Drawing.Point(149, 14);
-            this.bttnGetRecipe.Name = "bttnGetRecipe";
-            this.bttnGetRecipe.Size = new System.Drawing.Size(79, 23);
-            this.bttnGetRecipe.TabIndex = 21;
-            this.bttnGetRecipe.Text = "Get Recipe";
-            this.bttnGetRecipe.UseVisualStyleBackColor = true;
-            this.bttnGetRecipe.Click += new System.EventHandler(this.bttnGetRecipe_Click);
+            this.bttnLoadParameter.Location = new System.Drawing.Point(192, 14);
+            this.bttnLoadParameter.Name = "bttnLoadParameter";
+            this.bttnLoadParameter.Size = new System.Drawing.Size(79, 23);
+            this.bttnLoadParameter.TabIndex = 21;
+            this.bttnLoadParameter.Text = "Load";
+            this.bttnLoadParameter.UseVisualStyleBackColor = true;
+            this.bttnLoadParameter.Click += new System.EventHandler(this.bttnLoadParameter_Click);
             // 
             // panel1
             // 
@@ -702,7 +853,7 @@ namespace CognexVisionProForm
             this.panel1.Controls.Add(this.bttnPreProcessFileSelect);
             this.panel1.Controls.Add(this.cbPreProcessFileFound);
             this.panel1.Controls.Add(this.tbPreProcessNameEdit);
-            this.panel1.Location = new System.Drawing.Point(599, 175);
+            this.panel1.Location = new System.Drawing.Point(342, 385);
             this.panel1.Margin = new System.Windows.Forms.Padding(5);
             this.panel1.Name = "panel1";
             this.panel1.Padding = new System.Windows.Forms.Padding(5);
@@ -783,7 +934,7 @@ namespace CognexVisionProForm
             this.panel3.Controls.Add(this.cbToolBlock);
             this.panel3.Controls.Add(this.cbToolBlockFileFound);
             this.panel3.Controls.Add(this.tbToolBlockNameEdit);
-            this.panel3.Location = new System.Drawing.Point(599, 5);
+            this.panel3.Location = new System.Drawing.Point(342, 206);
             this.panel3.Margin = new System.Windows.Forms.Padding(5);
             this.panel3.Name = "panel3";
             this.panel3.Padding = new System.Windows.Forms.Padding(5);
@@ -892,7 +1043,7 @@ namespace CognexVisionProForm
             this.panel4.Margin = new System.Windows.Forms.Padding(5);
             this.panel4.Name = "panel4";
             this.panel4.Padding = new System.Windows.Forms.Padding(5);
-            this.panel4.Size = new System.Drawing.Size(592, 381);
+            this.panel4.Size = new System.Drawing.Size(335, 355);
             this.panel4.TabIndex = 33;
             this.panel4.Tag = "pnCameraControl";
             // 
@@ -962,9 +1113,9 @@ namespace CognexVisionProForm
             // 
             // bttnAutoConnect
             // 
-            this.bttnAutoConnect.Location = new System.Drawing.Point(345, 42);
+            this.bttnAutoConnect.Location = new System.Drawing.Point(155, 13);
             this.bttnAutoConnect.Name = "bttnAutoConnect";
-            this.bttnAutoConnect.Size = new System.Drawing.Size(225, 24);
+            this.bttnAutoConnect.Size = new System.Drawing.Size(174, 24);
             this.bttnAutoConnect.TabIndex = 39;
             this.bttnAutoConnect.Text = "Auto Connect All Cameras";
             this.bttnAutoConnect.UseVisualStyleBackColor = true;
@@ -1074,7 +1225,7 @@ namespace CognexVisionProForm
             this.cbServerList.FormattingEnabled = true;
             this.cbServerList.Location = new System.Drawing.Point(119, 156);
             this.cbServerList.Name = "cbServerList";
-            this.cbServerList.Size = new System.Drawing.Size(451, 21);
+            this.cbServerList.Size = new System.Drawing.Size(210, 21);
             this.cbServerList.TabIndex = 16;
             this.cbServerList.SelectedIndexChanged += new System.EventHandler(this.cbServerList_SelectedIndexChanged);
             // 
@@ -1104,7 +1255,7 @@ namespace CognexVisionProForm
             this.cbDeviceList.FormattingEnabled = true;
             this.cbDeviceList.Location = new System.Drawing.Point(119, 183);
             this.cbDeviceList.Name = "cbDeviceList";
-            this.cbDeviceList.Size = new System.Drawing.Size(451, 21);
+            this.cbDeviceList.Size = new System.Drawing.Size(210, 21);
             this.cbDeviceList.TabIndex = 17;
             // 
             // panel2
@@ -1117,7 +1268,7 @@ namespace CognexVisionProForm
             this.panel2.Controls.Add(this.label34);
             this.panel2.Controls.Add(this.label3);
             this.panel2.Controls.Add(this.tbArchiveCount);
-            this.panel2.Location = new System.Drawing.Point(599, 300);
+            this.panel2.Location = new System.Drawing.Point(5, 362);
             this.panel2.Margin = new System.Windows.Forms.Padding(5);
             this.panel2.Name = "panel2";
             this.panel2.Padding = new System.Windows.Forms.Padding(5);
@@ -1358,6 +1509,8 @@ namespace CognexVisionProForm
             this.panel11.ResumeLayout(false);
             this.panel11.PerformLayout();
             this.tabFrameGrabber.ResumeLayout(false);
+            this.panel6.ResumeLayout(false);
+            this.panel6.PerformLayout();
             this.panel5.ResumeLayout(false);
             this.panel5.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgRecipe)).EndInit();
@@ -1474,16 +1627,29 @@ namespace CognexVisionProForm
         private System.Windows.Forms.CheckBox cbSystemIdle;
         private System.Windows.Forms.TabPage taCameraData;
         private System.Windows.Forms.DataGridView dgCameraData;
-        private System.Windows.Forms.BindingSource toolBlockBindingSource;
         private System.Windows.Forms.Button bttnGetData;
         private System.Windows.Forms.NumericUpDown numArchiveIndex;
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.Panel panel5;
-        private System.Windows.Forms.Button bttnSetRecipe;
+        private System.Windows.Forms.Button bttnSaveParameter;
         private System.Windows.Forms.Label label13;
-        private System.Windows.Forms.Button bttnGetRecipe;
+        private System.Windows.Forms.Button bttnLoadParameter;
         private System.Windows.Forms.DataGridView dgRecipe;
+        private System.Windows.Forms.Panel panel6;
+        private System.Windows.Forms.Button bttnRecipeDelete;
+        private System.Windows.Forms.Label label14;
+        private System.Windows.Forms.Button bttnRecipeCreate;
+        private System.Windows.Forms.ComboBox cbRecipe;
+        private System.Windows.Forms.TextBox tbRecipeNew;
+        private System.Windows.Forms.BindingSource toolBlockBindingSource;
+        private System.Windows.Forms.Button bttnRecipeSave;
+        private System.Windows.Forms.Button bttnRecipeLoad;
+        private System.Windows.Forms.Label label16;
+        private System.Windows.Forms.TextBox tbRecipeActive;
+        private System.Windows.Forms.Label label15;
+        private System.Windows.Forms.Button bttnRecipeSaveAll;
+        private System.Windows.Forms.Button bttnRecipeLoadAll;
     }
 }
 

@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CognexVisionProForm", "Cogn
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibplctagWrapper", "LibplctagWrapper\LibplctagWrapper.csproj", "{394ABFC2-E570-462E-9994-37B33C348702}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "VisionAppInstaller", "VisionAppInstaller\VisionAppInstaller.vdproj", "{81AE561B-C076-4F38-91BF-1256A599AAA8}"
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "CognexVisionInstaller", "CognexVisionInstaller\CognexVisionInstaller.vdproj", "{A0FB6680-EA29-47D3-A8A7-68B9EF7A3C66}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,10 +33,10 @@ Global
 		{394ABFC2-E570-462E-9994-37B33C348702}.Release|Any CPU.Build.0 = Release|Any CPU
 		{394ABFC2-E570-462E-9994-37B33C348702}.Release|x64.ActiveCfg = Release|Any CPU
 		{394ABFC2-E570-462E-9994-37B33C348702}.Release|x64.Build.0 = Release|Any CPU
-		{81AE561B-C076-4F38-91BF-1256A599AAA8}.Debug|Any CPU.ActiveCfg = Debug
-		{81AE561B-C076-4F38-91BF-1256A599AAA8}.Debug|x64.ActiveCfg = Debug
-		{81AE561B-C076-4F38-91BF-1256A599AAA8}.Release|Any CPU.ActiveCfg = Release
-		{81AE561B-C076-4F38-91BF-1256A599AAA8}.Release|x64.ActiveCfg = Release
+		{A0FB6680-EA29-47D3-A8A7-68B9EF7A3C66}.Debug|Any CPU.ActiveCfg = Debug
+		{A0FB6680-EA29-47D3-A8A7-68B9EF7A3C66}.Debug|x64.ActiveCfg = Debug
+		{A0FB6680-EA29-47D3-A8A7-68B9EF7A3C66}.Release|Any CPU.ActiveCfg = Release
+		{A0FB6680-EA29-47D3-A8A7-68B9EF7A3C66}.Release|x64.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -211,6 +211,7 @@ namespace CognexVisionProForm
         public static void LoadForm(object Panel, object Form)
         {
             Panel p = Panel as Panel;
+            p.Visible = true;
             if (p.Controls.Count > 0)
             {
                 p.Controls.RemoveAt(0);

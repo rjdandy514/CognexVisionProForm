@@ -129,10 +129,13 @@ namespace CognexVisionProForm
             get { return resultUpdated_Mem; }
             set { resultUpdated_Mem = value; }
         }
+        public string FileName
+        {
+            get { return Path.GetFileName(toolFileLocation); }
+        }
         public bool FilePresent
         {
             get { return filePresent; }
-            
         }
         public List<ToolData> AllData
         {
@@ -166,7 +169,7 @@ namespace CognexVisionProForm
             }
             get { return inputs; }
         }
-        public void LoadvisionProject()
+        public void LoadVisionProject()
         {
             Utilities.LoggingStatment($"{toolName}: Load Vision Applicaiton");
 
@@ -189,6 +192,22 @@ namespace CognexVisionProForm
                 filePresent = false;
                 toolFile = "";
             }
+        }
+        public void LoadVisionProjectRecipe(string newFile)
+        {
+            toolFile = newFile;
+            if (File.Exists(toolFile))
+            {
+                filePresent = true;
+            }
+            else
+            {
+                filePresent = false;
+                toolFile = "";
+            }
+            toolBlock.Dispose();
+            toolBlock = new CogToolBlock();
+            InitJobManager();
         }
         public void SaveVisionProject()
         {

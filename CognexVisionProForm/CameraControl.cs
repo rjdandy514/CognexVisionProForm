@@ -107,7 +107,6 @@ namespace CognexVisionProForm
 
             pollingTimer.Start();
         }
-        
         private void bttnCameraSnap_MouseUp(object sender, MouseEventArgs e)
         {
             camera.Trigger = false;
@@ -248,7 +247,6 @@ namespace CognexVisionProForm
                 {
                     int selectedRecord = Convert.ToInt32(numRecordSelect.Value);
                     recordDisplay.Record = CogSerializer.DeepCopyObject(record.SubRecords[selectedRecord]) as ICogRecord;
-                    recordDisplay.Fit();
                     lbRecordName.Text = record.SubRecords[selectedRecord].Annotation;
                 }
                 catch (Exception e) { Debug.WriteLine(e); }
@@ -263,7 +261,8 @@ namespace CognexVisionProForm
                     lbRecordName.Text = "Disable PLC connection to view Image Records";
                 }
             }
-            
+
+            recordDisplay.Fit();
             recordDisplay.Enabled = true;
         }
         public void UpdateImage()

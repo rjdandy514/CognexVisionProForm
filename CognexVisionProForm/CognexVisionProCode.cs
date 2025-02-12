@@ -77,15 +77,6 @@ namespace CognexVisionProForm
                 plcRetry_Mem = plcRetry;
             }
         }
-        public int Recipe
-        {
-            get => recipe;
-            set 
-            {
-                recipe = value;
-                RecipeChange();
-            }
-        }
         public int StationNumber
         { get; set; }
 
@@ -123,9 +114,6 @@ namespace CognexVisionProForm
                 cameraControl[j].Tool = toolblockArray[j, 0];
                 
             }
-            recipeEcho = 99;
-            Recipe = 0;
-
             MainPLC = new PlcComms(this);
             dataLength = MainPLC.PlcToPcControlData.Length / cameraCount;
 
@@ -288,71 +276,6 @@ namespace CognexVisionProForm
             }
             
         }
-        public void RecipeData()
-        {
-            
-            //Update the Part Type
-            PartType[0] = "LCS-M";
-            PartType[1] = "LCS-H";
-            PartType[2] = "HPS";
-            PartType[3] = "LCS-X";
-            //determine FOV of camera depending on part type and station number
-            switch (StationNumber)
-            {
-                case 70:
-                    cameraCropLeft[0] = 1400;
-                    cameraCropWidth[0] = 5300;
-                    cameraCropLeft[1] = 0;
-                    cameraCropWidth[1] = 8192;
-                    cameraCropLeft[2] = 1400;
-                    cameraCropWidth[2] = 5300;
-                    cameraCropLeft[3] = 1400;
-                    cameraCropWidth[3] = 5300;
-                    break;
-                case 90:
-                    cameraCropLeft[0] = 1500;
-                    cameraCropWidth[0] = 5300;
-                    cameraCropLeft[1] = 1500;
-                    cameraCropWidth[1] = 5300;
-                    cameraCropLeft[2] = 1500;
-                    cameraCropWidth[2] = 5300;
-                    cameraCropLeft[3] = 1500;
-                    cameraCropWidth[3] = 5300;
-                    break;
-                default:
-                    cameraCropLeft[0] = 0;
-                    cameraCropWidth[0] = 8192;
-                    cameraCropLeft[1] = 0;
-                    cameraCropWidth[1] = 8192;
-                    cameraCropLeft[2] = 0;
-                    cameraCropWidth[2] = 8192;
-                    cameraCropLeft[3] = 0;
-                    cameraCropWidth[3] = 8192;
-                    break;
-            }
-        }
-        public void RecipeChange()
-        {
-            //update Recipe data
-            RecipeData();
-
-            //Only change recipe if system is idel
-            if (!SystemIdle) { return; }
-            if (recipe >= cameraCropWidth.Length) { recipe = 0; }
-            
-            //only update recipe if recipe number has changed
-            if (recipe != recipeEcho)
-            {
-                for(int cam = cameraCount-1; cam >= 0; cam--)
-                {
-                    CameraAcqArray[cam].CropWidth = cameraCropWidth[recipe];
-                    CameraAcqArray[cam].CropLeft = cameraCropLeft[recipe];
-                    if (CameraAcqArray[cam].Connected) { CameraAcqArray[cam].ChangeFOV(); }
-                    CameraAcqArray[cam].PartType = PartType[recipe];
-                }
-                recipeEcho = recipe;
-            }
-        }
         public void CameraAbort()
         {
             Array.Clear(toolTrigger, 0, toolTrigger.Length);
@@ -496,8 +419,6 @@ namespace CognexVisionProForm
             numArchiveIndex.Value = CameraAcqArray[selectedCameraId].ArchiveImageIndex;
             cbArchiveActive.Checked = CameraAcqArray[selectedCameraId].ArchiveImageActive;
 
-            
-
             cbCameraIdSelected.Items.Clear();
             for (int i = 0; i < cameraCount; i++)
             {
@@ -514,6 +435,11 @@ namespace CognexVisionProForm
                 else { cbToolBlock.Items.Add($"Empty{i}"); }
             }
             cbToolBlock.SelectedIndex = 0;
+
+            
+            CreateRecipeList();
+            cbRecipe.SelectedIndex = 0;
+            tbRecipeActive.Text = cbRecipe.Items[recipeSelected[cbCameraIdSelected.SelectedIndex]].ToString();
         }
         public void CheckLicense()
         {
@@ -543,7 +469,16 @@ namespace CognexVisionProForm
             int right;
             int yMiddle;
 
-            if (cameraConnectCount == 1)
+            if(cameraConnectCount == 0)
+            {
+                Camera1Panel.Visible = false;
+                Camera2Panel.Visible = false;
+                Camera3Panel.Visible = false;
+                Camera4Panel.Visible = false;
+                Camera5Panel.Visible = false;
+                Camera6Panel.Visible = false;
+            }
+            else if (cameraConnectCount == 1)
             {
 
                 Camera1Panel.Location = new Point(5, 5);
@@ -673,7 +608,6 @@ namespace CognexVisionProForm
             PlcAutoMode = (MainPLC.PlcToPcControl[index] & (1 << 0)) != 0;
             PlcRetry = ((MainPLC.PlcToPcControl[index] & (1 << 1)) != 0);
 
-            recipe = MainPLC.PlcToPcControl[index] >> 16;
 
             bool systemIdle_ONS = SystemIdle;
             //CAMERA COMMANDS
@@ -754,7 +688,6 @@ namespace CognexVisionProForm
             tempTag |= ((cogLicenseOk ? 1:0 ) << 1);
             tempTag |= ((!SystemIdle ? 1 : 0) << 2);
 
-            tempTag |= recipeEcho << 16;
 
             MainPLC.PcToPlcStatus[index] = tempTag;
             index++;
@@ -901,6 +834,187 @@ namespace CognexVisionProForm
 
                 RegKey.Close();
 
+            }
+        }
+        public void ToolblockRecipeSave(string recipe, int camera)
+        {
+            string recipeName;
+            string recipePath;
+
+            string source;
+            string destination;
+            string destinationFolder;
+
+            recipeName = recipe;
+            recipePath = Utilities.ExeFilePath + $"\\Camera{camera.ToString("00")}\\Recipe\\{recipeName}";
+
+            if (preProcess[camera].FilePresent)
+            {
+                source = Utilities.ExeFilePath + $"\\Camera{camera.ToString("00")}\\{preProcess[camera].FileName}";
+                destinationFolder = recipePath + $"\\Preprocess";
+                destination = destinationFolder + $"\\{preProcess[camera].FileName}";
+
+                if (!File.Exists(source))
+                {
+                    MessageBox.Show("Cannot find file");
+                    return;
+                }
+
+                try
+                {
+                    Directory.CreateDirectory(destinationFolder);
+                    File.Copy(source, destination, true);
+                }
+                catch (Exception ex) { MessageBox.Show(ex.ToString()); }
+            }
+
+            for (int i = 0; i < toolblockArray.GetLength(1); i++)
+            {
+                if (toolblockArray[camera, i].FilePresent)
+                {
+                    string fileName = Path.GetFileNameWithoutExtension(toolblockArray[camera, i].FileName) + "." + i.ToString("00");
+                    source = Utilities.ExeFilePath + $"\\Camera{cbCameraIdSelected.SelectedIndex.ToString("00")}\\{toolblockArray[camera, i].FileName}";
+                    destinationFolder = recipePath + $"\\ToolBlock";
+                    destination = destinationFolder + $"\\{fileName}";
+
+                    if (!File.Exists(source))
+                    {
+                        MessageBox.Show("Cannot find file");
+                        return;
+                    }
+
+                    try
+                    {
+                        Directory.CreateDirectory(destinationFolder);
+                        File.Copy(source, destination, true);
+                    }
+                    catch (Exception ex) { MessageBox.Show(ex.ToString()); }
+
+                }
+            }
+        }
+        public void ToolblockRecipeLoad(string recipe, int camera)
+        {
+            string recipePath;
+
+            string[] source;
+            string sourceFile;
+            string sourceFolder;
+            string destination;
+
+            recipePath = Utilities.ExeFilePath + $"\\Camera{camera.ToString("00")}\\Recipe\\{recipe}";
+
+            if (preProcessRequired)
+            {
+                sourceFolder = recipePath + $"\\Preprocess";
+                if (!Directory.Exists(sourceFolder)) { return; }
+                source = Directory.GetFiles(sourceFolder);
+                if (source.Length == 1)
+                {
+                    sourceFile = Path.GetFileNameWithoutExtension(source[0]);
+                    destination = Utilities.ExeFilePath + $"\\Camera{camera.ToString("00")}\\{sourceFile}.vpp";
+                    File.Copy(source[0], destination, true);
+
+                    preProcess[camera].LoadVisionProjectRecipe(destination);
+                }
+            }
+
+            sourceFolder = recipePath + $"\\Toolblock";
+            source = Directory.GetFiles(sourceFolder);
+            if (source.Length == 0) { return; }
+
+            for (int i = 0; i < source.Length; i++)
+            {
+                sourceFile = Path.GetFileNameWithoutExtension(source[i]);
+                string extension = Path.GetExtension(source[i]);
+                int index = Convert.ToInt32(extension.Replace(".", ""));
+                destination = Utilities.ExeFilePath + $"\\Camera{camera.ToString("00")}\\{sourceFile}.vpp";
+                File.Copy(source[i], destination, true);
+                toolblockArray[camera, index].LoadVisionProjectRecipe(destination);
+
+            }
+        }
+        public void CameraConfigSave(string recipe, int camera)
+        {
+            string recipeName;
+            string recipePath;
+
+            string source;
+            string destination;
+            string destinationFolder;
+
+            recipeName = recipe;
+            recipePath = Utilities.ExeFilePath + $"\\Camera{camera.ToString("00")}\\Recipe\\{recipeName}";
+            
+            if (CameraAcqArray[camera].ConfigFilePresent)
+            {
+                source = CameraAcqArray[camera].ConfigFile;
+                destinationFolder = recipePath + $"\\CameraData";
+                destination = destinationFolder + $"\\{Path.GetFileName(source)}";
+
+                if (!File.Exists(source))
+                {
+                    MessageBox.Show("Cannot find camera configuration file");
+                    return;
+                }
+
+                try
+                {
+                    Directory.CreateDirectory(destinationFolder);
+                    File.Copy(source, destination, true);
+                }
+                catch (Exception ex) { MessageBox.Show(ex.ToString()); }
+            }
+        }
+        public void CameraConfigLoad(string recipe, int camera)
+        {
+            string recipePath;
+
+            string[] source;
+            string sourceFile;
+            string sourceFolder;
+            string destination;
+            bool sourcePresent;
+
+            recipePath = Utilities.ExeFilePath + $"\\Camera{camera.ToString("00")}\\Recipe\\{recipe}";
+            sourceFolder = recipePath + $"\\CameraData";
+            if (!Directory.Exists(sourceFolder)) { return; }
+            source = Directory.GetFiles(sourceFolder);
+            sourcePresent = source.Length > 0;
+
+            if (sourcePresent)
+            {
+                CameraAcqArray[camera].Disconnect();
+
+                sourceFile = Path.GetFileName(source[0]);
+                destination = Utilities.ExeFilePath + $"\\Camera{camera.ToString("00")}\\{sourceFile}";
+                File.Copy(source[0], destination, true);
+
+                CameraAcqArray[camera].ConfigFile = destination;
+
+            }
+            else { return; }
+
+        }
+        private void CreateRecipeList()
+        {
+            string[] recipeList;
+            bool recipeExists;
+            string recipeName;
+            string recipePath;
+
+            recipePath = Utilities.ExeFilePath + $"\\Camera{cbCameraIdSelected.SelectedIndex.ToString("00")}\\Recipe";
+            recipeExists = Directory.Exists(recipePath);
+
+            if (recipeExists)
+            {
+                recipeList = Directory.GetDirectories(recipePath);
+                cbRecipe.Items.Clear();
+                foreach (string recipe in recipeList)
+                {
+                    string temp = recipe.Replace(recipePath + "\\", "");
+                    cbRecipe.Items.Add(temp);
+                }
             }
         }
         public static bool CloseCancel()

@@ -488,8 +488,6 @@ public class DalsaImage
 
             
             bool prmResult = false;
-            prmResult = acquisition.SetParameter(SapAcquisition.Prm.CROP_WIDTH, CropWidth, false);
-            prmResult = acquisition.SetParameter(SapAcquisition.Prm.CROP_LEFT, CropLeft, false);
             prmResult = acquisition.SetParameter(SapAcquisition.Prm.FLIP, Flip, true);
         }
 
@@ -542,16 +540,6 @@ public class DalsaImage
         {
             CheckLineScanFeatures();
         }
-    }
-    public void ChangeFOV()
-    {
-        if (Connected)
-        {
-            Disconnect();
-            Dispose();
-            CreateCamera();
-        }
-        
     }
     public void SnapPicture()
     {
@@ -878,9 +866,7 @@ public class DalsaImage
         bool getEnumTextFromValueResult = false;
         bool setFeatureValueResult = false;
         int enumValue;
-        double exposureTime;
-        int width;
-        int height;
+
         string enumString = "";
         string userSetSelector = "UserSetSelector";
         string userSetDefaultSelector = "UserSetDefaultSelector";
@@ -914,13 +900,6 @@ public class DalsaImage
             setFeatureValueResult = acqDevice.SetFeatureValue(userSetSelector, 4);
             setFeatureValueResult = acqDevice.SetFeatureValue(userSetLoad, true);
         }
-
-        //Get Image Width
-        getFeatureValueResult = acqDevice.GetFeatureValue("Width", out width);
-        //Get image height
-        getFeatureValueResult = acqDevice.GetFeatureValue("Height", out height);
-        //Get Exposure Time
-        getFeatureValueResult = acqDevice.GetFeatureValue("ExposureTime", out exposureTime);
     }
     public void XferNotify(object sender, SapXferNotifyEventArgs argsNotify)
     {
