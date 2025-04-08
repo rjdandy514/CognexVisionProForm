@@ -113,6 +113,8 @@ namespace CognexVisionProForm
         }
         private void bttnCameraSnap_Click(object sender, EventArgs e)
         {
+
+            if (!_form.SystemIdle) { return; }
             lbAcqTime.Text = $"Aquisition: --- ms";
             camera.Trigger = true;
             UpdateButton();
@@ -194,7 +196,7 @@ namespace CognexVisionProForm
             numToolSelect.Value = toolSelect;
             UpdateButton();
 
-            if (tool.ResultUpdated != Result_Update_Mem && !_form.ThreadsAlive)
+            if (tool.ResultUpdated != Result_Update_Mem && !_form.SystemIdle)
             {
                 this.ActiveControl = null;
                 UpdateToolDisplay();
@@ -228,11 +230,11 @@ namespace CognexVisionProForm
         public void UpdateImageRecord()
         {
             recordDisplay.Enabled = false;
-
+    
             try 
             {
-                //record = null;
-                record = tool.toolBlock.CreateLastRunRecord(); 
+                record = null;
+                //record = tool.toolBlock.CreateLastRunRecord(); 
                 Thread.Sleep(300); 
             }
             catch (Exception e) { Debug.WriteLine(e); }
@@ -254,7 +256,6 @@ namespace CognexVisionProForm
                     lbRecordName.Text = record.SubRecords[selectedRecord].Annotation;
                 }
                 catch (Exception e) { Debug.WriteLine(e); }
-                
 
             }
             else
@@ -271,7 +272,7 @@ namespace CognexVisionProForm
                     lbRecordName.Text = "Disable PLC connection to view Image Records";
                 }
             }
-
+            
             recordDisplay.Fit();
             recordDisplay.Enabled = true;
         }

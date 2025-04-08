@@ -364,6 +364,11 @@ namespace CognexVisionProForm
 
                     int camera = i;
                     int tool = desiredTool[camera];
+                    if (!toolblockArray[camera, tool].ToolReady) 
+                    {
+                        Debug.WriteLine($"Camera {camera} tool was not ready");
+                        continue; 
+                    }
                     taskToolRun[camera] = new Task(() => toolblockArray[camera, tool].ToolRun());
                     taskToolRun[camera].Start();
                     

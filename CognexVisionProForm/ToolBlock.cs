@@ -292,8 +292,8 @@ namespace CognexVisionProForm
         void Subject_Ran(object sender, System.EventArgs e)
         {
             GetInfoFromTool();
-            Debug.WriteLine(Thread.CurrentThread.Name);
-            
+            Debug.WriteLine($"Camera {CameraId}: {toolName} finished");
+
         }
         private void GetInfoFromTool()
         {
@@ -312,7 +312,7 @@ namespace CognexVisionProForm
             {
               GetAllToolData();
               CreateTable();
-              Debug.WriteLine($"Camera {CameraId} tool finished");
+              
             }
             
             
