@@ -43,7 +43,6 @@
             this.bttnTest = new System.Windows.Forms.Button();
             this.cbResultsUpdated = new System.Windows.Forms.CheckBox();
             this.bttnGetToolData = new System.Windows.Forms.Button();
-            this.bttnGrab = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.numRecordSelect = new System.Windows.Forms.NumericUpDown();
             this.label1 = new System.Windows.Forms.Label();
@@ -95,7 +94,7 @@
             this.bttnCameraSnap.BackColor = System.Drawing.SystemColors.ButtonFace;
             this.bttnCameraSnap.FlatAppearance.BorderColor = System.Drawing.Color.Red;
             this.bttnCameraSnap.FlatAppearance.BorderSize = 2;
-            this.bttnCameraSnap.Location = new System.Drawing.Point(3, 389);
+            this.bttnCameraSnap.Location = new System.Drawing.Point(3, 428);
             this.bttnCameraSnap.Name = "bttnCameraSnap";
             this.bttnCameraSnap.Size = new System.Drawing.Size(152, 29);
             this.bttnCameraSnap.TabIndex = 0;
@@ -169,7 +168,6 @@
             this.plControl.Controls.Add(this.bttnTest);
             this.plControl.Controls.Add(this.cbResultsUpdated);
             this.plControl.Controls.Add(this.bttnGetToolData);
-            this.plControl.Controls.Add(this.bttnGrab);
             this.plControl.Controls.Add(this.label2);
             this.plControl.Controls.Add(this.numRecordSelect);
             this.plControl.Controls.Add(this.label1);
@@ -199,7 +197,7 @@
             this.bttnTest.BackColor = System.Drawing.SystemColors.ButtonFace;
             this.bttnTest.FlatAppearance.BorderColor = System.Drawing.Color.Red;
             this.bttnTest.FlatAppearance.BorderSize = 2;
-            this.bttnTest.Location = new System.Drawing.Point(3, 266);
+            this.bttnTest.Location = new System.Drawing.Point(3, 305);
             this.bttnTest.Name = "bttnTest";
             this.bttnTest.Size = new System.Drawing.Size(152, 29);
             this.bttnTest.TabIndex = 40;
@@ -223,7 +221,7 @@
             this.bttnGetToolData.BackColor = System.Drawing.SystemColors.ButtonFace;
             this.bttnGetToolData.FlatAppearance.BorderColor = System.Drawing.Color.Red;
             this.bttnGetToolData.FlatAppearance.BorderSize = 2;
-            this.bttnGetToolData.Location = new System.Drawing.Point(3, 301);
+            this.bttnGetToolData.Location = new System.Drawing.Point(3, 340);
             this.bttnGetToolData.Name = "bttnGetToolData";
             this.bttnGetToolData.Size = new System.Drawing.Size(152, 29);
             this.bttnGetToolData.TabIndex = 37;
@@ -231,25 +229,11 @@
             this.bttnGetToolData.UseVisualStyleBackColor = false;
             this.bttnGetToolData.Click += new System.EventHandler(this.bttnGetToolData_Click);
             // 
-            // bttnGrab
-            // 
-            this.bttnGrab.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.bttnGrab.BackColor = System.Drawing.SystemColors.ButtonFace;
-            this.bttnGrab.FlatAppearance.BorderColor = System.Drawing.Color.Red;
-            this.bttnGrab.FlatAppearance.BorderSize = 2;
-            this.bttnGrab.Location = new System.Drawing.Point(3, 424);
-            this.bttnGrab.Name = "bttnGrab";
-            this.bttnGrab.Size = new System.Drawing.Size(152, 29);
-            this.bttnGrab.TabIndex = 36;
-            this.bttnGrab.Text = "Grab";
-            this.bttnGrab.UseVisualStyleBackColor = false;
-            this.bttnGrab.Click += new System.EventHandler(this.bttnGrab_Click);
-            // 
             // label2
             // 
             this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(6, 342);
+            this.label2.Location = new System.Drawing.Point(6, 381);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(87, 13);
             this.label2.TabIndex = 35;
@@ -258,7 +242,7 @@
             // numRecordSelect
             // 
             this.numRecordSelect.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.numRecordSelect.Location = new System.Drawing.Point(99, 340);
+            this.numRecordSelect.Location = new System.Drawing.Point(99, 379);
             this.numRecordSelect.Name = "numRecordSelect";
             this.numRecordSelect.Size = new System.Drawing.Size(50, 20);
             this.numRecordSelect.TabIndex = 34;
@@ -268,7 +252,7 @@
             // 
             this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(6, 368);
+            this.label1.Location = new System.Drawing.Point(6, 407);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(73, 13);
             this.label1.TabIndex = 33;
@@ -287,7 +271,7 @@
             // numToolSelect
             // 
             this.numToolSelect.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.numToolSelect.Location = new System.Drawing.Point(99, 366);
+            this.numToolSelect.Location = new System.Drawing.Point(99, 405);
             this.numToolSelect.Maximum = new decimal(new int[] {
             5,
             0,
@@ -408,7 +392,6 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.NumericUpDown numRecordSelect;
-        private System.Windows.Forms.Button bttnGrab;
         private System.Windows.Forms.Button bttnGetToolData;
         private System.Windows.Forms.CheckBox cbResultsUpdated;
         private System.Windows.Forms.Label lbRecordName;

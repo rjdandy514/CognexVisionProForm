@@ -266,6 +266,7 @@ namespace CognexVisionProForm
         }
         public void ToolRun()
         {
+            if (Thread.CurrentThread.Name == null) { Thread.CurrentThread.Name = $"Camera {CameraId} Tool"; }
             toolReady = false;
             toolBlock.GarbageCollectionEnabled = true;
             if (toolBlock.Inputs.Count > 0)
@@ -291,6 +292,8 @@ namespace CognexVisionProForm
         void Subject_Ran(object sender, System.EventArgs e)
         {
             GetInfoFromTool();
+            Debug.WriteLine(Thread.CurrentThread.Name);
+            
         }
         private void GetInfoFromTool()
         {
@@ -299,7 +302,7 @@ namespace CognexVisionProForm
             outputs = toolBlock.Outputs;
             for(int i = 0; i < outputs.Count;i++)
             {
-                    outputs[i] = toolBlock.Outputs[i];
+                outputs[i] = toolBlock.Outputs[i];
             }
 
             if (resultUpdated) { resultUpdated = false; }

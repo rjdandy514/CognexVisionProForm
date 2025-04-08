@@ -156,7 +156,11 @@ namespace CognexVisionProForm
                     resizeToolData();
                     toolFailedDisplay.UpdateResultData();
                 }
-                plToolData.Visible = !plToolData.Visible;
+                else 
+                { 
+                    plToolData.Visible = false; 
+                }
+
             }
             catch
             {
@@ -225,16 +229,16 @@ namespace CognexVisionProForm
         {
             recordDisplay.Enabled = false;
 
+            try 
+            {
+                //record = null;
+                record = tool.toolBlock.CreateLastRunRecord(); 
+                Thread.Sleep(300); 
+            }
+            catch (Exception e) { Debug.WriteLine(e); }
 
-            if (tool.toolBlock != null && !_form.PlcCommsActive)
-            {
-                try { record = tool.toolBlock.CreateLastRunRecord(); }
-                catch (Exception e) { Debug.WriteLine(e); }
-            }
-            else
-            {
-                record = null;
-            }
+
+
             
             //Determine last record to display
             if (record != null)
@@ -257,7 +261,13 @@ namespace CognexVisionProForm
             {
                 if (tool.Inputs[0].Value != null)
                 {
-                    recordDisplay.Image = tool.Inputs[0].Value as CogImage8Grey;
+                    try
+                    {
+                        recordDisplay.Image = tool.Inputs[0].Value as CogImage8Grey;
+                    }
+                    catch (Exception e) { Debug.WriteLine(e); }
+                
+                    
                     lbRecordName.Text = "Disable PLC connection to view Image Records";
                 }
             }
@@ -292,7 +302,6 @@ namespace CognexVisionProForm
 
             bool imageControl = !_form.PlcCommsActive && !(camera.Snapping || camera.Acquiring || camera.Grabbing);
             bttnCameraSnap.Enabled = imageControl;
-            bttnGrab.Enabled = imageControl;
 
             bttnCameraAbort.Enabled = camera.Snapping || camera.Acquiring || camera.Grabbing;
 
@@ -301,8 +310,6 @@ namespace CognexVisionProForm
             else if (camera.Snapping) { bttnCameraSnap.Text = " Snapping"; }
             else { bttnCameraSnap.Text = " Press To Snap"; }
 
-            if (camera.Grabbing) { bttnGrab.Text = "Grabbing"; }
-            else { bttnGrab.Text = "Press To Grab"; }
 
             bttnCameraLog.Enabled = !camera.ArchiveImageActive;
             if (camera.SaveImageSelected)

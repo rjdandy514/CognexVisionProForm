@@ -345,7 +345,7 @@ namespace CognexVisionProForm
                     cameraSnap[j] = false;
                     cameraSnapComplete[j] = false;
                     
-                    if (preProcessRequired && preProcess[j].ToolReady)
+                    if (preProcessRequired /*&& preProcess[j].ToolReady*/)
                     {
                         preProcess[j].Inputs[0].Value = CameraAcqArray[j].Image;
                         preProcess[j].ToolRun();
@@ -355,26 +355,29 @@ namespace CognexVisionProForm
 
             for(int i = 0; i < cameraCount;i++)
             {
-                if (preProcessRequired) { processedImage = preProcess[i].Outputs[0].Value as CogImage8Grey; }
-                else { processedImage = CameraAcqArray[i].Image as CogImage8Grey; }
+                
                 if (toolTrigger[i])
                 {
+                    if (preProcessRequired) { processedImage = preProcess[i].Outputs[0].Value as CogImage8Grey; }
+                    else { processedImage = CameraAcqArray[i].Image as CogImage8Grey; }
                     toolblockArray[i, desiredTool[i]].Inputs[0].Value = processedImage;
 
                     int camera = i;
-                    int tool = desiredTool[camera];                    
+                    int tool = desiredTool[camera];
                     taskToolRun[camera] = new Task(() => toolblockArray[camera, tool].ToolRun());
                     taskToolRun[camera].Start();
+                    
                 }
             }
+
+            //Task.WhenAll(taskToolRun);
             Debug.WriteLine("Trigger Complete");
 
             Array.Clear(toolTrigger, 0, toolTrigger.Length);
             Array.Clear(cameraSnap, 0, cameraSnap.Length);
             Array.Clear(cameraSnapComplete, 0, cameraSnapComplete.Length);
 
-           
-
+            
         }
         public void ToolBlockReload()
         {
@@ -401,17 +404,7 @@ namespace CognexVisionProForm
             ToolBlockTrigger();
         }
         public void UpdateFrameGrabberTab()
-        {
-            /*
-            for(int i = 0; i< cameraCount;i++)
-            {
-                CameraAcqArray[i].FindArchivedImages();
-                CameraAcqArray[i].ArchiveImageActive = true;
-            }
-            */
-            
-
-
+        {         
             cbConfigFileFound.Checked = CameraAcqArray[selectedCameraId].ConfigFilePresent;
             cbCameraConnected.Checked = CameraAcqArray[selectedCameraId].Connected;
             tbCameraName.Text = CameraAcqArray[selectedCameraId].Name;
@@ -838,6 +831,7 @@ namespace CognexVisionProForm
         }
         public void ToolblockRecipeSave(string recipe, int camera)
         {
+            
             string recipeName;
             string recipePath;
 
@@ -854,11 +848,13 @@ namespace CognexVisionProForm
                 destinationFolder = recipePath + $"\\Preprocess";
                 destination = destinationFolder + $"\\{preProcess[camera].FileName}";
 
+                
                 if (!File.Exists(source))
                 {
                     MessageBox.Show("Cannot find file");
                     return;
                 }
+                
 
                 try
                 {
@@ -1107,7 +1103,7 @@ namespace CognexVisionProForm
                 StationNumber = 15;
                 computerName = "OP15 Computer";
                 cameraCount = 2;
-                toolCount = 4;
+                toolCount = 6;
                 preProcessRequired = false;
             }
             else if(iP == OP45_55_IP)
@@ -1152,8 +1148,8 @@ namespace CognexVisionProForm
 
             for (int i = 0; i < task.Length; i++)
             {
-                if (task[i] != null) { alive |= (task[i].Status == TaskStatus.Running); }
-                
+                if (task[i] != null) { alive |= (task[i].Status == TaskStatus.Running || task[i].Status == TaskStatus.WaitingToRun ); }
+                if (alive) { return alive; }
             }
 
             return alive;

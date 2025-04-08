@@ -396,7 +396,7 @@ namespace CognexVisionProForm
                 cbToolBlock.Items.Add(toolblockArray[cbCameraIdSelected.SelectedIndex, i].Name);
             }
         }
-        private void bttnConfigSelect_Click(object sender, EventArgs e)
+        private void bttnConfigSelect_Click(object sender, EventArgs e) 
         {
             CameraAcqArray[selectedCameraId].LoadConfigFile();
             UpdateConfigFileData();
