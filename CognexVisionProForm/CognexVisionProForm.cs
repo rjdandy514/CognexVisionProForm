@@ -225,7 +225,6 @@ namespace CognexVisionProForm
                     if (CameraAcqArray[i].Connected || CameraAcqArray[i].ArchiveImageActive)
                     {
                         Utilities.LoadForm(allPanels[cameraConnectCount], cameraControl[i]);
-                        cameraControl[i].PauseTimer = false;
                         cameraConnectCount++;
                     }
                 }
@@ -269,10 +268,7 @@ namespace CognexVisionProForm
             }
             if (tabControl1.SelectedTab.Name != "tabImage")
             {
-                foreach(CameraControl camera in cameraControl)
-                {
-                    camera.PauseTimer = true;
-                }
+
             }
         }
         private void tabControl1_Deselecting(object sender, TabControlCancelEventArgs e)

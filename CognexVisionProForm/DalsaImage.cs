@@ -364,7 +364,7 @@ public class DalsaImage
             Dispose();
             return;
         }
-        await Task.Delay(300);
+        await Task.Delay(100);
         //System.Threading.Thread.Sleep(1000);
 
         UpdateImageData();

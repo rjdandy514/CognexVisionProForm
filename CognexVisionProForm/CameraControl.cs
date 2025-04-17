@@ -24,13 +24,18 @@ namespace CognexVisionProForm
         DalsaImage camera;
         ToolBlock tool;
         ToolBlock preProcess;
-        public ICogRecord record;
+        private ICogRecord record;
+        private ICogImage image;
+
         private int toolSelect = 0;
-        private bool updateDisplayRequest;
+        
         private bool Result_Update_Mem;
         private System.Windows.Forms.Timer pollingTimer;
         ShowResultData toolFailedDisplay;
-
+        public ICogImage Image
+        {
+            set { image = value; }
+        }
         public DalsaImage Camera
         {
             get { return camera; }
@@ -46,29 +51,24 @@ namespace CognexVisionProForm
             get { return preProcess; }
             set { preProcess = value; }
         }
+        public ICogRecord Record
+        {
+            set
+            {
+                record = value;
+            }
+        }
         public int ToolSelect
         {
             get { return toolSelect; }
             set { toolSelect = value; }
         }
-        public bool AutoDisplay
+        public bool DisplayEnable
         {
-            get; set;
+            get { return recordDisplay.Enabled; }
+            set { recordDisplay.Enabled = value; }
         }
-        public bool PauseTimer
-        {
-            set
-            {
-                if (pollingTimer == null) { return; }
-                if (value)
-                {
 
-                    pollingTimer.Stop();
-                }
-                else { pollingTimer.Start(); }
-            }
-
-        }
         public CameraControl(CognexVisionProForm Sender, DalsaImage Camera)
         {
             _form = new CognexVisionProForm();
@@ -196,11 +196,11 @@ namespace CognexVisionProForm
             numToolSelect.Value = toolSelect;
             UpdateButton();
 
-            if (tool.ResultUpdated != Result_Update_Mem && !_form.SystemIdle)
+            if (tool.ResultUpdated != Result_Update_Mem && _form.SystemIdle)
             {
                 this.ActiveControl = null;
                 UpdateToolDisplay();
-                UpdateImageRecord();
+                //UpdateImageRecord();
                 Result_Update_Mem = tool.ResultUpdated;
             }
         }
@@ -224,24 +224,11 @@ namespace CognexVisionProForm
                 }
                 else { toolFailedDisplay.UpdateResultData(); }
             }
-
-            updateDisplayRequest = false;
         }
         public void UpdateImageRecord()
         {
             recordDisplay.Enabled = false;
-    
-            try 
-            {
-                record = null;
-                //record = tool.toolBlock.CreateLastRunRecord(); 
-                Thread.Sleep(300); 
-            }
-            catch (Exception e) { Debug.WriteLine(e); }
 
-
-
-            
             //Determine last record to display
             if (record != null)
             {
@@ -252,7 +239,7 @@ namespace CognexVisionProForm
                 try
                 {
                     int selectedRecord = Convert.ToInt32(numRecordSelect.Value);
-                    recordDisplay.Record = CogSerializer.DeepCopyObject(record.SubRecords[selectedRecord]) as ICogRecord;
+                    recordDisplay.Record = record.SubRecords[selectedRecord];
                     lbRecordName.Text = record.SubRecords[selectedRecord].Annotation;
                 }
                 catch (Exception e) { Debug.WriteLine(e); }
@@ -260,24 +247,20 @@ namespace CognexVisionProForm
             }
             else
             {
-                if (tool.Inputs[0].Value != null)
+                if (image != null)
                 {
-                    try
-                    {
-                        recordDisplay.Image = tool.Inputs[0].Value as CogImage8Grey;
-                    }
-                    catch (Exception e) { Debug.WriteLine(e); }
-                
-                    
-                    lbRecordName.Text = "Disable PLC connection to view Image Records";
+                    recordDisplay.Image = image;
+                    lbRecordName.Text = "No Record to display";
                 }
+                    
+                
             }
-            
             recordDisplay.Fit();
             recordDisplay.Enabled = true;
         }
         public void UpdateImage()
         {
+
             //Do not try to resize if App is Minimized
             if (_form.WindowState == FormWindowState.Minimized) { return; }
             //*********************************************
@@ -294,7 +277,6 @@ namespace CognexVisionProForm
             {
                 recordDisplay.Fit();
             }
-            
         }
         private void UpdateButton()
         {

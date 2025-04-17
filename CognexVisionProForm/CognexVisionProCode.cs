@@ -43,6 +43,7 @@ namespace CognexVisionProForm
                 CameraUpdate();
             }
         }
+
         public bool PlcCommsActive
         {
             get; set;
@@ -60,6 +61,7 @@ namespace CognexVisionProForm
             {
                 systemIdle = true;
                 systemIdle &= toolTrigger.All(x => x == false);
+                systemIdle &= toolTriggerComplete.All(x => x == false);
                 systemIdle &= cameraSnap.All(x => x == false);
                 systemIdle &= cameraSnapComplete.All(x => x == false);
                 systemIdle &= !ThreadsAlive;
@@ -79,6 +81,26 @@ namespace CognexVisionProForm
         }
         public int StationNumber
         { get; set; }
+        public int UpdateCameraControl
+        {
+            set
+            {
+                cameraControl[value].Record = toolblockArray[value, desiredTool[value]].Record;
+                cameraControl[value].Image = CameraAcqArray[value].Image;
+            }
+        }
+        public int TriggerComplete
+        {
+            set
+            {
+                toolTriggerComplete[value] = true;
+
+                if(toolTriggerComplete.SequenceEqual(toolTrigger))
+                {
+                    ToolBlockTriggerUpdate();
+                }
+            }
+        }
 
         public void InitClasses()
         {
@@ -134,10 +156,6 @@ namespace CognexVisionProForm
                 if(preProcess[cam].FilePresent)
                 {
                     splashScreen.UpdateProgress($"Initialize JobManager: {CameraAcqArray[cam].Name} - {preProcess[cam].Name} Toolblock", 1);
-
-                    //threadPreProcess[cam] = new Thread(preProcess[cam].InitJobManager); 
-                    //threadPreProcess[cam].Start();
-
                     preProcess[cam].InitJobManager();
                 }
 
@@ -146,22 +164,9 @@ namespace CognexVisionProForm
                     if (toolblockArray[cam, i].FilePresent)
                     { 
                         splashScreen.UpdateProgress($"Initialize JobManager: {CameraAcqArray[cam].Name} - {toolblockArray[cam, i].Name} Toolblock", 1);
-
-                        //threadToolBlock[cam] = new Thread(toolblockArray[cam, i].InitJobManager);
-                        //threadToolBlock[cam].Start();
-
                         toolblockArray[cam, i].InitJobManager();
                     }
                 }
-
-                /*
-                if (threadPreProcess[cam] != null) { threadPreProcess[cam].Join(); }
-                foreach (Thread t in threadToolBlock)
-                {
-                    if (t != null) { t.Join(); }
-                }
-                */
-
             }
             
             splashScreen.Close();
@@ -344,9 +349,11 @@ namespace CognexVisionProForm
                     toolTrigger[j] = true;
                     cameraSnap[j] = false;
                     cameraSnapComplete[j] = false;
-                    
+                    cameraControl[j].DisplayEnable = false;
+
                     if (preProcessRequired /*&& preProcess[j].ToolReady*/)
                     {
+                        
                         preProcess[j].Inputs[0].Value = CameraAcqArray[j].Image;
                         preProcess[j].ToolRun();
                     }
@@ -364,6 +371,7 @@ namespace CognexVisionProForm
 
                     int camera = i;
                     int tool = desiredTool[camera];
+
                     if (!toolblockArray[camera, tool].ToolReady) 
                     {
                         Debug.WriteLine($"Camera {camera} tool was not ready");
@@ -378,11 +386,27 @@ namespace CognexVisionProForm
             //Task.WhenAll(taskToolRun);
             Debug.WriteLine("Trigger Complete");
 
-            Array.Clear(toolTrigger, 0, toolTrigger.Length);
             Array.Clear(cameraSnap, 0, cameraSnap.Length);
             Array.Clear(cameraSnapComplete, 0, cameraSnapComplete.Length);
 
             
+        }
+        public void ToolBlockTriggerUpdate()
+        {
+            for (int i = 0; i < cameraCount; i++)
+            {
+                if (toolTriggerComplete[i])
+                {
+                    cameraControl[i].Record = toolblockArray[i,desiredTool[i]].Record;
+                    Thread.Sleep(200);
+                    int camera = i;
+                    this.BeginInvoke((Action)delegate { cameraControl[camera].UpdateImageRecord(); });
+                    
+                }
+            }
+
+            Array.Clear(toolTriggerComplete, 0, toolTriggerComplete.Length);
+            Array.Clear(toolTrigger, 0, toolTrigger.Length);
         }
         public void ToolBlockReload()
         {

@@ -40,6 +40,7 @@ namespace CognexVisionProForm
         bool resultUpdated_Mem = false;
         bool toolReady = false;
         bool toolRunning = false;
+        private ICogRecord record;
         CogToolBlockTerminalCollection outputs = new CogToolBlockTerminalCollection();
         CogToolBlockTerminalCollection inputs = new CogToolBlockTerminalCollection();
 
@@ -100,17 +101,8 @@ namespace CognexVisionProForm
         {
             get;set;
         }
-        public ICogRunStatus RunStatus
-        {
-            get
-            {
-                if (toolBlock != null)
-                {
-                    return toolBlock.RunStatus;
-                }
-                else { return null; }
-            }
-        }
+
+
         public bool ToolReady
         {
             get 
@@ -168,6 +160,22 @@ namespace CognexVisionProForm
                 inputs = value;
             }
             get { return inputs; }
+        }
+        public ICogRunStatus RunStatus
+        {
+            get
+            {
+                if (toolBlock != null)
+                {
+                    return toolBlock.RunStatus;
+                }
+                else { return null; }
+            }
+        }
+        public ICogRecord Record
+        {
+            get { return record; }
+
         }
         public void LoadVisionProject()
         {
@@ -292,6 +300,11 @@ namespace CognexVisionProForm
         void Subject_Ran(object sender, System.EventArgs e)
         {
             GetInfoFromTool();
+            if(!Preprocess)
+            {
+                form.TriggerComplete = CameraId;
+            }
+            
             Debug.WriteLine($"Camera {CameraId}: {toolName} finished");
 
         }
@@ -304,18 +317,16 @@ namespace CognexVisionProForm
             {
                 outputs[i] = toolBlock.Outputs[i];
             }
-
-            if (resultUpdated) { resultUpdated = false; }
-            else { resultUpdated = true; }
-            
             if(!Preprocess)
             {
               GetAllToolData();
               CreateTable();
-              
+              record = toolBlock.CreateLastRunRecord();
+
             }
             
-            
+            if (resultUpdated) { resultUpdated = false; }
+            else { resultUpdated = true; }
             toolReady = true;
             
             Utilities.LoggingStatment($"{toolName}: Number of Outputs - {toolOutputCount}");

@@ -54,10 +54,14 @@
             this.recordDisplay = new Cognex.VisionPro.CogRecordDisplay();
             this.lbRecordName = new System.Windows.Forms.Label();
             this.plToolData = new System.Windows.Forms.Panel();
+            this.toolBlockBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.cameraControlBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.plControl.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numRecordSelect)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numToolSelect)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.recordDisplay)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.toolBlockBindingSource)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.cameraControlBindingSource)).BeginInit();
             this.SuspendLayout();
             // 
             // bttnCameraLog
@@ -326,6 +330,7 @@
             this.recordDisplay.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("recordDisplay.OcxState")));
             this.recordDisplay.Size = new System.Drawing.Size(62, 70);
             this.recordDisplay.TabIndex = 19;
+            this.recordDisplay.TabStop = false;
             // 
             // lbRecordName
             // 
@@ -367,6 +372,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.numRecordSelect)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numToolSelect)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.recordDisplay)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.toolBlockBindingSource)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.cameraControlBindingSource)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -397,5 +404,7 @@
         private System.Windows.Forms.Label lbRecordName;
         private System.Windows.Forms.Button bttnTest;
         private System.Windows.Forms.Panel plToolData;
+        private System.Windows.Forms.BindingSource toolBlockBindingSource;
+        private System.Windows.Forms.BindingSource cameraControlBindingSource;
     }
 }
