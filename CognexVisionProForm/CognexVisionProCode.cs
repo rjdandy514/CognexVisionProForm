@@ -296,6 +296,7 @@ namespace CognexVisionProForm
             if (cameraSnap.SequenceEqual(cameraSnapComplete)) 
             {
                 Array.Clear(toolTrigger, 0, toolTrigger.Length);
+                Array.Clear(toolTriggerComplete, 0, toolTriggerComplete.Length);
                 //if the cognex license is present, trigger Toolblock
                 if (cogLicenseOk) { ToolBlockTrigger(); }
             }
@@ -358,7 +359,6 @@ namespace CognexVisionProForm
 
             for(int i = 0; i < cameraCount;i++)
             {
-                
                 if (toolTrigger[i])
                 {
                     if (preProcessRequired) { processedImage = preProcess[i].Outputs[0].Value as CogImage8Grey; }
@@ -1174,7 +1174,5 @@ namespace CognexVisionProForm
 
             return alive;
         }
-
-
     }
 }
