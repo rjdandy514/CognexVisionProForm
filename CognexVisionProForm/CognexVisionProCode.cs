@@ -28,21 +28,7 @@ namespace CognexVisionProForm
 {
     public partial class CognexVisionProForm
     {
-        public int CameraSnap
-        {
-            set
-            {
-                cameraSnap[value] = true;
-            }
-        }
-        public int CameraSnapComplete
-        {
-            set
-            {
-                cameraSnapComplete[value] = true;
-                CameraUpdate();
-            }
-        }
+        
 
         public bool PlcCommsActive
         {
@@ -89,6 +75,18 @@ namespace CognexVisionProForm
                 cameraControl[value].Image = CameraAcqArray[value].Image;
             }
         }
+        public int CameraSnap
+        {
+            set { cameraSnap[value] = true; }
+        }
+        public int CameraSnapComplete
+        {
+            set
+            {
+                cameraSnapComplete[value] = true;
+                CameraUpdate();
+            }
+        }
         public int TriggerComplete
         {
             set
@@ -101,7 +99,6 @@ namespace CognexVisionProForm
                 }
             }
         }
-
         public void InitClasses()
         {
             pollingTimer = new System.Windows.Forms.Timer();
@@ -351,9 +348,8 @@ namespace CognexVisionProForm
                     cameraSnapComplete[j] = false;
                     cameraControl[j].DisplayEnable = false;
 
-                    if (preProcessRequired /*&& preProcess[j].ToolReady*/)
+                    if (preProcessRequired)
                     {
-                        
                         preProcess[j].Inputs[0].Value = CameraAcqArray[j].Image;
                         preProcess[j].ToolRun();
                     }
@@ -379,17 +375,12 @@ namespace CognexVisionProForm
                     }
                     taskToolRun[camera] = new Task(() => toolblockArray[camera, tool].ToolRun());
                     taskToolRun[camera].Start();
-                    
                 }
             }
-
-            //Task.WhenAll(taskToolRun);
             Debug.WriteLine("Trigger Complete");
 
             Array.Clear(cameraSnap, 0, cameraSnap.Length);
             Array.Clear(cameraSnapComplete, 0, cameraSnapComplete.Length);
-
-            
         }
         public void ToolBlockTriggerUpdate()
         {
