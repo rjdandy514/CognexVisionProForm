@@ -121,6 +121,9 @@ namespace CognexVisionProForm
         //*********************************************************************
         private void Form1_Load(object sender, EventArgs e)
         {
+
+           
+
             Thread.CurrentThread.Name = "Main Form";
             ComputerSetup();
 
@@ -174,6 +177,8 @@ namespace CognexVisionProForm
             }
             else { tabControl1.SelectedIndex = 1; }
 
+            cogToolBlockEditV21.SubjectChanged += new EventHandler(cogToolBlockEditV21_SubjectChanged);
+
             splashScreen.UpdateProgress("Getting Ready", 10);
         }
         private void Form1_Resize(object sender, EventArgs e)
@@ -204,7 +209,7 @@ namespace CognexVisionProForm
                 }
             }
 
-
+            cogToolBlockEditV21.SubjectChanged -= new EventHandler(cogToolBlockEditV21_SubjectChanged);
             MainPLC.Cleaning();
             cogToolBlockEditV21.Dispose();
             pollingTimer.Dispose();
@@ -263,7 +268,6 @@ namespace CognexVisionProForm
 
             if (tabControl1.SelectedTab.Name != "tabToolBlock")
             {
-                //if (cogToolBlockEditV21.Subject != null) { cogToolBlockEditV21.Subject.Dispose(); }
                     cogToolBlockEditV21.Subject = null;
             }
             if (tabControl1.SelectedTab.Name != "tabImage")
@@ -719,16 +723,19 @@ namespace CognexVisionProForm
 
             try
             {
+
+                //Disbale the Page to prevent users from stealing focus while toolblock is loading
+                cogToolBlockEditV21.Enabled = false;
+                Thread.Sleep(200);
                 toolBlock = CogSerializer.DeepCopyObject(toolblockArray[cameraSelected, toolSelected].toolBlock) as CogToolBlock;
                 cogToolBlockEditV21.Subject = new CogToolBlock();
                 cogToolBlockEditV21.Subject = toolBlock;
+                
             }
             catch(Exception ex)
             {
                 MessageBox.Show(ex.ToString());
             }
-
-
         }
         private void bttnUpdateImage_Click(object sender, EventArgs e)
         {
@@ -759,6 +766,12 @@ namespace CognexVisionProForm
                 MessageBox.Show("Program Saved");
 
             }
+        }
+        void cogToolBlockEditV21_SubjectChanged(object sender, EventArgs e)
+        {
+            //Triggered When the new tool block is loaded
+            //This has not been tested
+            cogToolBlockEditV21.Enabled = true;
         }
         //*********************************************************************
         //PLC CONNECTION
