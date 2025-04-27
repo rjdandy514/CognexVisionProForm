@@ -701,12 +701,33 @@ namespace CognexVisionProForm
             int toolSelected = cbTBToolSelected.SelectedIndex;
 
             //make sure that there are no selection out of range of arrays
-            if (cameraSelected < 0 || cameraSelected >= cameraCount) { return; }
-            if (toolSelected < 0 || toolSelected >= toolCount) { return; }
+            if (cameraSelected < 0 || cameraSelected >= cameraCount) 
+            {
+                MessageBox.Show("Invalid Camera Selected");
+                return; 
+            }
+            if (toolSelected < 0 || toolSelected >= toolCount) 
+            {
+                MessageBox.Show("Invalid ToolBlock Selected");
+                return; 
+            }
+            if (toolblockArray[cameraSelected, toolSelected].toolBlock == null) 
+            {
+                MessageBox.Show("ToolBlock is null");
+                return; 
+            }
 
-            toolBlock = CogSerializer.DeepCopyObject(toolblockArray[cameraSelected, toolSelected].toolBlock) as CogToolBlock;
-            cogToolBlockEditV21.Subject = new CogToolBlock();
-            cogToolBlockEditV21.Subject = toolBlock;
+            try
+            {
+                toolBlock = CogSerializer.DeepCopyObject(toolblockArray[cameraSelected, toolSelected].toolBlock) as CogToolBlock;
+                cogToolBlockEditV21.Subject = new CogToolBlock();
+                cogToolBlockEditV21.Subject = toolBlock;
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+
 
         }
         private void bttnUpdateImage_Click(object sender, EventArgs e)

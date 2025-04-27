@@ -281,7 +281,6 @@ namespace CognexVisionProForm
         private void UpdateButton()
         {
             numToolSelect.Enabled = !_form.PlcCommsActive;
-            numRecordSelect.Enabled = !_form.PlcCommsActive;
 
             bool imageControl = !_form.PlcCommsActive && !(camera.Snapping || camera.Acquiring || camera.Grabbing);
             bttnCameraSnap.Enabled = imageControl;
